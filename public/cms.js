@@ -19,7 +19,7 @@ putContent=function(data){
  firstPutContent(data);
  if(typeof venues!=='undefined'){
   for(const [code,key] of [['zyb','zyb'],['pob','pob'],['east','east']]){
-   if(data['venue_'+key+'_subtitle']!==undefined)venues[code].sub=data['venue_'+key+'_subtitle'];
+   for(const [suffix,prop] of [['subtitle','sub'],['desc','desc'],['second','second'],['features','features']]){const value=data['venue_'+key+'_'+suffix];if(value!==undefined)venues[code][prop]=value}for(const [idx,imageKey] of [[0,'gallery_'+key+'_1_image'],[1,'gallery_'+key+'_2_image']]){if(data[imageKey]&&venues[code].gallery)venues[code].gallery[idx]=data[imageKey]}
    if(data['venue_'+key+'_image'])venues[code].photo=data['venue_'+key+'_image'];
   }
  }
