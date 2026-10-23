@@ -74,6 +74,8 @@ async function api(request,env,url){const path=url.pathname;
 }
 export default {async fetch(request,env){const url=new URL(request.url),p=url.pathname;
  try{
+  // Serve the homepage explicitly when HTML URL canonicalisation is disabled.
+  if(p==='/')return env.ASSETS.fetch(new Request(new URL('/index.html',request.url),request));
   if(p==='/admin')return env.ASSETS.fetch(new Request(new URL('/admin.html',request.url),request));
   if(p==='/events')return env.ASSETS.fetch(new Request(new URL('/events.html',request.url),request));
   if(p.startsWith('/api/')){
