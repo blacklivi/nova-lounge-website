@@ -33,5 +33,22 @@
   ],
   "ai": {
     "binding": "AI"
+  },
+  "previews": {
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_id": "944d9466-f220-4c3e-904f-8a7afafe12f3"
+      }
+    ],
+    "r2_buckets": [
+      {
+        "binding": "MEDIA",
+        "bucket_name": "nova-website-media-preview"
+      }
+    ],
+    "ai": {
+      "binding": "AI"
+    }
   }
 }
