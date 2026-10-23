@@ -30,5 +30,8 @@
       "binding": "MEDIA",
       "bucket_name": "nova-website-media"
     }
-  ]
+  ],
+  "ai": {
+    "binding": "AI"
+  }
 }
