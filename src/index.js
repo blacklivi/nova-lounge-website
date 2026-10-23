@@ -18,11 +18,26 @@ function validImage(v){return !v||MEDIA_RE.test(v)||(/^\/media\/base-[A-Za-z0-9]
 function checkAuth(req,env){return authenticated(req,env)}
 function jsonSecurity(req){return originAllowed(req) && req.headers.get('x-nova-admin')==='1'}
 const venueIDs=new Set(['zyb','pob','east']);
+const CYR=/[А-Яа-яЁё]/;
+function shouldTranslate(key,value){
+ return Boolean(value&&CYR.test(value)&&!IMAGE_KEYS.has(key)&&!key.startsWith('menu_')&&!key.startsWith('instagram_')&&!key.startsWith('telegram_')&&!key.startsWith('phone_'));
+}
+async function translateToEnglish(env,source){
+ if(!source||!CYR.test(source))return source;
+ if(!env.AI)throw Error('ai_unavailable');
+ const r=await env.AI.run('@cf/meta/m2m100-1.2b',{text:source,source_lang:'ru',target_lang:'en'});
+ if(!r?.translated_text||typeof r.translated_text!=='string')throw Error('translation_failed');
+ return r.translated_text.trim().replace(/Zybitsk(?:aya|aya Street)?/gi,'Zybitskaya').replace(/Pobediteley Avenue Avenue/g,'Pobediteley Avenue');
+}
+async function translateEvent(env,b){
+ const t=await Promise.allSettled([translateToEnglish(env,b.title),translateToEnglish(env,b.description)]);
+ return {title_en:t[0].status==='fulfilled'?t[0].value:'',description_en:t[1].status==='fulfilled'?t[1].value:'',translation_pending:t.some(x=>x.status==='rejected')};
+}
 function validateEvent(b){const title=short(b.title,110),description=short(b.description,1300),date=short(b.starts_at,16),venue=short(b.venue,8),image_url=short(b.image_url,220);
  if(!title||!/^20\d\d-(0[1-9]|1[0-2])-([0-2]\d|3[01])T([01]\d|2[0-3]):[0-5]\d$/.test(date)||!venueIDs.has(venue)||!validImage(image_url))throw Error('invalid_event');return {title,description,starts_at:date,venue,image_url,published:b.published===false||b.published===0?0:1}}
-async function eventList(db,admin=false){const q=admin?'SELECT * FROM events ORDER BY starts_at DESC,created_at DESC':'SELECT id,title,description,starts_at,venue,image_url FROM events WHERE published = 1 ORDER BY starts_at ASC';return (await db.prepare(q).all()).results||[]}
+async function eventList(db,admin=false){const q=admin?'SELECT * FROM events ORDER BY starts_at DESC,created_at DESC':'SELECT id,title,description,title_en,description_en,starts_at,venue,image_url FROM events WHERE published = 1 ORDER BY starts_at ASC';return (await db.prepare(q).all()).results||[]}
 async function api(request,env,url){const path=url.pathname;
- if(path==='/api/content'&&request.method==='GET'){const rows=(await env.DB.prepare('SELECT key,value FROM site_content').all()).results||[];return respond({content:Object.fromEntries(rows.map(r=>[r.key,r.value]))})}
+ if(path==='/api/content'&&request.method==='GET'){const [ru,en]=await Promise.all([env.DB.prepare('SELECT key,value FROM site_content').all(),env.DB.prepare('SELECT key,value FROM site_content_en').all()]);return respond({content:Object.fromEntries((ru.results||[]).map(r=>[r.key,r.value])),content_en:Object.fromEntries((en.results||[]).map(r=>[r.key,r.value]))})}
  if(path==='/api/events'&&request.method==='GET'){return respond({events:await eventList(env.DB)})}
  if(path==='/api/admin/login'&&request.method==='POST'){
   if(!originAllowed(request))return error('origin_denied',403);
@@ -47,18 +62,30 @@ async function api(request,env,url){const path=url.pathname;
   if(request.method!=='PUT')return error('method_not_allowed',405);
   const b=await payload(request),entries=Object.entries(b.content||{});
   if(!entries.length||entries.length>32||entries.some(([k,v])=>!EDITABLE.has(k)||typeof v!=='string'||v.length>1600||(IMAGE_KEYS.has(k)&&!validImage(v))||((k.startsWith('instagram_')||k.startsWith('telegram_')||k.startsWith('menu_'))&&v&&!/^https:\/\/[\w.-]+(?:\/[^\s]*)?$/.test(v))))return error('invalid_content');
-  await env.DB.batch(entries.map(([k,v])=>env.DB.prepare('INSERT INTO site_content(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP').bind(k,v)));
-  return respond({ok:true,count:entries.length});
+  await env.DB.batch(entries.flatMap(([k,v])=>[
+    env.DB.prepare('INSERT INTO site_content(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP').bind(k,v),
+    env.DB.prepare('DELETE FROM site_content_en WHERE key=?').bind(k)
+  ]));
+  const translatable=entries.filter(([k,v])=>shouldTranslate(k,v));
+  const results=await Promise.allSettled(translatable.map(async ([k,v])=>{
+    const translated=await translateToEnglish(env,v);
+    await env.DB.prepare('INSERT INTO site_content_en(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP').bind(k,translated).run();
+    return k;
+  }));
+  return respond({ok:true,count:entries.length,translated:results.filter(x=>x.status==='fulfilled').length,
+    translation_pending:results.filter(x=>x.status==='rejected').length,
+    pending_keys:translatable.filter((x,i)=>results[i].status==='rejected').map(([k])=>k)});
+
  }
  if(path==='/api/admin/events'){
   if(request.method==='GET')return respond({events:await eventList(env.DB,true)});
-  if(request.method==='POST'){let b=validateEvent(await payload(request)),id=crypto.randomUUID();await env.DB.prepare('INSERT INTO events(id,title,description,starts_at,venue,image_url,published) VALUES(?,?,?,?,?,?,?)').bind(id,b.title,b.description,b.starts_at,b.venue,b.image_url,b.published).run();return respond({ok:true,id},201)}
+  if(request.method==='POST'){const b=validateEvent(await payload(request)),id=crypto.randomUUID();const en=await translateEvent(env,b);await env.DB.prepare('INSERT INTO events(id,title,description,title_en,description_en,starts_at,venue,image_url,published) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.published).run();return respond({ok:true,id,translation_pending:en.translation_pending},201)}
  }
  if(path.startsWith('/api/admin/events/')){
   const id=path.slice('/api/admin/events/'.length);
   if(!/^[0-9a-f-]{36}$/.test(id))return error('invalid_id');
   if(request.method==='DELETE'){await env.DB.prepare('DELETE FROM events WHERE id=?').bind(id).run();return respond({ok:true})}
-  if(request.method==='PUT'){const b=validateEvent(await payload(request));const r=await env.DB.prepare('UPDATE events SET title=?,description=?,starts_at=?,venue=?,image_url=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(b.title,b.description,b.starts_at,b.venue,b.image_url,b.published,id).run();return respond({ok:true,changed:r.meta?.changes||0})}
+  if(request.method==='PUT'){const b=validateEvent(await payload(request));const en=await translateEvent(env,b);const r=await env.DB.prepare('UPDATE events SET title=?,description=?,title_en=?,description_en=?,starts_at=?,venue=?,image_url=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.published,id).run();return respond({ok:true,changed:r.meta?.changes||0,translation_pending:en.translation_pending})}
  }
  if(path==='/api/admin/upload'&&request.method==='POST'){
   const type=request.headers.get('content-type')||'';if(!['image/jpeg','image/png','image/webp'].includes(type))return error('unsupported_image_type');
