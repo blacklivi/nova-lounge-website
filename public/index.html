@@ -124,6 +124,8 @@ footer{padding:34px clamp(26px,3vw,50px) 30px;display:flex;justify-content:space
 .events-heading-link{display:flex;align-items:center;justify-content:space-between;gap:20px;width:100%;color:var(--ink);padding:0}
 .events-heading-link .ui-arrow{width:26px;height:26px;margin:0;flex-shrink:0}
 @media(max-width:780px){
+ .venue-card{grid-template-columns:minmax(0,42fr) minmax(0,58fr);max-width:100%}
+ .venue-img,.venue-foot{min-width:0}
  .venue-card:nth-child(2) .venue-title{
   font-size:clamp(16px,4vw,24px);
   line-height:1.18;
@@ -135,6 +137,7 @@ footer{padding:34px clamp(26px,3vw,50px) 30px;display:flex;justify-content:space
  .venue-card:nth-child(2) .venue-description{max-width:calc(100% - 27px)}
  .events-block{padding-bottom:43px}
 }
+@media(max-width:420px){.venue-card{grid-template-columns:minmax(0,39fr) minmax(0,61fr)}}
 
 </style>
 <script defer src="/i18n.js"></script></head>
