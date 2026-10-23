@@ -1,12 +1,8 @@
 {
-  "name": "nova-lounge-website",
-  "private": true,
-  "version": "0.1.0",
-  "description": "NOVA Minsk lounge cafes — website design preview",
-  "scripts": {
-    "deploy": "wrangler deploy"
-  },
-  "devDependencies": {
-    "wrangler": "^4.102.0"
-  }
+  "name":"nova-lounge-website",
+  "version":"1.0.0",
+  "private":true,
+  "type":"module",
+  "scripts":{"deploy":"wrangler deploy","check":"node --check src/index.js && node --check public/admin.js && node --check public/cms.js && node --check public/events.js"},
+  "devDependencies":{"wrangler":"^4.102.0"}
 }
