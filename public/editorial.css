@@ -7,3 +7,8 @@
 .language-toggle button.is-active,.language-toggle button[aria-pressed="true"]{font-weight:700;color:var(--ink)}
 .language-toggle span{color:#a6aa9d}
 @media(max-width:570px){.language-toggle{gap:5px;margin-left:0}.e-header nav{gap:11px}}
+
+
+/* Text arrows are rendered as SVG, never substituted with iOS emoji glyphs. */
+.ui-arrow{width:1.1em;height:1.1em;display:inline-block;vertical-align:-.18em;flex-shrink:0;color:inherit;fill:none;pointer-events:none}
+a .ui-arrow,button .ui-arrow{width:1em;height:1em;margin-left:.25em}
