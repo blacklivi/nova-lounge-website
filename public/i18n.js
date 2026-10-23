@@ -63,6 +63,12 @@ Object.assign(WORDS,{
 "Локация":"Location","Закрыть":"Close",
 "INSTAGRAM — ССЫЛКИ БУДУТ ДОБАВЛЕНЫ":"INSTAGRAM — LINKS COMING SOON"
 });
+Object.assign(WORDS,{
+"Загрузка архива…":"Loading archive…",
+"МИНСК · ТРИ ПРОСТРАНСТВА":"MINSK · THREE LOCATIONS",
+"БРОНИРОВАНИЕ ↗":"BOOK A TABLE ↗",
+"NOVA — Пространства Минска • интерактивный прототип":"NOVA — Minsk locations"
+});
 const ordered=Object.entries(WORDS).sort((a,b)=>b[0].length-a[0].length);
 let lang="ru";try{lang=localStorage.getItem("nova-language")==="en"?"en":"ru"}catch(e){}
 const memory=new WeakMap();
