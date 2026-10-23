@@ -31,6 +31,38 @@ const WORDS={
 "Заявка отправлена":"Request submitted","Заявка подготовлена":"Request prepared","Скопировать заявку":"Copy request","Вернуться":"Back",
 "Пожалуйста, заполните форму.":"Please complete the form.","Выбрать заведение для брони":"Choose a location to book"
 };
+
+Object.assign(WORDS,{
+"Вернуться к заведению →":"Return to location →",
+"Прямые ссылки на QR-меню пока не предоставлены, поэтому переходы к ним не активированы.":"QR menu links have not yet been provided, so these links are inactive.",
+"Здесь будет открываться QR-меню именно заведения NOVA / ":"The QR menu for NOVA / ",
+"на отдельной платформе.":"will open on its dedicated platform.",
+"Ссылка на меню пока не подключена. В прототипе никаких переходов на меню других заведений нет.":"The menu link is not connected yet. This preview will not open a menu from another location.",
+"Вернуться к заведению":"Return to location",
+"Вечеринки и DJ-сеты проходят на Зыбицкой. Раздел готов к подключению актуальной афиши — без выдуманных дат и артистов.":"Parties and DJ sets take place at Zybitskaya. The events page will show confirmed dates and performers only.",
+"Подробнее о Зыбицкой →":"Explore Zybitskaya →",
+"Здесь будут только адрес, телефон, Instagram и часы работы NOVA / ":"This page will show the address, phone, Instagram and opening hours for NOVA / ",
+"Реальные контактные данные ещё не предоставлены. Они будут добавлены после подтверждения.":"Confirmed contact information will be added here when available.",
+"Выберите заведение, чтобы посмотреть его адрес, телефон и часы работы.":"Choose a location to see its address, phone and opening hours.",
+"Музыка, кухня и наши пространства. Здесь появится видео о NOVA, когда будет готов реальный видеоматериал.":"Music, food and our spaces. A NOVA film will appear here once original footage is available.",
+"Видео отсутствует — вместо него показан демонстрационный кадр.":"Video is not available yet; this is a temporary image.",
+"Предпросмотр • Telegram-бот":"Preview · Telegram bot","Заявка":"Request","готова.":"ready.","Такое сообщение получит администратор после подключения Telegram.":"This is the message the team will receive once Telegram is connected.",
+"Новая заявка на бронь":"New reservation request","Гостей:":"Guests:","Имя:":"Name:","Телефон:":"Phone:","Дата:":"Date:","Время:":"Time:",
+"Это только предварительный просмотр.":"This is a preview only.","Сообщение никому не отправлено, бронь не оформлена, введённые данные не сохранены.":"No message has been sent, no table is reserved, and the entered information is not saved.",
+"Проверить другую заявку →":"Review another request →",
+"NOVA / Зыбицкая, Минск":"NOVA / Zybitskaya, Minsk",
+"NOVA / проспект Победителей, Минск":"NOVA / Pobediteley Avenue, Minsk",
+"NOVA / район Восток, Минск":"NOVA / Vostok, Minsk",
+"проспект Победителей":"Pobediteley Avenue","район Восток":"Vostok district",
+"Меню":"Menu","Наше меню.":"Our menu.","Забронировать":"Reserve","Открыть форму бронирования":"Open booking form",
+"Демонстрационный режим":"Demo mode","Городская энергия":"City energy",
+"Ланчи":"Lunch","Вечернее меню":"Evening menu","Кальяны":"Shisha",
+"Основная навигация":"Main navigation","Навигация в подвале":"Footer navigation","Три заведения NOVA":"Three NOVA locations",
+"Пространства Минска":"Minsk locations",
+"СОБЫТИЯ NOVA":"NOVA EVENTS","Мероприятия":"Events",
+"Локация":"Location","Закрыть":"Close",
+"INSTAGRAM — ССЫЛКИ БУДУТ ДОБАВЛЕНЫ":"INSTAGRAM — LINKS COMING SOON"
+});
 const ordered=Object.entries(WORDS).sort((a,b)=>b[0].length-a[0].length);
 let lang="ru";try{lang=localStorage.getItem("nova-language")==="en"?"en":"ru"}catch(e){}
 const memory=new WeakMap();
@@ -64,7 +96,7 @@ function visit(root){if(root.nodeType===3){updateNode(root);return}if(root.nodeT
 }
 function sync(){document.documentElement.lang=lang;document.querySelectorAll("[data-language]").forEach(btn=>{
  const v=btn.dataset.language;btn.setAttribute("aria-pressed",String(v===lang));btn.classList.toggle("is-active",v===lang);
-});visit(document.body);if(document.title.includes("Пространства Минска"))document.title=lang==="en"?"NOVA — Minsk locations": "NOVA — Пространства Минска";else if(document.title.includes("События — NOVA")||document.title==="Events — NOVA Minsk")document.title=lang==="en"?"Events — NOVA Minsk":"События — NOVA Minsk";}
+});visit(document.body);if(document.title.includes("Пространства Минска")||document.title.includes("Minsk locations"))document.title=lang==="en"?"NOVA — Minsk locations": "NOVA — Пространства Минска";else if(document.title.includes("События — NOVA")||document.title==="Events — NOVA Minsk")document.title=lang==="en"?"Events — NOVA Minsk":"События — NOVA Minsk";}
 function set(next){if(next!=="en"&&next!=="ru")return;if(lang===next)return;lang=next;try{localStorage.setItem("nova-language",lang)}catch(e){}sync();document.dispatchEvent(new CustomEvent("nova:languagechange",{detail:{language:lang}}));}
 window.NOVAI18N={get language(){return lang},setLanguage:set,translate:english,apply:sync};
 function init(){document.addEventListener("click",e=>{const b=e.target.closest("[data-language]");if(b){e.preventDefault();set(b.dataset.language)}});sync();const observer=new MutationObserver(m=>{for(const entry of m){for(const node of entry.addedNodes)visit(node)}});observer.observe(document.body,{childList:true,subtree:true});}
