@@ -32,3 +32,25 @@
 .field input[type=date]::-webkit-calendar-picker-indicator,.field input[type=time]::-webkit-calendar-picker-indicator{opacity:.8;cursor:pointer;filter:grayscale(1)}
 .field input:focus,.field select:focus,.nova-select-trigger:focus-visible{border-color:var(--olive)}
 .field input::selection,.field select::selection{background:#dce6d4;color:#151813}
+
+
+/* Desktop-only calendar and time chooser: no platform-blue selection. */
+.nova-calendar{position:absolute;top:calc(100% + 4px);left:0;width:min(324px,85vw);background:#fff;border:1px solid #a7afa0;box-shadow:0 16px 35px rgba(10,25,10,.16);padding:14px;z-index:95;color:var(--ink)}
+.nova-calendar[hidden],.nova-time-list[hidden]{display:none!important}
+.nova-calendar-bar{display:grid;grid-template-columns:38px 1fr 38px;align-items:center;gap:6px;margin-bottom:13px;font:500 14px Manrope,Arial,sans-serif}
+.nova-calendar-bar>span{text-align:center;text-transform:capitalize}
+.nova-cal-nav{height:36px;background:#fff;border:1px solid #d5dbd0;color:var(--ink);cursor:pointer;font:500 22px/1 Manrope,Arial,sans-serif}
+.nova-cal-nav:disabled{opacity:.25;cursor:default}
+.nova-cal-nav:not(:disabled):hover{background:#e4eadd}
+.nova-cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;text-align:center}
+.nova-cal-grid>.nova-cal-weekday{display:grid;place-items:center;height:30px;font:500 11px Manrope,Arial,sans-serif;color:var(--muted)}
+.nova-cal-day{height:34px;border:0;background:transparent;font:400 13px Manrope,Arial,sans-serif;color:var(--ink);cursor:pointer}
+.nova-cal-day:hover,.nova-cal-day:focus-visible{background:#e4eadd;outline:2px solid var(--olive);outline-offset:-2px}
+.nova-cal-day[aria-selected=true]{background:var(--olive);color:#fff}
+.nova-cal-day:disabled{opacity:.25;cursor:default;background:transparent;outline:none}
+.nova-time-field{position:relative}
+.nova-time-field input{padding-right:45px}
+.nova-time-toggle{position:absolute;right:1px;top:calc(50% + 3px);width:42px;height:46px;border:0;border-left:1px solid #d9ded5;background:#fff;color:var(--olive);cursor:pointer;font:500 21px Manrope,Arial,sans-serif}
+.nova-time-toggle:hover,.nova-time-toggle:focus-visible{background:#e4eadd;outline:2px solid var(--olive);outline-offset:-2px}
+.nova-time-list{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid #a7afa0;box-shadow:0 12px 30px rgba(10,25,10,.13);height:min(240px,35vh);overflow:auto;z-index:95}
+@media (hover:none),(pointer:coarse){.nova-calendar,.nova-time-list,.nova-time-toggle,.nova-select{display:none!important}}
