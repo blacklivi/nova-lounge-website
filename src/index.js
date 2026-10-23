@@ -9,7 +9,7 @@ function error(code,status=400){return respond({ok:false,error:code},status)}
 function secureCookie(value,maxAge){return `nova_admin=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`}
 const utf8=s=>new TextEncoder().encode(s);
 const b64=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
-async function signature(secret,payload){const key=await crypto.subtle.importKey('raw',utf8(secret),'HMAC',false,['sign']);return b64(await crypto.subtle.sign('HMAC',key,utf8(payload)))}
+async function signature(secret,payload){const key=await crypto.subtle.importKey('raw',utf8(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return b64(await crypto.subtle.sign('HMAC',key,utf8(payload)))}
 async function authenticated(req,env){if(!env.ADMIN_SIGNING_KEY)return false;const m=(req.headers.get('cookie')||'').match(/(?:^|;\s*)nova_admin=([^;]+)/);if(!m)return false;const [expiry,sig]=m[1].split('.');if(!expiry||!sig||!/^[0-9]+$/.test(expiry)||Number(expiry)<Date.now())return false;return (await signature(env.ADMIN_SIGNING_KEY,expiry))===sig}
 function originAllowed(request){const origin=request.headers.get('origin');return !origin||origin===new URL(request.url).origin}
 async function payload(req){if(!req.headers.get('content-type')?.includes('application/json'))throw Error('json_required');const data=await req.json();if(!data||typeof data!=='object'||Array.isArray(data))throw Error('invalid_json');return data}
