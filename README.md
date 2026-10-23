@@ -22,3 +22,7 @@ npx wrangler deploy
 Для Cloudflare Workers Builds: репозиторий `blacklivi/nova-lounge-website`, ветка `main`, пустая команда сборки, команда публикации `npx wrangler deploy`.
 
 **Никогда не размещать ключ Telegram-бота в исходном коде или GitHub.** Для будущей серверной интеграции использовать Cloudflare Secrets.
+
+## Автоматические публикации
+
+С 23 октября 2026 года Cloudflare Workers Builds подключён к GitHub: коммиты ветки `main` должны автоматически запускать сборку и публикацию Worker `nova-lounge-demo`. Первая сборка проверяется отдельно; наличие соединения само по себе не подтверждает успешный деплой. Сайт AVE и другие Cloudflare Workers не участвуют в данном процессе.
