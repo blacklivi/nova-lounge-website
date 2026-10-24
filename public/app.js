@@ -99,15 +99,15 @@ function scrollToPosition(y,instant=false){
  const end=Math.max(0,Math.min(max,Math.round(y)));
  const start=scrollY,delta=end-start,distance=Math.abs(delta);
  if(instant||matchMedia('(prefers-reduced-motion: reduce)').matches||distance<3){
-  window.scrollTo({top:end,behavior:'instant'});
+  window.scrollTo({top:end,behavior:'auto'});
   updateTop();return;
  }
- const duration=Math.min(600,300+distance*.08);
+ const duration=Math.min(560,280+distance*.075);
  const beginning=performance.now();
  const tick=now=>{
   const progress=Math.min(1,(now-beginning)/duration);
   const eased=1-Math.pow(1-progress,3);
-  window.scrollTo({top:start+delta*eased,behavior:'instant'});
+  window.scrollTo({top:start+delta*eased,behavior:'auto'});
   if(progress<1)scrollFrame=requestAnimationFrame(tick);
   else{scrollFrame=0;updateTop();}
  };
