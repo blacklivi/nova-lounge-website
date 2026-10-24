@@ -89,8 +89,46 @@ const canonical=document.querySelector('link[rel="canonical"]');if(canonical)can
  app.querySelector('dialog').addEventListener('click',e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
  updateTop();
 }
-function scrollToHash(instant=false){const el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView({behavior:instant?'instant':motion()});}
-const motion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth';
+// Coordinated, bounded-duration anchor scrolling. Native smooth scroll can take
+// much longer for deep links and doesn't reliably account for the sticky header.
+let scrollFrame=0;
+function cancelGuidedScroll(){if(scrollFrame){cancelAnimationFrame(scrollFrame);scrollFrame=0;}}
+function scrollToPosition(y,instant=false){
+ cancelGuidedScroll();
+ const max=Math.max(0,document.documentElement.scrollHeight-innerHeight);
+ const end=Math.max(0,Math.min(max,Math.round(y)));
+ const start=scrollY,delta=end-start,distance=Math.abs(delta);
+ if(instant||matchMedia('(prefers-reduced-motion: reduce)').matches||distance<3){
+  window.scrollTo({top:end,behavior:'auto'});
+  updateTop();return;
+ }
+ const duration=Math.min(560,280+distance*.075);
+ const beginning=performance.now();
+ const tick=now=>{
+  const progress=Math.min(1,(now-beginning)/duration);
+  const eased=1-Math.pow(1-progress,3);
+  window.scrollTo({top:start+delta*eased,behavior:'auto'});
+  if(progress<1)scrollFrame=requestAnimationFrame(tick);
+  else{scrollFrame=0;updateTop();}
+ };
+ scrollFrame=requestAnimationFrame(tick);
+}
+function scrollToSection(id,instant=false){
+ const el=document.getElementById(id);
+ if(!el)return false;
+ const top=id==='top'?0:el.getBoundingClientRect().top+scrollY-(document.querySelector('.site-header')?.getBoundingClientRect().height||0)-12;
+ scrollToPosition(top,instant);return true;
+}
+function scrollToHash(instant=false){
+ const hash=location.hash;
+ if(hash.length>1)scrollToSection(decodeURIComponent(hash.slice(1)),instant);
+}
+// Allow visitors to interrupt a programmed scroll with ordinary touch, wheel or keyboard input.
+document.addEventListener('touchstart',cancelGuidedScroll,{passive:true});
+document.addEventListener('wheel',cancelGuidedScroll,{passive:true});
+document.addEventListener('keydown',e=>{
+ if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key))cancelGuidedScroll();
+});
 function setDrawer(open){
  drawerOpen=open;
  const toggle=document.querySelector('[data-drawer]');
@@ -178,23 +216,62 @@ function reviewBooking(e){
  document.getElementById('modal-title').focus();modalKind='review';
 }
 function updateTop(){const button=document.querySelector('[data-top]');if(button)button.hidden=scrollY<600;}
-function navigate(id){closeModal(true);if(drawerOpen)setDrawer(false);history.pushState({},'',ids.includes(id)?venueURL(id):id?'/#'+id:'/');render();if(ids.includes(id)){window.scrollTo({top:0,behavior:'instant'});document.querySelector('main').focus({preventScroll:true});}else scrollToHash();}
+function navigate(id){
+ closeModal(true);
+ if(drawerOpen)setDrawer(false);
+ const place=ids.includes(id);
+ const target=place?venueURL(id):id?'/#'+id:'/';
+ const current=location.pathname+location.hash;
+ if(current!==target)history.pushState({},'',target);
+ // Keeping the home DOM intact prevents the visible jump before smooth scrolling.
+ if(!place&&!selected){scrollToSection(id);return;}
+ cancelGuidedScroll();
+ render();
+ window.scrollTo({top:0,behavior:'instant'});
+ if(place){
+  document.querySelector('main')?.classList.add('route-enter');
+  document.querySelector('main')?.focus({preventScroll:true});
+ }else if(id){
+  scrollToSection(id);
+ }
+}
 document.addEventListener('click',e=>{
  const b=e.target.closest('button,a');if(!b)return;
  if(b.matches('[data-language]')){const next=b.dataset.language;if(next===language)return;const open=drawerOpen,kind=modalKind,id=modalVenue;language=next;try{localStorage.setItem('nova-language',language)}catch{}drawerOpen=false;document.body.classList.remove('lock');render();if(open)setDrawer(true);if(kind&&kind!=='review')openModal(kind,id);document.querySelector(`[data-language="${next}"]`)?.focus();return;}
  if(b.matches('[data-drawer]')){setDrawer(!drawerOpen);return;}
  if(b.matches('[data-modal]')){openModal(b.dataset.modal,b.dataset.venue||selected);return;}
  if(b.matches('[data-close]')){closeModal();return;}
- if(b.matches('[data-top]')){window.scrollTo({top:0,behavior:motion()});document.querySelector('.brand').focus({preventScroll:true});return;}
+ if(b.matches('[data-top]')){scrollToPosition(0);document.querySelector('.brand').focus({preventScroll:true});return;}
  if(b.matches('[data-place],[data-home]')&&!isEvents){e.preventDefault();navigate(b.dataset.place||b.dataset.home);return;}
- if(b.getAttribute('href')==='#contacts'&&drawerOpen)setDrawer(false);
+ // Footer anchors work from both the home page and /events without a native snap.
+ if(b.getAttribute('href')==='#contacts'){
+  e.preventDefault();
+  if(drawerOpen)setDrawer(false);
+  if(location.hash!=='#contacts')history.pushState({},'','#contacts');
+  scrollToSection('contacts');
+  return;
+ }
 });
 document.addEventListener('keydown',e=>{
  if(drawerOpen&&e.key==='Escape'){setDrawer(false);document.querySelector('[data-drawer]').focus();}
  if(drawerOpen&&e.key==='Tab'){const controls=[...document.querySelectorAll('.site-header button,.site-header a,#drawer a,#drawer button')].filter(x=>x.offsetParent!==null),first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
 });
 window.addEventListener('scroll',updateTop,{passive:true});
-window.addEventListener('popstate',()=>{closeModal(true);drawerOpen=false;document.body.classList.remove('lock');render();scrollToHash(true);});
+window.addEventListener('popstate',()=>{
+ cancelGuidedScroll();
+ closeModal(true);
+ if(drawerOpen)setDrawer(false);
+ // Going back between anchors on the same home page must not remount the page.
+ const stillOnHome=!isEvents&&!selected&&location.pathname==='/';
+ if(stillOnHome){
+  if(location.hash)scrollToHash(true);
+  else scrollToPosition(0,true);
+  return;
+ }
+ render();
+ if(location.hash)scrollToHash(true);
+ else window.scrollTo({top:0,behavior:'auto'});
+});
 matchMedia('(min-width:901px)').addEventListener('change',e=>{if(e.matches&&drawerOpen)setDrawer(false);});
 async function getJSON(url){const r=await fetch(url);if(!r.ok)throw Error(url+': '+r.status);return r.json();}
 try { defaults=await getJSON('/content-defaults.json'); } catch { app.innerHTML='<p class="loading">NOVA — '+t('Не удалось загрузить страницу. Обновите её.','Could not load the page. Please reload.')+'</p>';throw Error('Defaults unavailable'); }
