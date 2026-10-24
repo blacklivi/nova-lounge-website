@@ -16,7 +16,7 @@ function structuredBusiness(v,origin,override,defaults){
  name:'NOVA — '+v.name,url:origin+'/spaces/'+Object.keys(VENUES).find(k=>VENUES[k]===v),
  description:property('venue_'+id+'_desc')||v.description,
  telephone:property('phone_'+id)||v.phone,
- address:{'@type':'PostalAddress',streetAddress:property('address_'+id)||v.street,addressLocality:'Минск',addressCountry:'BY'},
+ address:{'@type':'PostalAddress',streetAddress:(property('address_'+id)||v.street).replace(/^Минск,?\s*/i,''),addressLocality:'Минск',addressCountry:'BY'},
  hasMap:property('map_'+id)||v.map,
  image:origin+(property('venue_'+id+'_image')||v.image),
  openingHoursSpecification:v.opening.map(x=>({'@type':'OpeningHoursSpecification',dayOfWeek:x.days,opens:'12:00',closes:x.closes})),
