@@ -36,7 +36,7 @@ function contactLinks(id){
  return `${phone&&validPhone(phone)?`<a class="footer-phone" href="tel:${esc(phone.replace(/[^+\d]/g,''))}">${text(phone)}</a>`:''}${instagram||telegram||route?`<div class="footer-socials">${instagram?`<a class="footer-social-icon" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="Instagram NOVA ${name(id)}" title="Instagram">${instagramMark}<span class="sr-only">Instagram</span></a>`:''}${telegram?`<a class="footer-social-text" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer">Telegram</a>`:''}${route?`<a class="footer-route footer-social-icon" href="${esc(route)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Показать NOVA на карте','View NOVA on map')} ${name(id)}" title="${t('На карте','View on map')}">${locationMark}</a>`:''}</div>`:''}`;
 }
 function footer(){return `<footer class="site-footer" id="contacts"><div class="footer-top"><div><a class="brand" href="/">NOVA</a><p data-content="footer_tagline">${content('footer_tagline')}</p></div></div><div class="footer-locations">${ids.map(id=>`<div class="footer-location"><h3><a href="${venueURL(id)}" data-place="${id}">NOVA / ${name(id)}</a></h3>${value('address_'+id)?`<p class="venue-address">${content('address_'+id)}</p>`:''}${value('hours_'+id)?`<p class="venue-hours">${content('hours_'+id)}</p>`:''}${contactLinks(id)}${!['address_','phone_','instagram_','telegram_','hours_','map_'].some(k=>value(k+id))?`<p class="muted">${t('Контакты уточняются','Contact details coming soon')}</p>`:''}</div>`).join('')}</div><div class="footer-bottom"><span>NOVA · MINSK</span><span>${t('Демонстрационная версия · заявки не отправляются','Demo website · booking requests are not sent')}</span></div></footer>`;}
-function layers(){return `<aside id="drawer" class="drawer" hidden aria-label="${t('Мобильная навигация','Mobile navigation')}"><nav>${nav()}</nav><button type="button" class="button" data-modal="booking">${bookingLabel()}</button><p>MINSK · LOUNGE CAFÉ</p></aside><div class="mobile-cta"><button class="button" data-modal="booking">${bookingLabel()}</button></div><button class="to-top" data-top hidden aria-label="${t('Наверх','Back to top')}">${arrow}</button><dialog class="modal" aria-labelledby="modal-title"><div class="modal-shell"><div class="modal-top"><span class="eyebrow">NOVA / <span id="modal-caption">MINSK</span></span><button class="close" data-close aria-label="${t('Закрыть окно','Close dialog')}">×</button></div><div id="modal-body"></div></div></dialog>`;}
+function layers(){return `<aside id="drawer" class="drawer" inert aria-hidden="true" aria-label="${t('Мобильная навигация','Mobile navigation')}"><nav>${nav()}</nav><button type="button" class="button" data-modal="booking">${bookingLabel()}</button><p>MINSK · LOUNGE CAFÉ</p></aside><div class="mobile-cta"><button class="button" data-modal="booking">${bookingLabel()}</button></div><button class="to-top" data-top hidden aria-label="${t('Наверх','Back to top')}">${arrow}</button><dialog class="modal" aria-labelledby="modal-title"><div class="modal-shell"><div class="modal-top"><span class="eyebrow">NOVA / <span id="modal-caption">MINSK</span></span><button class="close" data-close aria-label="${t('Закрыть окно','Close dialog')}">×</button></div><div id="modal-body"></div></div></dialog>`;}
 function eventCard(e,home=false){
  const title=language==='en'?(e.title_en||t('','Event — translation pending')):e.title;
  const desc=language==='en'?(e.description_en||''):e.description;
@@ -45,7 +45,7 @@ function eventCard(e,home=false){
  const poster=localImage(e.image_url);
  return `<${home?'a':'article'} ${home?`href="/events#event-${esc(e.id)}"`: `id="event-${esc(e.id)}"`} class="event-card ${poster?'':'no-image'}">${poster?`<img src="${esc(poster)}" alt="${text(title)}" loading="lazy" width="600" height="800">`:''}<div class="event-info"><time datetime="${esc(e.starts_at)}:00+03:00">${text(when)} · ${t('Минск','Minsk')}</time><h3>${text(title)}</h3>${!home&&desc?`<p>${text(desc)}</p>`:''}<div class="event-location">NOVA / ${name(e.venue)}</div></div></${home?'a':'article'}>`;
 }
-function home(){const next=splitEvents(events).upcoming[0];return `<section class="hero" id="top"><div class="hero-copy"><span class="eyebrow" data-content="hero_kicker">${content('hero_kicker')}</span><h1>NOVA</h1><p class="hero-tagline" data-content="hero_tagline">${content('hero_tagline')}</p></div><div class="hero-photo">${image('hero_image',t('Интерьер и коктейль — концептуальное изображение','Interior and cocktail — concept image'),true)}<div class="photo-side">${t('Еда<br>Люди<br>Музыка<br>Атмосфера','Food<br>People<br>Music<br>Atmosphere')}</div></div></section><section class="venues" id="venues" aria-labelledby="venues-heading"><h2 class="venues-heading" id="venues-heading">${t('ВЫБРАТЬ ЗАВЕДЕНИЕ','EXPLORE OUR SPACES')}</h2>${ids.map(id=>`<a class="venue-card" href="${venueURL(id)}" data-place="${id}"><div class="venue-img">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id))}</div><div class="venue-foot"><h3 class="venue-title">${name(id)}</h3><p class="venue-description" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</p></div></a>`).join('')}</section><section class="story" id="about"><div class="story-copy"><span class="eyebrow muted" data-content="story_kicker">${content('story_kicker')}</span><h2 data-content="story_title">${content('story_title')}</h2><p data-content="story_description">${content('story_description')}</p><button class="text-link" data-modal="menu">${t('Посмотреть меню','View the menu')}</button></div><figure class="story-photo">${image('story_image',t('Подача блюда — демонстрационное изображение','Food presentation — concept image'))}<figcaption class="image-note" data-content="media_note">${content('media_note')}</figcaption></figure></section><section class="home-events"><a class="section-link" href="/events"><h2>${t('События','Events')}</h2>${arrow}</a><div>${next?eventCard(next,true):`<p class="event-empty">${eventsFailed?t('Не удалось загрузить афишу. Повторите позже.','Could not load events. Please try again later.'):t('Новые встречи — скоро. Здесь появится ближайшее событие NOVA.','Our next event will be announced here soon.')}</p>`}</div></section><section class="book-strip" id="booking"><div class="book-image">${image('booking_image',t('Детали интерьера — концепция','Interior details — concept image'))}</div><button class="book-main" data-modal="booking"><span class="eyebrow">${t('Ждем вас','We look forward to seeing you')}</span><span class="book-title" data-content="booking_title">${content('booking_title')}</span></button></section>`;}
+function home(){const next=splitEvents(events).upcoming[0];return `<section class="hero" id="top"><div class="hero-copy"><span class="eyebrow" data-content="hero_kicker">${content('hero_kicker')}</span><h1>NOVA</h1><p class="hero-tagline" data-content="hero_tagline">${content('hero_tagline')}</p></div><div class="hero-photo">${image('hero_image',t('Интерьер и коктейль — концептуальное изображение','Interior and cocktail — concept image'),true)}<div class="photo-side">${t('Еда<br>Люди<br>Музыка<br>Атмосфера','Food<br>People<br>Music<br>Atmosphere')}</div></div></section><section class="venues" id="venues" aria-labelledby="venues-heading"><h2 class="venues-heading" id="venues-heading">${t('ВЫБРАТЬ ЗАВЕДЕНИЕ','EXPLORE OUR SPACES')}</h2>${ids.map(id=>`<a class="venue-card" href="${venueURL(id)}" data-place="${id}"><div class="venue-img">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id))}</div><div class="venue-foot"><h3 class="venue-title">${name(id)}</h3><p class="venue-description" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</p></div></a>`).join('')}</section><section class="story" id="about"><div class="story-copy"><span class="eyebrow muted" data-content="story_kicker">${content('story_kicker')}</span><h2 data-content="story_title">${content('story_title')}</h2><p data-content="story_description">${content('story_description')}</p><button class="text-link" data-modal="menu">${t('Посмотреть меню','View the menu')}</button></div><figure class="story-photo">${image('story_image',t('Подача блюда — демонстрационное изображение','Food presentation — concept image'))}<figcaption class="image-note" data-content="media_note">${content('media_note')}</figcaption></figure></section><section class="home-events"><a class="section-link" href="/events"><h2>${t('События','Events')}</h2>${arrow}</a><div>${next?eventCard(next,true):`<p class="event-empty">${eventsFailed?t('Не удалось загрузить афишу. Повторите позже.','Could not load events. Please try again later.'):t('Новые встречи — скоро. Здесь появится ближайшее событие NOVA.','Our next event will be announced here soon.')}</p>`}</div></section><section class="book-strip" id="booking"><div class="book-image">${image('booking_image',t('Детали интерьера — концепция','Interior details — concept image'))}</div><button class="book-main" type="button" data-modal="booking"><span class="book-welcome">${t('Мы с нетерпением ждём встречи с вами.','We look forward to seeing you.')}</span><span class="book-cta" data-content="booking_title">${content('booking_title')}</span></button></section>`;}
 function detail(id){return `<article class="detail"><a href="#venues" data-home="venues" class="detail-back">${arrow}${t('Все пространства NOVA','All NOVA spaces')}</a><div class="detail-grid"><div class="detail-copy"><span class="eyebrow muted">NOVA / MINSK</span><h1>${name(id)}</h1><div class="subtitle" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</div><p data-content="venue_${id}_desc">${content('venue_'+id+'_desc',t('Описание готовится.','Details coming soon.'))}</p><div class="detail-actions"><button class="button" data-modal="booking" data-venue="${id}">${bookingLabel()}</button><button class="button secondary" data-modal="menu-location" data-venue="${id}">${t('Посмотреть меню','View the menu')}</button></div></div><div class="detail-image">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id),true)}</div></div><div class="detail-bottom"><div><span class="eyebrow muted">${t('Атмосфера NOVA','NOVA atmosphere')}</span><h2>${t('В своём ритме.','Your kind of evening.')}</h2><p data-content="venue_${id}_second">${content('venue_'+id+'_second')}</p><p class="features" data-content="venue_${id}_features">${content('venue_'+id+'_features')}</p><button class="text-link" data-modal="contacts" data-venue="${id}">${t('Контакты и расположение','Contacts and directions')}</button></div><div><div class="detail-gallery">${[1,2].map(i=>image(`gallery_${id}_${i}_image`,t('Демонстрационное изображение','Concept image'))).join('')}</div><p class="image-note">${content('media_note')}</p></div></div></article>`;}
 function eventsPage(){const {upcoming,past}=splitEvents(events);return `<div class="events-page"><section class="events-intro"><span class="eyebrow muted">NOVA / MINSK</span><h1>${t('События','Events')}</h1><p>${t('Встречи, музыка и вечера, которые хочется повторить.','Music, good company and nights worth remembering.')}</p></section>${[[upcoming,t('Ближайшие','Coming up'),'future'],[past,t('Архив','Archive'),'archive']].map(([list,title,id])=>`<section class="events-section ${id}"><h2>${title}</h2><div class="events-list" id="${id}">${list.length?list.map(e=>eventCard(e)).join(''):`<p class="event-empty">${eventsFailed?t('Афиша временно недоступна.','Events are temporarily unavailable.'):id==='future'?t('Сейчас нет анонсированных мероприятий.','No upcoming events announced yet.'):t('Архив мероприятий пока пуст.','No past events yet.')}</p>`}</div></section>`).join('')}</div>`;}
 function render(){
@@ -66,31 +66,54 @@ const meta=document.querySelector('meta[name="description"]');
 if(meta)meta.content=selected?descriptions[selected][language==='en'?1:0]:isEvents?t('Афиша NOVA в Минске: DJ-сеты, вечеринки и ближайшие события.','NOVA events in Minsk: parties, DJ sets and upcoming nights.'):t('NOVA — три лаунж-кафе в Минске: Зыбицкая, Победителей и Восток. Кухня, ланчи, вечерние встречи и события.','NOVA — three lounge cafés in Minsk: Zybitskaya, Pobediteley and Vostok. Food, music and gatherings.');
 const canonical=document.querySelector('link[rel="canonical"]');if(canonical)canonical.href=location.origin+(isEvents?'/events':selected?venueURL(selected):'/');
  app.innerHTML=header()+`<main id="main" tabindex="-1">${isEvents?eventsPage():selected?detail(selected):home()}</main>`+footer()+layers();
- app.querySelector('dialog').addEventListener('close',closeModal);
+ app.querySelector('dialog').addEventListener('cancel',e=>{e.preventDefault();closeModal();});
+ app.querySelector('dialog').addEventListener('close',()=>{document.querySelector('dialog')?.classList.remove('is-visible');});
  app.querySelector('dialog').addEventListener('click',e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
  updateTop();
 }
 function scrollToHash(instant=false){const el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView({behavior:instant?'instant':motion()});}
 const motion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth';
-function setDrawer(open){drawerOpen=open;const toggle=document.querySelector('[data-drawer]');toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?t('Закрыть меню','Close menu'):t('Открыть меню','Open menu'));document.querySelector('#drawer').hidden=!open;document.body.classList.toggle('lock',open);for(const s of ['main','.site-footer','.mobile-cta'])document.querySelector(s).inert=open;}
-function closeModal(){
+function setDrawer(open){
+ drawerOpen=open;
+ const toggle=document.querySelector('[data-drawer]');
+ const drawer=document.querySelector('#drawer');
+ if(!toggle||!drawer)return;
+ toggle.setAttribute('aria-expanded',String(open));
+ toggle.setAttribute('aria-label',open?t('Закрыть меню','Close menu'):t('Открыть меню','Open menu'));
+ drawer.classList.toggle('is-open',open);
+ drawer.inert=!open;
+ drawer.setAttribute('aria-hidden',String(!open));
+ document.body.classList.toggle('lock',open);
+ for(const selector of ['main','.site-footer','.mobile-cta']){const el=document.querySelector(selector);if(el)el.inert=open;}
+}
+let modalCloseTimer=null;
+function closeModal(instant=false){
  const dialog=document.querySelector('dialog');
  if(!dialog)return;
- const previousFocus=lastFocus;
- if(dialog.open)dialog.close();
- document.body.classList.remove('lock');
- modalKind='';
- lastFocus=null;
- if(!previousFocus?.isConnected)return;
- if(keyboardModalInteraction){
-  // Keyboard users return to the original trigger without changing scroll position.
-  previousFocus.focus({preventScroll:true});
- }else{
-  // Mobile Safari may automatically focus the opening button when a dialog closes.
-  // Do not force that focus after touch input: it draws an unwanted full-width outline.
-  if(document.activeElement===previousFocus)previousFocus.blur();
-  requestAnimationFrame(()=>{if(document.activeElement===previousFocus)previousFocus.blur();});
+ if(modalCloseTimer!==null){
+  if(!instant)return;
+  clearTimeout(modalCloseTimer);modalCloseTimer=null;
  }
+ const previousFocus=lastFocus;
+ dialog.classList.remove('is-visible');
+ const finish=()=>{
+  modalCloseTimer=null;
+  if(dialog.open)dialog.close();
+  if(!drawerOpen)document.body.classList.remove('lock');
+  modalKind='';
+  lastFocus=null;
+  if(!previousFocus?.isConnected)return;
+  if(keyboardModalInteraction){
+   previousFocus.focus({preventScroll:true});
+  }else{
+   // Avoid the full-panel focus ring iOS Safari shows after touch dismissal.
+   if(document.activeElement===previousFocus)previousFocus.blur();
+   requestAnimationFrame(()=>{if(document.activeElement===previousFocus)previousFocus.blur();});
+  }
+ };
+ if(dialog.open&&!instant&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+  modalCloseTimer=setTimeout(finish,260);
+ }else finish();
 }
 function contactPanel(id){const address=value('address_'+id),hours=value('hours_'+id),links=contactLinks(id);return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p>${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;}
 function openModal(kind,id=selected){
@@ -112,7 +135,13 @@ function openModal(kind,id=selected){
  }else if(kind==='menu-location'){
  body.innerHTML=`<h2 id="modal-title">${t('Меню','Menu')} / ${name(id)}</h2><p class="intro">${t('Ссылка на меню этого заведения пока не подключена.','The menu for this space is coming soon.')}</p><button class="button secondary" data-close>${t('Закрыть','Close')}</button>`;
  }else if(kind==='contacts')body.innerHTML=`<h2 id="modal-title">${t('Контакты','Contacts')} / ${name(id)}</h2>${contactPanel(id)}`;
- if(!dialog.open)dialog.showModal();document.body.classList.add('lock');
+ if(modalCloseTimer!==null){clearTimeout(modalCloseTimer);modalCloseTimer=null;}
+ dialog.classList.remove('is-visible');
+ if(!dialog.open)dialog.showModal();
+ document.body.classList.add('lock');
+ // Force the closed visual state before the entrance transition starts.
+ void dialog.offsetWidth;
+ requestAnimationFrame(()=>{if(dialog.open)dialog.classList.add('is-visible');});
  // Move initial focus to the labelled dialog heading; avoid an autofocus ring on Close in iOS Safari.
  const heading=body.querySelector('#modal-title');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
 }
@@ -131,7 +160,7 @@ function reviewBooking(e){
  document.getElementById('modal-title').focus();modalKind='review';
 }
 function updateTop(){const button=document.querySelector('[data-top]');if(button)button.hidden=scrollY<600;}
-function navigate(id){closeModal();if(drawerOpen)setDrawer(false);history.pushState({},'',ids.includes(id)?venueURL(id):id?'/#'+id:'/');render();if(ids.includes(id)){window.scrollTo({top:0,behavior:'instant'});document.querySelector('main').focus({preventScroll:true});}else scrollToHash();}
+function navigate(id){closeModal(true);if(drawerOpen)setDrawer(false);history.pushState({},'',ids.includes(id)?venueURL(id):id?'/#'+id:'/');render();if(ids.includes(id)){window.scrollTo({top:0,behavior:'instant'});document.querySelector('main').focus({preventScroll:true});}else scrollToHash();}
 document.addEventListener('click',e=>{
  const b=e.target.closest('button,a');if(!b)return;
  if(b.matches('[data-language]')){const next=b.dataset.language;if(next===language)return;const open=drawerOpen,kind=modalKind,id=modalVenue;language=next;try{localStorage.setItem('nova-language',language)}catch{}drawerOpen=false;document.body.classList.remove('lock');render();if(open)setDrawer(true);if(kind&&kind!=='review')openModal(kind,id);document.querySelector(`[data-language="${next}"]`)?.focus();return;}
@@ -147,7 +176,7 @@ document.addEventListener('keydown',e=>{
  if(drawerOpen&&e.key==='Tab'){const controls=[...document.querySelectorAll('.site-header button,.site-header a,#drawer a,#drawer button')].filter(x=>x.offsetParent!==null),first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
 });
 window.addEventListener('scroll',updateTop,{passive:true});
-window.addEventListener('popstate',()=>{closeModal();drawerOpen=false;document.body.classList.remove('lock');render();scrollToHash(true);});
+window.addEventListener('popstate',()=>{closeModal(true);drawerOpen=false;document.body.classList.remove('lock');render();scrollToHash(true);});
 matchMedia('(min-width:901px)').addEventListener('change',e=>{if(e.matches&&drawerOpen)setDrawer(false);});
 async function getJSON(url){const r=await fetch(url);if(!r.ok)throw Error(url+': '+r.status);return r.json();}
 try { defaults=await getJSON('/content-defaults.json'); } catch { app.innerHTML='<p class="loading">NOVA — '+t('Не удалось загрузить страницу. Обновите её.','Could not load the page. Please reload.')+'</p>';throw Error('Defaults unavailable'); }
