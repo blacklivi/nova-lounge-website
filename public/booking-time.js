@@ -4,8 +4,9 @@ export function enhanceBookingTime(form,language){
  const input=form.elements.time;if(!input)return;
  input.type='text';input.inputMode='numeric';input.pattern='(?:[01][0-9]|2[0-3]):[0-5][0-9]';input.autocomplete='off';input.placeholder='HH:MM';
  const field=input.closest('.field');field.classList.add('nova-time-field');
- const trigger=document.createElement('button');trigger.type='button';trigger.className='nova-time-toggle';trigger.textContent='⌄';trigger.setAttribute('aria-label',language==='en'?'Choose time':'Выбрать время');trigger.setAttribute('aria-expanded','false');
- const list=document.createElement('div');list.className='nova-time-list';list.setAttribute('role','listbox');list.hidden=true;
+ const control=document.createElement('div');control.className='nova-time-control';input.before(control);control.append(input);
+ const trigger=document.createElement('button');trigger.type='button';trigger.className='nova-time-toggle';trigger.textContent='';trigger.setAttribute('aria-label',language==='en'?'Choose time':'Выбрать время');trigger.setAttribute('aria-expanded','false');trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-controls','nova-time-options');
+ const list=document.createElement('div');list.className='nova-time-list';list.setAttribute('role','listbox');list.id='nova-time-options';list.hidden=true;
  const close=()=>{list.hidden=true;trigger.setAttribute('aria-expanded','false')};
  const items=[];
  for(let i=0;i<96;i++){
@@ -15,7 +16,10 @@ export function enhanceBookingTime(form,language){
    item.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();items[(items.indexOf(item)+items.length+(e.key==='ArrowDown'?1:-1))%items.length].focus()}else if(e.key==='Escape'){e.preventDefault();close();input.focus()}});
    list.append(item);items.push(item);
  }
- trigger.addEventListener('click',()=>{if(!list.hidden){close();return}list.hidden=false;trigger.setAttribute('aria-expanded','true');const match=items.find(x=>x.textContent===input.value)||items[76];match.scrollIntoView({block:'center'})});
+ trigger.addEventListener('click',()=>{if(!list.hidden){close();return}list.hidden=false;trigger.setAttribute('aria-expanded','true');const match=items.find(x=>x.textContent===input.value)||items[76];list.scrollTop=Math.max(0,match.offsetTop-list.offsetTop-list.clientHeight/2)});
  input.addEventListener('input',()=>input.setCustomValidity(''));
- field.append(trigger,list);field.addEventListener('focusout',e=>{if(!field.contains(e.relatedTarget))close()});
+ control.append(trigger,list);
+ control.addEventListener('focusout',e=>{if(!control.contains(e.relatedTarget))close()});
+ const outside=e=>{if(!control.contains(e.target))close()};document.addEventListener('pointerdown',outside);
+ form.closest('dialog')?.addEventListener('close',()=>document.removeEventListener('pointerdown',outside),{once:true});
 }
