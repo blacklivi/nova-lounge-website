@@ -9,6 +9,11 @@ let language = 'ru';
 try { language = localStorage.getItem('nova-language') === 'en' ? 'en' : 'ru'; } catch {}
 let defaults = {content:{},content_en:{}}, source = {}, events = [], contentFailed = false, eventsFailed = false;
 let selected = null, lastFocus = null, modalKind = '', modalVenue = '', drawerOpen = false;
+// Keep keyboard focus restoration accessible without leaving a focus ring after touch taps.
+let keyboardModalInteraction = false;
+document.addEventListener('pointerdown',()=>{keyboardModalInteraction=false;},{capture:true});
+document.addEventListener('touchstart',()=>{keyboardModalInteraction=false;},{capture:true,passive:true});
+document.addEventListener('keydown',e=>{if(['Tab','Enter',' ','Escape'].includes(e.key))keyboardModalInteraction=true;},{capture:true});
 const t = (ru,en) => language === 'en' ? en : ru;
 const text = value => esc(typography(value,language));
 const name = id => names[language][id] || 'NOVA';
@@ -50,7 +55,25 @@ function render(){
 function scrollToHash(instant=false){const el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView({behavior:instant?'instant':motion()});}
 const motion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth';
 function setDrawer(open){drawerOpen=open;const toggle=document.querySelector('[data-drawer]');toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?t('Закрыть меню','Close menu'):t('Открыть меню','Open menu'));document.querySelector('#drawer').hidden=!open;document.body.classList.toggle('lock',open);for(const s of ['main','.site-footer','.mobile-cta'])document.querySelector(s).inert=open;}
-function closeModal(){const dialog=document.querySelector('dialog');if(dialog.open)dialog.close();document.body.classList.remove('lock');modalKind='';lastFocus?.focus?.();lastFocus=null;}
+function closeModal(){
+ const dialog=document.querySelector('dialog');
+ if(!dialog)return;
+ const previousFocus=lastFocus;
+ if(dialog.open)dialog.close();
+ document.body.classList.remove('lock');
+ modalKind='';
+ lastFocus=null;
+ if(!previousFocus?.isConnected)return;
+ if(keyboardModalInteraction){
+  // Keyboard users return to the original trigger without changing scroll position.
+  previousFocus.focus({preventScroll:true});
+ }else{
+  // Mobile Safari may automatically focus the opening button when a dialog closes.
+  // Do not force that focus after touch input: it draws an unwanted full-width outline.
+  if(document.activeElement===previousFocus)previousFocus.blur();
+  requestAnimationFrame(()=>{if(document.activeElement===previousFocus)previousFocus.blur();});
+ }
+}
 function contactPanel(id){const address=value('address_'+id),hours=value('hours_'+id),links=contactLinks(id);return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p>${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p>${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;}
 function openModal(kind,id=selected){
  if(drawerOpen)setDrawer(false);
