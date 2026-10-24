@@ -79,7 +79,7 @@ function reviewBooking(e){
  e.preventDefault();const form=e.currentTarget,fd=new FormData(form),phone=form.elements.phone;
  if(!ids.includes(fd.get('venue'))){const btn=form.querySelector('.nova-select-trigger');if(btn){btn.setAttribute('aria-invalid','true');btn.focus()}else{form.elements.venue.setCustomValidity(t('Выберите заведение','Choose a space'));form.elements.venue.reportValidity()}return;}
  const bookingTime=String(fd.get('time')||'');
- if(!/^(?:[01]\\d|2[0-3]):(?:00|15|30|45)$/.test(bookingTime)){
+ if(!/^(?:[01]\d|2[0-3]):(?:00|15|30|45)$/.test(bookingTime)){
   const field=form.elements.time;field.setCustomValidity(t('Выберите время с шагом 15 минут.','Choose a time in 15-minute intervals.'));field.reportValidity();field.addEventListener('change',()=>field.setCustomValidity(''),{once:true});return;
  }
  if(!validPhone(phone.value)){const error=t('Введите корректный номер: от 7 до 15 цифр; +375 и 9 цифр для Беларуси.','Enter a valid number: 7–15 digits, or +375 followed by 9 digits for Belarus.');phone.setCustomValidity(error);document.getElementById('phone-error').textContent=error;phone.reportValidity();return;}
