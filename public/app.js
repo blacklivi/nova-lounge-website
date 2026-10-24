@@ -50,9 +50,9 @@ function render(){
  document.documentElement.lang=language;
  selected=!isEvents?(paths[location.pathname.split('/')[2]]||(ids.includes(location.hash.slice(1))?location.hash.slice(1):null)):null;
  const titles={
- zyb:['NOVA Зыбицкая — лаунж-кафе, DJ и вечеринки в Минске','NOVA Zybitskaya — DJ nights & lounge café in Minsk'],
- pob:['NOVA Победителей — кафе для встреч в Минске','NOVA Pobediteley — lounge café in Minsk'],
- east:['NOVA Восток — кафе на Франциска Скорины, 2','NOVA Vostok — lounge café in Minsk']
+ zyb:['NOVA Зыбицкая — лаунж-кафе и DJ-вечеринки в Минске','NOVA Zybitskaya — DJ nights & lounge café in Minsk'],
+ pob:['NOVA Победителей — лаунж-кафе на проспекте Победителей, 89/3','NOVA Pobediteley — lounge café in Minsk'],
+ east:['NOVA Восток — лаунж-кафе на Франциска Скорины, 2','NOVA Vostok — lounge café in Minsk']
 };
 const descriptions={
  zyb:['NOVA Зыбицкая, 2: ланчи, кухня, DJ-сеты и вечеринки в центре Минска. Телефон +375 25 722-33-33.','NOVA at 2 Zybitskaya Street, Minsk: food, DJ sets and late-night events. Call +375 25 722-33-33.'],
