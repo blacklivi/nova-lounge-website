@@ -36,17 +36,17 @@
     "phone_zyb": "+375 25 722-33-33",
     "hours_zyb": "Пн–чт, вс: 12:00–02:00\nПт–сб: 12:00–05:00",
     "instagram_zyb": "https://www.instagram.com/myata.lounge.minsk/",
-    "map_zyb": "https://yandex.ru/maps/?rtext=~53.905828%2C27.560007&rtt=auto",
+    "map_zyb": "https://yandex.ru/maps/org/80044003602",
     "address_pob": "пр-т Победителей, 89/3",
     "phone_pob": "+375 25 644-33-33",
     "hours_pob": "Ежедневно: 12:00–02:00",
     "instagram_pob": "https://www.instagram.com/myata.lounge.minsk/",
-    "map_pob": "https://yandex.ru/maps/?rtext=~53.932639%2C27.504087&rtt=auto",
+    "map_pob": "https://yandex.ru/maps/org/myata_lounge/1498688403",
     "address_east": "ул. Франциска Скорины, 2",
     "phone_east": "+375 44 791-33-33",
     "hours_east": "Пн–чт, вс: 12:00–02:00\nПт–сб: 12:00–04:00",
     "instagram_east": "https://www.instagram.com/myata.lounge.minsk/",
-    "map_east": "https://yandex.ru/maps/?rtext=~53.927985%2C27.643066&rtt=auto"
+    "map_east": "https://yandex.ru/maps/org/136614972290"
   },
   "content_en": {
     "venue_zyb_subtitle": "Parties / DJ sets / City energy",
@@ -85,16 +85,16 @@
     "phone_zyb": "+375 25 722-33-33",
     "hours_zyb": "Mon–Thu, Sun: 12 PM–2 AM\nFri–Sat: 12 PM–5 AM",
     "instagram_zyb": "https://www.instagram.com/myata.lounge.minsk/",
-    "map_zyb": "https://yandex.ru/maps/?rtext=~53.905828%2C27.560007&rtt=auto",
+    "map_zyb": "https://yandex.ru/maps/org/80044003602",
     "address_pob": "89/3 Pobediteley Ave.",
     "phone_pob": "+375 25 644-33-33",
     "hours_pob": "Daily: 12 PM–2 AM",
     "instagram_pob": "https://www.instagram.com/myata.lounge.minsk/",
-    "map_pob": "https://yandex.ru/maps/?rtext=~53.932639%2C27.504087&rtt=auto",
+    "map_pob": "https://yandex.ru/maps/org/myata_lounge/1498688403",
     "address_east": "2 Francyska Skaryny St.",
     "phone_east": "+375 44 791-33-33",
     "hours_east": "Mon–Thu, Sun: 12 PM–2 AM\nFri–Sat: 12 PM–4 AM",
     "instagram_east": "https://www.instagram.com/myata.lounge.minsk/",
-    "map_east": "https://yandex.ru/maps/?rtext=~53.927985%2C27.643066&rtt=auto"
+    "map_east": "https://yandex.ru/maps/org/136614972290"
   }
 }
