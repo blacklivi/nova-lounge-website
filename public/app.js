@@ -261,10 +261,16 @@ window.addEventListener('popstate',()=>{
  cancelGuidedScroll();
  closeModal(true);
  if(drawerOpen)setDrawer(false);
- // Browser history should restore locations immediately, never replay a long animation.
+ // Going back between anchors on the same home page must not remount the page.
+ const stillOnHome=!isEvents&&!selected&&location.pathname==='/';
+ if(stillOnHome){
+  if(location.hash)scrollToHash(true);
+  else scrollToPosition(0,true);
+  return;
+ }
  render();
  if(location.hash)scrollToHash(true);
- else if(selected)window.scrollTo({top:0,behavior:'instant'});
+ else window.scrollTo({top:0,behavior:'auto'});
 });
 matchMedia('(min-width:901px)').addEventListener('change',e=>{if(e.matches&&drawerOpen)setDrawer(false);});
 async function getJSON(url){const r=await fetch(url);if(!r.ok)throw Error(url+': '+r.status);return r.json();}
