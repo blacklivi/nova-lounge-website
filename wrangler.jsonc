@@ -14,7 +14,10 @@
       "/api/*",
       "/media/upload-*",
       "/admin",
-      "/events"
+      "/events",
+      "/spaces/*",
+      "/robots.txt",
+      "/sitemap.xml"
     ],
     "html_handling": "none"
   },
