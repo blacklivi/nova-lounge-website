@@ -38,7 +38,7 @@ function fallback(route,v,origin,over,def){
   const n=htmlEscape(v.name),desc=htmlEscape(val('venue_'+v.id+'_desc')||v.description);
   const address=htmlEscape(val('address_'+v.id)||v.street),phone=htmlEscape(val('phone_'+v.id)||v.phone);
   const map=htmlEscape(val('map_'+v.id)||v.map);
-  return '<main id="seo-fallback"><h1>NOVA — '+n+'</h1><p>'+desc+'</p><address>'+address+', Минск</address><p><a href="tel:'+phone.replace(/[^\d+]/g,'')+'">'+phone+'</a></p><p><a href="'+map+'">Показать на карте и построить маршрут</a></p><nav><a href="/">Все пространства NOVA</a></nav></main>';
+  return '<main id="seo-fallback"><h1>NOVA — '+n+'</h1><p>'+desc+'</p><address>'+address+', Минск</address><p><a href="tel:'+phone.replace(/[^\d+]/g,'')+'">'+phone+'</a></p><p><a href="'+map+'">Открыть карточку заведения на карте</a></p><nav><a href="/">Все пространства NOVA</a></nav></main>';
  }
  if(route==='/events')return '<main id="seo-fallback"><h1>События NOVA в Минске</h1><p>Афиша вечеринок и DJ-сетов NOVA.</p><a href="/">Все пространства</a></main>';
  return '<main id="seo-fallback"><h1>NOVA — три лаунж-кафе в Минске</h1><p>Зыбицкая, Победителей и Восток: кухня, встречи, вечеринки и ланчи.</p><ul>'+Object.entries(VENUES).map(([slug,item])=>'<li><a href="/spaces/'+slug+'">NOVA '+htmlEscape(item.name)+' — '+htmlEscape(item.street)+'</a></li>').join('')+'</ul></main>';
