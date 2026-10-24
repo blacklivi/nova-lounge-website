@@ -31,7 +31,22 @@
     "booking_title": "Забронировать\nстол",
     "booking_image": "/media/clean-10ba4a5fc7477c.jpg",
     "footer_tagline": "Три пространства для встреч в Минске.",
-    "media_note": "Демонстрационные изображения. Реальные фотографии NOVA готовятся."
+    "media_note": "Демонстрационные изображения. Реальные фотографии NOVA готовятся.",
+    "address_zyb": "Минск, ул. Зыбицкая, 2",
+    "phone_zyb": "+375 25 722-33-33",
+    "hours_zyb": "Пн–чт, вс: 12:00–02:00; пт–сб: 12:00–05:00",
+    "instagram_zyb": "https://www.instagram.com/myata.lounge.minsk/",
+    "map_zyb": "https://yandex.ru/maps/org/80044003602",
+    "address_pob": "Минск, просп. Победителей, 89, корп. 3, 2-й этаж",
+    "phone_pob": "+375 25 644-33-33",
+    "hours_pob": "Ежедневно: 12:00–02:00",
+    "instagram_pob": "https://www.instagram.com/myata.lounge.minsk/",
+    "map_pob": "https://yandex.ru/maps/org/myata_lounge/1498688403",
+    "address_east": "Минск, ул. Франциска Скорины, 2",
+    "phone_east": "+375 44 791-33-33",
+    "hours_east": "Пн–чт, вс: 12:00–02:00; пт–сб: 12:00–04:00",
+    "instagram_east": "https://www.instagram.com/myata.lounge.minsk/",
+    "map_east": "https://yandex.ru/maps/org/136614972290"
   },
   "content_en": {
     "venue_zyb_subtitle": "Parties / DJ sets / City energy",
@@ -65,6 +80,21 @@
     "booking_title": "Reserve\na table",
     "booking_image": "/media/clean-10ba4a5fc7477c.jpg",
     "footer_tagline": "Three spaces to meet, unwind and stay awhile in Minsk.",
-    "media_note": "Concept photography. Original images of NOVA will be added soon."
+    "media_note": "Concept photography. Original images of NOVA will be added soon.",
+    "address_zyb": "2 Zybitskaya Street, Minsk",
+    "phone_zyb": "+375 25 722-33-33",
+    "hours_zyb": "Mon–Thu, Sun: 12:00–02:00; Fri–Sat: 12:00–05:00",
+    "instagram_zyb": "https://www.instagram.com/myata.lounge.minsk/",
+    "map_zyb": "https://yandex.ru/maps/org/80044003602",
+    "address_pob": "89/3 Pobediteley Avenue, 2nd floor, Minsk",
+    "phone_pob": "+375 25 644-33-33",
+    "hours_pob": "Daily: 12:00–02:00",
+    "instagram_pob": "https://www.instagram.com/myata.lounge.minsk/",
+    "map_pob": "https://yandex.ru/maps/org/myata_lounge/1498688403",
+    "address_east": "2 Francyska Skaryny Street, Minsk",
+    "phone_east": "+375 44 791-33-33",
+    "hours_east": "Mon–Thu, Sun: 12:00–02:00; Fri–Sat: 12:00–04:00",
+    "instagram_east": "https://www.instagram.com/myata.lounge.minsk/",
+    "map_east": "https://yandex.ru/maps/org/136614972290"
   }
 }

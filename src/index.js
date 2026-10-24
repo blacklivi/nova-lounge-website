@@ -1,6 +1,7 @@
+import {publicPage,seoRoute,isPublicPage} from './seo.js';
 // NOVA website — API for editorial content, events, media and protected admin.
 // Secrets ADMIN_PASSWORD and ADMIN_SIGNING_KEY are Cloudflare Worker secrets, never committed.
-const EDITABLE = new Set(['hero_tagline','hero_kicker','hero_image','story_title','story_description','story_kicker','story_image','booking_title','booking_image','venue_zyb_image','venue_pob_image','venue_east_image','venue_zyb_subtitle','venue_pob_subtitle','venue_east_subtitle','venue_zyb_desc','venue_pob_desc','venue_east_desc','venue_zyb_second','venue_pob_second','venue_east_second','venue_zyb_features','venue_pob_features','venue_east_features','gallery_zyb_1_image','gallery_zyb_2_image','gallery_pob_1_image','gallery_pob_2_image','gallery_east_1_image','gallery_east_2_image','instagram_zyb','instagram_pob','instagram_east','telegram_zyb','telegram_pob','telegram_east','menu_zyb','menu_pob','menu_east','address_zyb','address_pob','address_east','phone_zyb','phone_pob','phone_east','footer_tagline','media_note','hours_zyb','hours_pob','hours_east']);
+const EDITABLE = new Set(['hero_tagline','hero_kicker','hero_image','story_title','story_description','story_kicker','story_image','booking_title','booking_image','venue_zyb_image','venue_pob_image','venue_east_image','venue_zyb_subtitle','venue_pob_subtitle','venue_east_subtitle','venue_zyb_desc','venue_pob_desc','venue_east_desc','venue_zyb_second','venue_pob_second','venue_east_second','venue_zyb_features','venue_pob_features','venue_east_features','gallery_zyb_1_image','gallery_zyb_2_image','gallery_pob_1_image','gallery_pob_2_image','gallery_east_1_image','gallery_east_2_image','instagram_zyb','instagram_pob','instagram_east','telegram_zyb','telegram_pob','telegram_east','menu_zyb','menu_pob','menu_east','address_zyb','address_pob','address_east','phone_zyb','phone_pob','phone_east','footer_tagline','media_note','hours_zyb','hours_pob','hours_east','map_zyb','map_pob','map_east']);
 const IMAGE_KEYS = new Set([...EDITABLE].filter(k=>k.endsWith('_image')));
 const MEDIA_RE=/^\/media\/[A-Za-z0-9_.-]+\.(?:jpg|png|webp)$/;
 const noStore={ 'Cache-Control':'no-store', 'X-Content-Type-Options':'nosniff'};
@@ -20,7 +21,7 @@ function jsonSecurity(req){return originAllowed(req) && req.headers.get('x-nova-
 const venueIDs=new Set(['zyb','pob','east']);
 const CYR=/[А-Яа-яЁё]/;
 function shouldTranslate(key,value){
- return Boolean(value&&CYR.test(value)&&!IMAGE_KEYS.has(key)&&!key.startsWith('menu_')&&!key.startsWith('instagram_')&&!key.startsWith('telegram_')&&!key.startsWith('phone_'));
+ return Boolean(value&&CYR.test(value)&&!IMAGE_KEYS.has(key)&&!key.startsWith('menu_')&&!key.startsWith('instagram_')&&!key.startsWith('telegram_')&&!key.startsWith('map_')&&!key.startsWith('phone_'));
 }
 async function translateToEnglish(env,source){
  if(!source||!CYR.test(source))return source;
@@ -61,7 +62,7 @@ async function api(request,env,url){const path=url.pathname;
   if(request.method==='GET')return api(new Request(new URL('/api/content',request.url)),env,new URL('/api/content',request.url));
   if(request.method!=='PUT')return error('method_not_allowed',405);
   const b=await payload(request),entries=Object.entries(b.content||{});
-  if(!entries.length||entries.length>32||entries.some(([k,v])=>!EDITABLE.has(k)||typeof v!=='string'||v.length>1600||(IMAGE_KEYS.has(k)&&!validImage(v))||((k.startsWith('instagram_')||k.startsWith('telegram_')||k.startsWith('menu_'))&&v&&!/^https:\/\/[\w.-]+(?:\/[^\s]*)?$/.test(v))))return error('invalid_content');
+  if(!entries.length||entries.length>32||entries.some(([k,v])=>!EDITABLE.has(k)||typeof v!=='string'||v.length>1600||(IMAGE_KEYS.has(k)&&!validImage(v))||((k.startsWith('instagram_')||k.startsWith('telegram_')||k.startsWith('map_')||k.startsWith('menu_'))&&v&&!/^https:\/\/[\w.-]+(?:\/[^\s]*)?$/.test(v))))return error('invalid_content');
   await env.DB.batch(entries.flatMap(([k,v])=>[
     env.DB.prepare('INSERT INTO site_content(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP').bind(k,v),
     env.DB.prepare('DELETE FROM site_content_en WHERE key=?').bind(k)
@@ -101,10 +102,14 @@ async function api(request,env,url){const path=url.pathname;
 }
 export default {async fetch(request,env){const url=new URL(request.url),p=url.pathname;
  try{
-  // Serve the homepage explicitly when HTML URL canonicalisation is disabled.
-  if(p==='/')return env.ASSETS.fetch(new Request(new URL('/index.html',request.url),request));
-  if(p==='/admin')return env.ASSETS.fetch(new Request(new URL('/admin.html',request.url),request));
-  if(p==='/events')return env.ASSETS.fetch(new Request(new URL('/events.html',request.url),request));
+  // Generate crawlable landing pages and switch indexing on only for a future official domain.
+  if(p==='/robots.txt'||p==='/sitemap.xml')return seoRoute(request);
+  if(isPublicPage(p))return publicPage(request,env,p.replace(/\/$/,'')||'/');
+  if(p==='/admin'){
+   const page=await env.ASSETS.fetch(new Request(new URL('/admin.html',request.url),request));
+   const headers=new Headers(page.headers);headers.set('X-Robots-Tag','noindex, nofollow');
+   return new Response(page.body,{status:page.status,headers});
+  }
   if(p.startsWith('/api/')){
     if(!env.DB)return error('database_not_connected',503);
     return await api(request,env,url);
