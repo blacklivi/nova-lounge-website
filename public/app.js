@@ -1,6 +1,7 @@
 import {escapeHTML as esc, typography, cleanPhone, validPhone, minskNow, splitEvents, safeURL, localImage, localizedValue} from './core.js';
 import {enhanceBookingSelects} from './booking-selects.js';
 import {enhanceBookingDate} from './booking-date.js';
+import {initMotionLab, enterMotionHome} from './motion-lab.js';
 const app = document.querySelector('#app');
 const isEvents = document.body.dataset.page === 'events';
 const ids = ['zyb','pob','east'];
@@ -97,6 +98,7 @@ const canonical=document.querySelector('link[rel="canonical"]');if(canonical)can
  app.querySelector('dialog').addEventListener('close',()=>{document.querySelector('dialog')?.classList.remove('is-visible');});
  app.querySelector('dialog').addEventListener('click',e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
  updateTop();
+ initMotionLab();
 }
 // Coordinated, bounded-duration anchor scrolling. Native smooth scroll can take
 // much longer for deep links and doesn't reliably account for the sticky header.
@@ -290,3 +292,4 @@ await Promise.allSettled([getJSON('/api/content').then(data=>{source=data;}).cat
 // Avoid resetting a form, focus or navigation if a slow API finishes after interaction.
 if(!modalKind&&!drawerOpen){const focused=document.activeElement;const focusLanguage=focused?.dataset?.language;render();if(focusLanguage)document.querySelector(`[data-language="${focusLanguage}"]`)?.focus();scrollToHash(true);}
 if(contentFailed)console.warn('NOVA content unavailable; bundled defaults are displayed.');
+enterMotionHome();
