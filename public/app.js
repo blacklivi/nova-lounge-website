@@ -293,12 +293,61 @@ async function getJSON(url){
   return await r.json();
  }finally{clearTimeout(deadline)}
 }
-try { defaults=await getJSON('/content-defaults.json'); } catch { app.innerHTML='<p class="loading">NOVA — '+t('Не удалось загрузить страницу. Обновите её.','Could not load the page. Please reload.')+'</p>';throw Error('Defaults unavailable'); }
-// Wait for editorial data before the initial mount. Rendering twice used to
-// discard the first animation halfway through and visibly jump the hero image.
-await Promise.allSettled([getJSON('/api/content').then(data=>{source=data;}).catch(()=>{contentFailed=true;}),getJSON('/api/events').then(data=>{events=Array.isArray(data.events)?data.events:[];eventsLoaded=true;}).catch(()=>{eventsFailed=true;})]);
+// Server-inlined defaults eliminate another network roundtrip before first paint.
+// Direct .html asset requests retain the network fallback.
+try {
+ const inline=document.getElementById('nova-initial-defaults');
+ defaults=inline?JSON.parse(inline.textContent):await getJSON('/content-defaults.json');
+} catch {
+ defaults=await getJSON('/content-defaults.json').catch(()=>({content:{},content_en:{}}));
+}
+const editorLoad=Promise.allSettled([
+ getJSON('/api/content').then(data=>{source=data;}).catch(()=>{contentFailed=true;}),
+ getJSON('/api/events').then(data=>{events=Array.isArray(data.events)?data.events:[];eventsLoaded=true;}).catch(()=>{eventsFailed=true;})
+]);
+let editorReady=false;
+editorLoad.then(()=>{editorReady=true;});
+// Do not hold the initial interactive screen hostage to a slow CMS request.
+await Promise.race([editorLoad, new Promise(resolve=>setTimeout(resolve,750))]);
+const pendingRefresh=!editorReady;
 render();
 scrollToHash(true);
-// Apply the intro before the browser's first painted frame, only once per visit.
-enterMotionHome();
+
+const firstPaint=document.getElementById('nova-first-paint');
+if(firstPaint) {
+ // The actual first-paint hero already played the entrance animation.
+ // Keep it visible until its sequence finishes; hand over to identical live UI.
+ const elapsed=performance.now()-(window.__novaBootStarted||performance.now());
+ const hold=Math.max(0,1550-elapsed);
+ setTimeout(()=>{
+  if(firstPaint.isConnected){
+   firstPaint.classList.add('nova-boot-exit');
+   setTimeout(()=>firstPaint.remove(),340);
+  }
+ }, matchMedia('(prefers-reduced-motion: reduce)').matches||location.hash?0:hold);
+} else {
+ enterMotionHome();
+}
+if(pendingRefresh) {
+ editorLoad.then(()=>{
+  // Update CMS/event information without restarting the large hero animation.
+  if(modalKind||drawerOpen)return;
+  const stableHero=!isEvents&&location.pathname==='/'?document.querySelector('main .hero'):null;
+  render();
+  if(stableHero) {
+   const freshHero=document.querySelector('main .hero');
+   if(freshHero) {
+    for(const field of ['hero_kicker','hero_tagline']){
+     const oldNode=stableHero.querySelector('[data-content="'+field+'"]');
+     const newNode=freshHero.querySelector('[data-content="'+field+'"]');
+     if(oldNode&&newNode)oldNode.textContent=newNode.textContent;
+    }
+    const oldImage=stableHero.querySelector('[data-image="hero_image"]');
+    const newImage=freshHero.querySelector('[data-image="hero_image"]');
+    if(oldImage&&newImage&&oldImage.getAttribute('src')!==newImage.getAttribute('src'))oldImage.setAttribute('src',newImage.getAttribute('src'));
+    freshHero.replaceWith(stableHero);
+   }
+  }
+ });
+}
 if(contentFailed)console.warn('NOVA content unavailable; bundled defaults are displayed.');
