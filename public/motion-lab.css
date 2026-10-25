@@ -1,3 +1,62 @@
+/* First visual frame, drawn by the Worker while the interactive bundle loads. */
+#nova-first-paint {
+ position:fixed;inset:0;z-index:95;overflow:hidden;background:#fff;
+ pointer-events:none;isolation:isolate;
+}
+#nova-first-paint .site-header { position:relative;z-index:2; }
+#nova-first-paint [data-boot-lang=en]{display:none}
+html[data-nova-boot-lang=en] #nova-first-paint [data-boot-lang=ru]{display:none}
+html[data-nova-boot-lang=en] #nova-first-paint [data-boot-lang=en]{display:inline}
+#nova-first-paint .hero-tagline {white-space:pre-line}
+#nova-first-paint .header-side .language span {
+ font-size:11px;padding:12px 6px;color:var(--muted);
+}
+html[data-nova-boot-lang=ru] #nova-first-paint .language span:first-child,
+html[data-nova-boot-lang=en] #nova-first-paint .language span:last-child {
+ color:var(--ink);text-decoration:underline;text-underline-offset:5px;
+}
+#nova-first-paint .hero {height:clamp(540px,43vw,960px);}
+html.nova-js:not(.nova-deep-link) #nova-first-paint .hero h1{
+ animation:nova-boot-headline 1450ms cubic-bezier(.25,.72,.23,1) 100ms both;
+}
+html.nova-js:not(.nova-deep-link) #nova-first-paint .hero-photo{
+ animation:nova-boot-picture 1350ms cubic-bezier(.25,.72,.23,1) 100ms both;
+}
+html.nova-js:not(.nova-deep-link) #nova-first-paint .hero-copy .eyebrow,
+html.nova-js:not(.nova-deep-link) #nova-first-paint .hero-tagline,
+html.nova-js:not(.nova-deep-link) #nova-first-paint .photo-side{
+ animation:nova-boot-details 850ms cubic-bezier(.25,.72,.23,1) both;
+}
+#nova-first-paint .hero-copy .eyebrow{animation-delay:150ms!important}
+#nova-first-paint .hero-tagline{animation-delay:480ms!important}
+#nova-first-paint .photo-side{animation-delay:670ms!important}
+@keyframes nova-boot-headline {
+ from{opacity:.25;clip-path:inset(0 100% 0 0);transform:translate3d(0,12px,0)}
+ to{opacity:1;clip-path:inset(0 0 0 0);transform:translate3d(0,0,0)}
+}
+@keyframes nova-boot-picture {
+ from{opacity:0;transform:translate3d(0,20px,0) scale(1.015)}
+ to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes nova-boot-details{
+ from{opacity:0;transform:translate3d(0,9px,0)}
+ to{opacity:1;transform:translate3d(0,0,0)}
+}
+#nova-first-paint.nova-boot-exit {
+ opacity:0;
+ transition:opacity 300ms cubic-bezier(.4,0,.2,1);
+}
+html.nova-deep-link #nova-first-paint{display:none}
+@media (max-width:900px) {
+ #nova-first-paint .site-header {display:flex;justify-content:space-between}
+ #nova-first-paint .main-nav{display:none}
+ #nova-first-paint .header-side .language{display:flex}
+ #nova-first-paint .hero{height:auto}
+}
+@media (prefers-reduced-motion:reduce){
+ #nova-first-paint *,#nova-first-paint{animation:none!important;transition:none!important}
+}
+/* When a non-home SEO route is pending, the SEO index remains in HTML but not on screen. */
 /*
  * NOVA Motion Lab v2 — a continuous, restrained motion system.
  * Standalone and scoped to the experimental branch. No production stylesheet edits.
