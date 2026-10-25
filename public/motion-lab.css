@@ -1,0 +1,130 @@
+/*
+ * NOVA / Motion Lab — removable editorial-motion experiment.
+ * Intentionally scoped to html.motion-lab: the main branch has none of these effects.
+ */
+html.motion-lab .lab-letter {
+  display: inline-block;
+  transform-origin: 50% 80%;
+  vertical-align: baseline;
+}
+html.motion-lab .lab-intro .lab-letter {
+  animation: lab-letter-in 860ms cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(90ms + var(--letter-index) * 90ms);
+}
+@keyframes lab-letter-in {
+  from { opacity: 0; transform: translate3d(0, 26px, 0); filter: blur(4px); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
+}
+html.motion-lab .lab-intro .hero-photo {
+  animation: lab-image-reveal 1050ms cubic-bezier(.22, 1, .36, 1) both;
+}
+@keyframes lab-image-reveal {
+  from { clip-path: inset(0 0 0 100%); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+html.motion-lab .hero-photo img {
+  transform: translate3d(0, var(--lab-drift, 0px), 0) scale(1.045);
+  transform-origin: center;
+  will-change: auto;
+}
+html.motion-lab .lab-intro .hero-photo img {
+  animation: lab-hero-focus 1150ms cubic-bezier(.22, 1, .36, 1) both;
+}
+@keyframes lab-hero-focus {
+  from { transform: translate3d(0, 0, 0) scale(1.09); }
+  to   { transform: translate3d(0, 0, 0) scale(1.045); }
+}
+html.motion-lab .lab-intro .hero-copy .eyebrow,
+html.motion-lab .lab-intro .hero-tagline,
+html.motion-lab .lab-intro .photo-side {
+  animation: lab-caption-in 680ms cubic-bezier(.22, 1, .36, 1) both;
+}
+html.motion-lab .lab-intro .hero-copy .eyebrow { animation-delay: 170ms; }
+html.motion-lab .lab-intro .hero-tagline { animation-delay: 570ms; }
+html.motion-lab .lab-intro .photo-side { animation-delay: 770ms; }
+@keyframes lab-caption-in {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* Scroll reveals never change element dimensions or scroll positions. */
+html.motion-lab .lab-reveal {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity 690ms cubic-bezier(.22, 1, .36, 1),
+              transform 740ms cubic-bezier(.22, 1, .36, 1);
+  transition-delay: 40ms;
+}
+html.motion-lab .lab-reveal.venue-card {
+  transition-delay: calc(var(--lab-order, 0) * 85ms);
+}
+html.motion-lab .lab-reveal.lab-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+html.motion-lab .story-photo.lab-reveal {
+  clip-path: inset(0 0 7% 0);
+  transition: opacity 700ms ease, transform 780ms cubic-bezier(.22,1,.36,1),
+              clip-path 850ms cubic-bezier(.22,1,.36,1);
+}
+html.motion-lab .story-photo.lab-reveal.lab-visible { clip-path: inset(0 0 0 0); }
+
+/* Typography and links: a restrained recurring visual language. */
+html.motion-lab .main-nav a,
+html.motion-lab .drawer nav a { position: relative; }
+html.motion-lab .main-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 300ms cubic-bezier(.2,.7,.2,1);
+}
+html.motion-lab .main-nav a:hover::after,
+html.motion-lab .main-nav a:focus-visible::after,
+html.motion-lab .main-nav a[aria-current="page"]::after { transform: scaleX(1); }
+html.motion-lab .venue-img img {
+  transition: transform 750ms cubic-bezier(.22,1,.36,1), filter 500ms ease;
+}
+html.motion-lab .venue-card:hover .venue-img img,
+html.motion-lab .venue-card:focus-visible .venue-img img { transform: scale(1.045); }
+html.motion-lab .venue-card .venue-title {
+  transition: transform 320ms cubic-bezier(.2,.7,.2,1);
+}
+html.motion-lab .venue-card:hover .venue-title { transform: translateX(5px); }
+html.motion-lab .section-link .arrow,
+html.motion-lab .book-cta-arrow {
+  transition: transform 320ms cubic-bezier(.2,.7,.2,1);
+}
+html.motion-lab .book-main:hover .book-cta-arrow { transform: translateX(7px); }
+html.motion-lab .detail-gallery img { transition: transform 700ms cubic-bezier(.22,1,.36,1); }
+@media (hover:hover) {
+  html.motion-lab .detail-gallery img:hover { transform: scale(1.035); }
+}
+@media (max-width: 900px) {
+  html.motion-lab .hero-photo img { transform: none; }
+  html.motion-lab .lab-intro .hero-photo img { animation: none; }
+  html.motion-lab .lab-intro .hero-photo { animation-duration: 750ms; }
+  html.motion-lab .lab-intro .lab-letter { animation-duration: 680ms; }
+  html.motion-lab .lab-reveal { transform: translate3d(0, 13px, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.motion-lab .lab-letter,
+  html.motion-lab .hero-photo,
+  html.motion-lab .hero-photo img,
+  html.motion-lab .lab-reveal,
+  html.motion-lab .lab-intro .hero-copy .eyebrow,
+  html.motion-lab .lab-intro .hero-tagline,
+  html.motion-lab .lab-intro .photo-side {
+    animation: none !important;
+    transition: none !important;
+    clip-path: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
