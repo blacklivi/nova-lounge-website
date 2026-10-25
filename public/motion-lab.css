@@ -2,7 +2,7 @@
  * NOVA Motion Lab v2 — a continuous, restrained motion system.
  * Standalone and scoped to the experimental branch. No production stylesheet edits.
  */
-html.motion-lab .lab-intro .hero h1 {
+html.motion-lab .hero.lab-intro h1 {
   animation: lab-word-enter 1100ms cubic-bezier(.22, .65, .28, 1) both;
   animation-delay: 70ms;
 }
