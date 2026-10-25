@@ -43,6 +43,31 @@ function fallback(route,v,origin,over,def){
  if(route==='/events')return '<main id="seo-fallback"><h1>События NOVA в Минске</h1><p>Афиша вечеринок и DJ-сетов NOVA.</p><a href="/">Все пространства</a></main>';
  return '<main id="seo-fallback"><h1>NOVA — три лаунж-кафе в Минске</h1><p>Зыбицкая, Победителей и Восток: кухня, встречи, вечеринки и ланчи.</p><ul>'+Object.entries(VENUES).map(([slug,item])=>'<li><a href="/spaces/'+slug+'">NOVA '+htmlEscape(item.name)+' — '+htmlEscape(item.street)+'</a></li>').join('')+'</ul></main>';
 }
+// Fast first-paint hero for the motion experiment. Styled by the existing site.css.
+// The SEO text remains in the response for no-JS clients, but is never displayed
+// ahead of the actual interface while JavaScript is enabled.
+function firstPaint(route, defaults){
+ if(route!=='/')return '';
+ const ru=defaults.content||{},en=defaults.content_en||{};
+ const bilingual=(ruText,enText)=>'<span data-boot-lang="ru">'+htmlEscape(ruText)+'</span><span data-boot-lang="en">'+htmlEscape(enText)+'</span>';
+ const picture=/^\/media\/[\w.-]+\.(?:jpe?g|png|webp|avif)$/.test(ru.hero_image||'')?ru.hero_image:'/media/clean-076f0b2eaafa35.jpg';
+ const nav=(labelRu,labelEn,href)=>'<a href="'+href+'">'+bilingual(labelRu,labelEn)+'</a>';
+ return '<div id="nova-first-paint" aria-hidden="true">'+
+  '<header class="site-header">'+
+  '<a class="brand" href="/">NOVA</a>'+
+  '<nav class="main-nav">'+
+  nav('Пространства','Spaces','/#venues')+nav('События','Events','/events')+
+  nav('О нас','About','/#about')+nav('Контакты','Contacts','/#contacts')+
+  '</nav><div class="header-side"><div class="language"><span>RU</span><span>EN</span></div>'+
+  '<span class="button header-book">'+bilingual('Забронировать стол','Reserve a table')+'</span></div></header>'+
+  '<main><section class="hero lab-intro" id="nova-boot-hero">'+
+  '<div class="hero-copy"><span class="eyebrow">'+htmlEscape(ru.hero_kicker||'MINSK · LOUNGE CAFÉ')+'</span>'+
+  '<h1>NOVA</h1>'+
+  '<p class="hero-tagline">'+bilingual(ru.hero_tagline||'Три пространства.\nОдин ритм.',en.hero_tagline||'Three spaces.\nOne rhythm.')+'</p></div>'+
+  '<div class="hero-photo"><img src="'+htmlEscape(picture)+'" alt="" width="1200" height="900" fetchpriority="high" decoding="async">'+
+  '<div class="photo-side">'+bilingual('Еда<br>Люди<br>Музыка<br>Атмосфера','Food<br>People<br>Music<br>Atmosphere').replaceAll('&lt;br&gt;','<br>')+'</div>'+
+  '</div></section></main></div>';
+}
 export async function publicPage(request,env,route){
  const url=new URL(request.url),v=VENUES[route.split('/')[2]],origin=url.origin;
  const asset=route==='/events'?'/events.html':'/index.html';
@@ -64,7 +89,7 @@ export async function publicPage(request,env,route){
  content=content.replace(/<title>[^<]*<\/title>/,'<title>'+htmlEscape(title)+'</title>')
   .replace(/<meta name="description" content="[^"]*">/,'<meta name="description" content="'+htmlEscape(desc)+'">')
   .replace('</head>',head+'</head>')
-  .replace('<div id="app"><p class="loading">NOVA</p></div>','<div id="app">'+fallback(route,v,origin,over,def)+'</div>');
+  .replace('<div id="app"><p class="loading">NOVA</p></div>',firstPaint(route,def)+'<div id="app">'+fallback(route,v,origin,over,def)+'</div>');
  const headers=new Headers(page.headers);headers.set('Content-Type','text/html; charset=utf-8');
  headers.set('Cache-Control','public, max-age=120, must-revalidate');
  headers.set('X-Content-Type-Options','nosniff');
