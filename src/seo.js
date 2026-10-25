@@ -88,7 +88,7 @@ export async function publicPage(request,env,route){
  let content=await page.text();
  content=content.replace(/<title>[^<]*<\/title>/,'<title>'+htmlEscape(title)+'</title>')
   .replace(/<meta name="description" content="[^"]*">/,'<meta name="description" content="'+htmlEscape(desc)+'">')
-  .replace('</head>',head+'</head>')
+  .replace('</head>',head+'<script type="application/json" id="nova-initial-defaults">'+scriptJson(def)+'</script></head>')
   .replace('<div id="app"><p class="loading">NOVA</p></div>',firstPaint(route,def)+'<div id="app">'+fallback(route,v,origin,over,def)+'</div>');
  const headers=new Headers(page.headers);headers.set('Content-Type','text/html; charset=utf-8');
  headers.set('Cache-Control','public, max-age=120, must-revalidate');
