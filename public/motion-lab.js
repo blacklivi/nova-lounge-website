@@ -1,30 +1,52 @@
-// NOVA editorial motion experiment.
-// No data writes, tracking, third-party libraries or changes to the production Worker.
+// NOVA editorial motion experiment. Kept entirely separate from the production branch.
+// Native browser transforms and a single reveal timeline, no third-party animation engine.
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const desktopMotion = window.matchMedia('(min-width: 901px) and (hover: hover) and (pointer: fine)');
 let observer = null;
 let listenersInstalled = false;
-let scrollFrame = 0;
+let parallaxFrame = 0;
+let parallaxCurrent = 0;
+let parallaxTarget = 0;
 let introShown = false;
 
-function updatePhotoDrift() {
-  scrollFrame = 0;
+function updateParallaxTarget() {
   const photo = document.querySelector('.hero-photo');
-  if (!photo) return;
-  if (reducedMotion.matches || !desktopMotion.matches) {
-    photo.style.removeProperty('--lab-drift');
+  if (!photo || reducedMotion.matches || !desktopMotion.matches) {
+    parallaxTarget = 0;
+  } else {
+    const rect = photo.getBoundingClientRect();
+    // No work after the hero scrolls entirely out of view.
+    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+    parallaxTarget = Math.max(0, Math.min(16, window.scrollY * 0.04));
+  }
+  if (!parallaxFrame) parallaxFrame = window.requestAnimationFrame(animateParallax);
+}
+
+function animateParallax() {
+  const photo = document.querySelector('.hero-photo');
+  if (!photo) {
+    parallaxFrame = 0;
+    parallaxCurrent = 0;
     return;
   }
-  const distance = Math.max(0, Math.min(26, window.scrollY * 0.075));
-  photo.style.setProperty('--lab-drift', distance.toFixed(1) + 'px');
+  // Small inertial lag removes the single-frame steps of scroll-driven styling.
+  parallaxCurrent += (parallaxTarget - parallaxCurrent) * 0.14;
+  if (Math.abs(parallaxTarget - parallaxCurrent) < 0.08) {
+    parallaxCurrent = parallaxTarget;
+    parallaxFrame = 0;
+  } else {
+    parallaxFrame = window.requestAnimationFrame(animateParallax);
+  }
+  photo.style.setProperty('--lab-drift', parallaxCurrent.toFixed(2) + 'px');
 }
 
-function schedulePhotoDrift() {
-  if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updatePhotoDrift);
-}
-
-function observeEditorialSections() {
+function revealSections() {
   if (observer) observer.disconnect();
+  document.querySelectorAll('.lab-reveal').forEach(el => {
+    el.classList.remove('lab-reveal');
+    el.classList.remove('lab-visible');
+    el.style.removeProperty('--lab-order');
+  });
   if (reducedMotion.matches || !('IntersectionObserver' in window)) return;
   observer = new IntersectionObserver((entries, activeObserver) => {
     for (const entry of entries) {
@@ -32,7 +54,7 @@ function observeEditorialSections() {
       entry.target.classList.add('lab-visible');
       activeObserver.unobserve(entry.target);
     }
-  }, { rootMargin: '0px 0px -5% 0px', threshold: 0.08 });
+  }, {rootMargin: '0px 0px -6% 0px', threshold: 0.01});
 
   const selectors = [
     '.venues-heading', '.venue-card', '.story-copy', '.story-photo',
@@ -41,53 +63,49 @@ function observeEditorialSections() {
     '.events-intro', '.events-section',
     '.detail-copy', '.detail-image', '.detail-bottom > div'
   ].join(',');
-  const elements = [...document.querySelectorAll(selectors)];
-  elements.forEach((element, index) => {
+  let venueIndex = 0;
+  for (const element of document.querySelectorAll(selectors)) {
     const rect = element.getBoundingClientRect();
-    // Never hide a section that is already visible or above the viewport.
-    if (rect.top < window.innerHeight * 0.83) {
+    // Content already near the viewport must never blink out when we hydrate.
+    if (rect.top <= window.innerHeight + 24 || rect.bottom < 0) {
       element.classList.add('lab-visible');
-      return;
+      continue;
     }
     element.classList.add('lab-reveal');
     if (element.classList.contains('venue-card')) {
-      element.style.setProperty('--lab-order', String(index % 3));
+      element.style.setProperty('--lab-order', String(venueIndex++ % 3));
     }
     observer.observe(element);
-  });
+  }
 }
 
 export function initMotionLab() {
   if (reducedMotion.matches) {
     document.documentElement.classList.remove('motion-lab');
-    if (observer) observer.disconnect();
+    observer?.disconnect();
+    document.querySelectorAll('.lab-reveal').forEach(el => el.classList.add('lab-visible'));
+    updateParallaxTarget();
     return;
   }
   document.documentElement.classList.add('motion-lab');
-  observeEditorialSections();
-  schedulePhotoDrift();
+  revealSections();
+  updateParallaxTarget();
 
   if (!listenersInstalled) {
     listenersInstalled = true;
-    window.addEventListener('scroll', schedulePhotoDrift, { passive: true });
-    window.addEventListener('resize', schedulePhotoDrift, { passive: true });
-    reducedMotion.addEventListener('change', () => {
-      initMotionLab();
-      if (reducedMotion.matches) document.querySelectorAll('.lab-reveal').forEach(el => el.classList.add('lab-visible'));
-    });
+    window.addEventListener('scroll', updateParallaxTarget, {passive:true});
+    window.addEventListener('resize', updateParallaxTarget, {passive:true});
+    desktopMotion.addEventListener('change', updateParallaxTarget);
+    reducedMotion.addEventListener('change', initMotionLab);
   }
 }
 
 export function enterMotionHome() {
-  if (introShown || reducedMotion.matches || window.scrollY > 40 || location.hash ||
-      location.pathname !== '/' || document.body.dataset.page !== 'home') return;
+  if (introShown || reducedMotion.matches || window.scrollY > 40 ||
+      location.hash || location.pathname !== '/' || document.body.dataset.page !== 'home') return;
   const hero = document.querySelector('.hero');
-  const headline = hero?.querySelector('h1');
-  if (!headline) return;
+  if (!hero) return;
   introShown = true;
-  headline.setAttribute('aria-label', 'NOVA');
-  headline.innerHTML = [...'NOVA'].map((letter, index) =>
-    '<span class="lab-letter" aria-hidden="true" style="--letter-index:' + index + '">' + letter + '</span>'
-  ).join('');
+  // Animate the intact word, not individual glyphs. This preserves kerning and layout.
   hero.classList.add('lab-intro');
 }
