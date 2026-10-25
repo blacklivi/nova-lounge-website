@@ -56,6 +56,29 @@ html.nova-deep-link #nova-first-paint{display:none}
 @media (prefers-reduced-motion:reduce){
  #nova-first-paint *,#nova-first-paint{animation:none!important;transition:none!important}
 }
+html:not(.nova-js) #nova-first-paint{display:none}
+
+/* Secondary editorial movement: images settle into place without extra opacity layers. */
+html.motion-lab .story-photo.lab-reveal img {
+ transform:scale(1.035);
+ transition:transform 1150ms cubic-bezier(.25,.72,.23,1);
+}
+html.motion-lab .story-photo.lab-reveal.lab-visible img{
+ transform:scale(1);
+}
+html.motion-lab .event-card .event-info{
+ transition:transform 520ms cubic-bezier(.25,.72,.23,1);
+}
+@media (hover:hover){
+ html.motion-lab .event-card:hover .event-info{
+  transform:translate3d(0,-3px,0);
+ }
+}
+@media (prefers-reduced-motion:reduce) {
+ html.motion-lab .story-photo.lab-reveal img,
+ html.motion-lab .event-card .event-info{transition:none!important;transform:none!important}
+}
+
 /* When a non-home SEO route is pending, the SEO index remains in HTML but not on screen. */
 /*
  * NOVA Motion Lab v2 — a continuous, restrained motion system.
