@@ -113,11 +113,11 @@ function scrollToPosition(y,instant=false){
   window.scrollTo({top:end,behavior:'auto'});
   updateTop();return;
  }
- const duration=Math.min(560,280+distance*.075);
+ const duration=Math.min(680,330+distance*.065);
  const beginning=performance.now();
  const tick=now=>{
   const progress=Math.min(1,(now-beginning)/duration);
-  const eased=1-Math.pow(1-progress,3);
+  const eased=(1-Math.cos(Math.PI*progress))/2;
   window.scrollTo({top:start+delta*eased,behavior:'auto'});
   if(progress<1)scrollFrame=requestAnimationFrame(tick);
   else{scrollFrame=0;updateTop();}
@@ -284,12 +284,21 @@ window.addEventListener('popstate',()=>{
  else window.scrollTo({top:0,behavior:'auto'});
 });
 matchMedia('(min-width:901px)').addEventListener('change',e=>{if(e.matches&&drawerOpen)setDrawer(false);});
-async function getJSON(url){const r=await fetch(url);if(!r.ok)throw Error(url+': '+r.status);return r.json();}
+async function getJSON(url){
+ const controller=new AbortController();
+ const deadline=setTimeout(()=>controller.abort(),5000);
+ try{
+  const r=await fetch(url,{signal:controller.signal,cache:url.startsWith('/api/')?'no-store':'default'});
+  if(!r.ok)throw Error(url+': '+r.status);
+  return await r.json();
+ }finally{clearTimeout(deadline)}
+}
 try { defaults=await getJSON('/content-defaults.json'); } catch { app.innerHTML='<p class="loading">NOVA — '+t('Не удалось загрузить страницу. Обновите её.','Could not load the page. Please reload.')+'</p>';throw Error('Defaults unavailable'); }
-// Draw immediately with bundled defaults; the CMS remains authoritative when it loads.
-render();scrollToHash(true);
+// Wait for editorial data before the initial mount. Rendering twice used to
+// discard the first animation halfway through and visibly jump the hero image.
 await Promise.allSettled([getJSON('/api/content').then(data=>{source=data;}).catch(()=>{contentFailed=true;}),getJSON('/api/events').then(data=>{events=Array.isArray(data.events)?data.events:[];eventsLoaded=true;}).catch(()=>{eventsFailed=true;})]);
-// Avoid resetting a form, focus or navigation if a slow API finishes after interaction.
-if(!modalKind&&!drawerOpen){const focused=document.activeElement;const focusLanguage=focused?.dataset?.language;render();if(focusLanguage)document.querySelector(`[data-language="${focusLanguage}"]`)?.focus();scrollToHash(true);}
-if(contentFailed)console.warn('NOVA content unavailable; bundled defaults are displayed.');
+render();
+scrollToHash(true);
+// Apply the intro before the browser's first painted frame, only once per visit.
 enterMotionHome();
+if(contentFailed)console.warn('NOVA content unavailable; bundled defaults are displayed.');
