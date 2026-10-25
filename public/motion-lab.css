@@ -84,7 +84,7 @@ html.motion-lab .event-card .event-info{
  * NOVA Motion Lab v2 — a continuous, restrained motion system.
  * Standalone and scoped to the experimental branch. No production stylesheet edits.
  */
-html.motion-lab .hero.lab-intro h1 {
+html.motion-lab #app .hero.lab-intro h1 {
   animation: lab-word-enter 1100ms cubic-bezier(.22, .65, .28, 1) both;
   animation-delay: 70ms;
 }
@@ -95,12 +95,12 @@ html.motion-lab .hero.lab-intro h1 {
 
 /* Photo frame and image now have independent jobs: entry vs. parallax.
    No competing transform animations and no expensive full-width clip-path wipe. */
-html.motion-lab .hero-photo img {
+html.motion-lab #app .hero-photo img {
   transform: translate3d(0, var(--lab-drift, 0px), 0) scale(1.05);
   transform-origin: center;
   will-change: transform;
 }
-html.motion-lab .lab-intro .hero-photo {
+html.motion-lab #app .lab-intro .hero-photo {
   animation: lab-photo-enter 1150ms cubic-bezier(.22, .65, .28, 1) 100ms both;
 }
 @keyframes lab-photo-enter {
@@ -108,14 +108,14 @@ html.motion-lab .lab-intro .hero-photo {
   to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-html.motion-lab .lab-intro .hero-copy .eyebrow,
-html.motion-lab .lab-intro .hero-tagline,
-html.motion-lab .lab-intro .photo-side {
+html.motion-lab #app .lab-intro .hero-copy .eyebrow,
+html.motion-lab #app .lab-intro .hero-tagline,
+html.motion-lab #app .lab-intro .photo-side {
   animation: lab-copy-enter 860ms cubic-bezier(.22, .65, .28, 1) both;
 }
-html.motion-lab .lab-intro .hero-copy .eyebrow { animation-delay: 240ms; }
-html.motion-lab .lab-intro .hero-tagline { animation-delay: 450ms; }
-html.motion-lab .lab-intro .photo-side { animation-delay: 640ms; }
+html.motion-lab #app .lab-intro .hero-copy .eyebrow { animation-delay: 240ms; }
+html.motion-lab #app .lab-intro .hero-tagline { animation-delay: 450ms; }
+html.motion-lab #app .lab-intro .photo-side { animation-delay: 640ms; }
 @keyframes lab-copy-enter {
   from { opacity: 0; transform: translate3d(0, 9px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
@@ -193,11 +193,11 @@ html.motion-lab .detail-gallery img {
   html.motion-lab .detail-gallery img:hover { transform: scale(1.025); }
 }
 @media (max-width: 900px) {
-  html.motion-lab .hero-photo img {
+  html.motion-lab #app .hero-photo img {
     transform: none;
     will-change: auto;
   }
-  html.motion-lab .lab-intro .hero-photo {
+  html.motion-lab #app .lab-intro .hero-photo {
     animation-duration: 950ms;
   }
   html.motion-lab .lab-reveal {
@@ -205,14 +205,14 @@ html.motion-lab .detail-gallery img {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  html.motion-lab .hero h1,
-  html.motion-lab .hero-photo,
-  html.motion-lab .hero-photo img,
+  html.motion-lab #app .hero h1,
+  html.motion-lab #app .hero-photo,
+  html.motion-lab #app .hero-photo img,
   html.motion-lab .lab-reveal,
   html.motion-lab main.route-enter,
-  html.motion-lab .lab-intro .hero-copy .eyebrow,
-  html.motion-lab .lab-intro .hero-tagline,
-  html.motion-lab .lab-intro .photo-side {
+  html.motion-lab #app .lab-intro .hero-copy .eyebrow,
+  html.motion-lab #app .lab-intro .hero-tagline,
+  html.motion-lab #app .lab-intro .photo-side {
     animation: none !important;
     transition: none !important;
     opacity: 1 !important;
