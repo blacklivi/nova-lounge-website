@@ -39,3 +39,6 @@
 
 /* Editorial reading-order reveals. Images keep their layout and crop stable. */
 @media(min-width:761px){.space-card:nth-child(2){--reveal-delay:85ms}.space-card:nth-child(3){--reveal-delay:170ms}.demo-event:nth-child(2){--reveal-delay:110ms}}
+
+/* Keep all three brand swatches on one line even at iPhone SE width. */
+@media(max-width:350px){.tokens{gap:8px}.swatch{width:calc((100% - 16px)/3);height:80px}.swatch b{font-size:9px;left:7px}}
