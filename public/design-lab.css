@@ -1,0 +1,87 @@
+/* NOVA Design Lab: additive editorial polish of the ORIGINAL website.
+   No replacement grid, no changing crop/width as imagery loads. */
+body[data-design-lab="true"]{
+  --lab-ease:cubic-bezier(.22,1,.36,1);
+  --lab-soft:#e6ebe1;
+}
+body[data-design-lab="true"] .main-nav a{
+  position:relative;
+  text-decoration:none!important;
+  text-underline-offset:0;
+}
+body[data-design-lab="true"] .main-nav a::after{
+  content:"";position:absolute;left:0;right:0;bottom:-6px;height:1px;
+  background:currentColor;transform:scaleX(0);transform-origin:left center;
+  transition:transform .28s var(--lab-ease);opacity:.72;
+}
+@media(hover:hover){
+  body[data-design-lab="true"] .main-nav a:hover::after{transform:scaleX(1)}
+}
+body[data-design-lab="true"] .main-nav a:focus-visible::after,
+body[data-design-lab="true"] .main-nav a[aria-current="page"]::after{transform:scaleX(1)}
+body[data-design-lab="true"] .venue-card .venue-img{
+  background-color:#e7e9e3;isolation:isolate;
+}
+@media(hover:hover){
+  body[data-design-lab="true"] .venue-card .venue-img img{
+    transition:transform .65s var(--lab-ease),filter .4s ease;
+  }
+  body[data-design-lab="true"] .venue-card:hover .venue-img img{
+    transform:scale(1.04);
+  }
+  body[data-design-lab="true"] .venue-card:hover .venue-title{color:var(--olive)}
+}
+body[data-design-lab="true"] .venue-title{
+  transition:color .26s ease;
+}
+body[data-design-lab="true"] .venue-card:focus-visible .venue-img{
+  outline:2px solid var(--olive);outline-offset:5px;
+}
+body[data-design-lab="true"] .button{
+  transition:background-color .26s ease,border-color .26s ease,color .26s ease;
+}
+body[data-design-lab="true"] .text-link{
+  transition:color .2s ease,border-color .2s ease;
+}
+body[data-design-lab="true"] .text-link:hover{color:var(--olive);border-color:var(--olive)}
+body[data-design-lab="true"] .hero-photo img{
+  /* The image must be full-width from first paint, including on iOS. */
+  width:100%;height:100%;transform:none;
+}
+@keyframes novaLabEntrance{
+  from{opacity:.25;transform:translate3d(0,12px,0)}
+  to{opacity:1;transform:translate3d(0,0,0)}
+}
+@media(prefers-reduced-motion:no-preference){
+  body[data-design-lab="true"] .hero-copy h1{
+    animation:novaLabEntrance .69s var(--lab-ease) both;
+  }
+  body[data-design-lab="true"] .hero-copy>.eyebrow{
+    animation:novaLabEntrance .5s var(--lab-ease) both;
+  }
+  body[data-design-lab="true"] .hero-tagline{
+    animation:novaLabEntrance .75s .16s var(--lab-ease) both;
+  }
+}
+body[data-design-lab="true"] .lab-reveal{
+  transition:opacity .68s var(--lab-ease),transform .68s var(--lab-ease);
+}
+body[data-design-lab="true"] .lab-reveal.lab-pending{
+  opacity:0;transform:translate3d(0,18px,0);
+}
+body[data-design-lab="true"] .lab-reveal.lab-visible{
+  opacity:1;transform:none;
+}
+@media(min-width:901px) and (prefers-reduced-motion:no-preference){
+  body[data-design-lab="true"] .venue-card:nth-of-type(2){transition-delay:55ms}
+  body[data-design-lab="true"] .venue-card:nth-of-type(3){transition-delay:115ms}
+}
+@media(max-width:900px){
+  body[data-design-lab="true"] .hero-photo img{width:100%;height:100%;object-fit:cover}
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-design-lab="true"] .lab-reveal,
+  body[data-design-lab="true"] .lab-reveal.lab-pending{
+    opacity:1!important;transform:none!important;transition:none!important;
+  }
+}

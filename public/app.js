@@ -284,9 +284,17 @@ window.addEventListener('popstate',()=>{
 matchMedia('(min-width:901px)').addEventListener('change',e=>{if(e.matches&&drawerOpen)setDrawer(false);});
 async function getJSON(url){const r=await fetch(url);if(!r.ok)throw Error(url+': '+r.status);return r.json();}
 try { defaults=await getJSON('/content-defaults.json'); } catch { app.innerHTML='<p class="loading">NOVA — '+t('Не удалось загрузить страницу. Обновите её.','Could not load the page. Please reload.')+'</p>';throw Error('Defaults unavailable'); }
-// Draw immediately with bundled defaults; the CMS remains authoritative when it loads.
-render();scrollToHash(true);
-await Promise.allSettled([getJSON('/api/content').then(data=>{source=data;}).catch(()=>{contentFailed=true;}),getJSON('/api/events').then(data=>{events=Array.isArray(data.events)?data.events:[];eventsLoaded=true;}).catch(()=>{eventsFailed=true;})]);
-// Avoid resetting a form, focus or navigation if a slow API finishes after interaction.
-if(!modalKind&&!drawerOpen){const focused=document.activeElement;const focusLanguage=focused?.dataset?.language;render();if(focusLanguage)document.querySelector(`[data-language="${focusLanguage}"]`)?.focus();scrollToHash(true);}
-if(contentFailed)console.warn('NOVA content unavailable; bundled defaults are displayed.');
+// The isolated design-lab deploy has no CMS bindings and must not remount its
+// hero while fetching empty API responses. Render the original site once, with
+// bundled content and presentation-only event examples.
+if(document.body.dataset.designLab==='true'){
+  eventsLoaded=true;
+  render();
+  scrollToHash(true);
+}else{
+  // Regular NOVA CMS logic is intentionally preserved for a future reviewed merge.
+  render();scrollToHash(true);
+  await Promise.allSettled([getJSON('/api/content').then(data=>{source=data;}).catch(()=>{contentFailed=true;}),getJSON('/api/events').then(data=>{events=Array.isArray(data.events)?data.events:[];eventsLoaded=true;}).catch(()=>{eventsFailed=true;})]);
+  if(!modalKind&&!drawerOpen){const focused=document.activeElement;const focusLanguage=focused?.dataset?.language;render();if(focusLanguage)document.querySelector(`[data-language="${focusLanguage}"]`)?.focus();scrollToHash(true);}
+  if(contentFailed)console.warn('NOVA content unavailable; bundled defaults are displayed.');
+}

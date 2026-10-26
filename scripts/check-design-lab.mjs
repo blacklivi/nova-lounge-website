@@ -31,6 +31,12 @@ assert.match(worker,/isPublicPage/);
 assert.match(worker,/api\/content/);
 assert.match(worker,/api\/events/);
 assert.ok(!worker.includes('env.DB')&&!worker.includes('env.MEDIA'),'Live data bindings cannot be used in lab worker');
-for(const p of ['public/index.html','public/events.html','public/site.css','public/app.js'])assert.ok(existsSync(p),'Missing original website file: '+p);
+for(const p of ['public/index.html','public/events.html','public/site.css','public/app.js','public/design-lab.css','public/design-lab-ui.js'])assert.ok(existsSync(p),'Missing original website file: '+p);
 assert.ok(!/fetch\(['"]\/api\//.test(html+'\n'+js),'Concept must not contact APIs');
 console.log('NOVA Design Lab: static safety & asset checks passed.');
+
+assert.match(readFileSync('public/index.html','utf8'),/data-design-lab="true"/);
+assert.match(readFileSync('public/events.html','utf8'),/data-design-lab="true"/);
+assert.match(readFileSync('public/app.js','utf8'),/eventsLoaded=true;[\s\S]*?render\(\)/);
+assert.match(readFileSync('public/design-lab-ui.js','utf8'),/IntersectionObserver/);
+assert.match(readFileSync('public/design-lab.css','utf8'),/prefers-reduced-motion/);
