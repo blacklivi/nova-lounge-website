@@ -11,9 +11,11 @@
  transform-origin:center;
 }
 /* Match the split in the server hero and hydrated hero. It intersects the V midpoint. */
-@media (min-width:601px){
+@media (min-width:901px){
  #nova-first-paint .hero, #app .hero {
-  grid-template-columns:35.5% minmax(0,1fr);
+  /* Bootstrap finds the visual centre of the V and shares this exact edge. */
+  grid-template-columns:var(--nova-hero-split,35.5%) minmax(0,1fr);
+  transition:grid-template-columns 700ms cubic-bezier(.35,.65,.35,1);
  }
 }
 #nova-first-paint .site-header { position:relative;z-index:2; }
