@@ -1,3 +1,36 @@
+// One-time cinematic introduction; never hide functional content indefinitely.
+(() => {
+ const root=document.documentElement,app=document.getElementById('app');
+ if(!app)return;
+ let started=false;
+ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+ const imageReady=img=>new Promise(resolve=>{
+   if(!img||img.complete){resolve();return;}
+   img.addEventListener('load',resolve,{once:true});
+   img.addEventListener('error',resolve,{once:true});
+ });
+ const onRender=()=>{
+   if(!app.querySelector('main'))return;
+   root.classList.add('lab-app-rendered');
+   const hero=app.querySelector('.hero-editorial');
+   if(!hero){root.classList.remove('lab-hero-preparing');return;}
+   if(started)return;
+   started=true;
+   const font=document.fonts?.load?document.fonts.load('300 48px Manrope','NOVA').catch(()=>{}):Promise.resolve();
+   Promise.race([Promise.all([font,imageReady(hero.querySelector('.hero-photo img'))]),sleep(2300)])
+    .then(()=>new Promise(ok=>requestAnimationFrame(()=>requestAnimationFrame(ok))))
+    .then(()=>{root.classList.add('lab-hero-ready');root.classList.remove('lab-hero-preparing')})
+    .catch(()=>{root.classList.add('lab-hero-ready');root.classList.remove('lab-hero-preparing')});
+ };
+ const change=new MutationObserver(onRender);
+ change.observe(app,{childList:true});onRender();
+ const onScroll=()=>document.body.classList.toggle('lab-hero-scrolled',scrollY>40);
+ addEventListener('scroll',onScroll,{passive:true});onScroll();
+ matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{
+  if(e.matches){root.classList.remove('lab-hero-preparing');root.classList.add('lab-hero-ready');}
+ });
+})();
+
 // Original NOVA site, only in design-lab branch.
 // Scroll reveal is purely cosmetic: never hide above-the-fold content.
 (() => {

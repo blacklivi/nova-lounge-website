@@ -131,3 +131,18 @@ for(const target of [
 ])assert.ok(densityCSS.includes(target),'Density missing: '+target);
 assert.match(densityCSS,/body\[data-design-lab=true\]/);
 assert.match(densityCSS,/prefers-reduced-motion:reduce/);
+
+// Full-screen cover, first-paint gating and editorial labels.
+const revisedApp=readFileSync('public/app.js','utf8');
+const revisedCSS=readFileSync('public/design-lab.css','utf8');
+const revisedHTML=readFileSync('public/index.html','utf8');
+const revisedUI=readFileSync('public/design-lab-ui.js','utf8');
+assert.match(revisedHTML,/lab-hero-preparing/);
+assert.match(revisedCSS,/height:100svh/);
+assert.match(revisedCSS,/novaHeroWord/);
+assert.match(revisedCSS,/#seo-fallback\{display:none/);
+assert.match(revisedApp,/hero-title-mask/);
+assert.match(revisedUI,/lab-hero-ready/);
+assert.match(revisedUI,/document\.fonts\.load/);
+const visibleViews=revisedApp.slice(revisedApp.indexOf('function home(){'),revisedApp.indexOf('function eventsPage(){'));
+for(const token of ['01—03','04 / NOVA JOURNAL','05 / NOVA EVENTS','06 / NOVA RESERVATIONS','07 / NOVA MINSK','hero-space-number'])assert.ok(!visibleViews.includes(token),'Visible number remains: '+token);
