@@ -34,9 +34,36 @@ This is **static source review** plus an isolated client concept. It is **not** 
 ## Deliverable created in this commit
 `/concept.html`: static editorial **design preview** with intentionally non-functional UI mockups, keyboard navigation, standalone concept CSS and one-shot motion. No database, backend, booking or CMS calls.
 
-## Remaining before sharing a live link
-1. Confirm separate Cloudflare branch preview and database isolation, or create a dedicated Worker `nova-design-lab` with its own D1/R2.
-2. Verify preview URL resolves directly to this branch's `/concept.html`, not the live demo site.
-3. Run desktop and mobile screenshots (320 / 390 / 768 / 1440), inspect actual source image crops, keyboard focus, reduced-motion setting.
-4. If presenting a motion video, record from this isolated concept rather than from the functioning website.
-5. Preserve original site and do not merge without independent review.
+## 26 October 2026 — implementation and verification update
+
+- Isolated GitHub branch: `nova-design-lab`; separate Worker: `nova-design-lab`.
+- Published static concept: https://nova-design-lab.blacklivi-olx.workers.dev/concept.html
+- Cloudflare's build trigger includes **only** `nova-design-lab`, runs `npm run check:design-lab`, then deploys with `wrangler.design-lab.jsonc`.
+- The deployed Worker has **ASSETS only**. Verified no D1, R2 or secret bindings. API calls and unapproved paths respond without touching the CMS.
+- Automated build completed successfully with asset, anchor, noindex and route checks.
+- Fixed 320px headline overflow and three-brand-swatch layout.
+- Changed mobile desktop-artboard preview to an explicitly swipeable full-width specimen. The horizontal scrolling remains inside the frame, not across the document.
+- Added one-time staggered reveal of editorial cards, a bounded and interruptible chapter scroll, and progressive enhancement where invisible content never becomes permanently hidden if JavaScript fails.
+
+### Browser-rendering layout checks
+
+| Width | Observed document overflow | Result |
+|---|---:|---|
+| 320px mobile | 320px / 320px | Pass; swatches aligned, main hero full width, scrollable desktop specimen |
+| 390px mobile | 390px / 390px | Pass; hero full width, desktop specimen swipeable |
+| 768px tablet | 768px / 768px | Pass; three venue columns visible |
+| 1024px desktop | 1024px / 1024px | Pass; navigation shown |
+| 1440px desktop | 1440px / 1440px | Pass; image and oversized brand title aligned |
+| 1920px desktop | 1920px / 1920px | Pass; no horizontal overflow |
+
+Browser rendering screenshots were inspected at 320px mobile (intro), 390px mobile (hero and desktop specimen), and 1440px desktop (hero). Original project photographs resolved in the browser. Other lazy-loaded assets need further screenshot validation after scroll.
+
+### Still outstanding
+
+1. Full browser screenshot matrix, particularly 360, 375, 430, 1280 and 2560px, plus tablet portrait and real Safari iPhone.
+2. Comprehensive WCAG/keyboard/focus and motion-reduction tests on actual devices; CSS supports reduced motion but this has not been independently validated on Safari.
+3. Exporting polished client video MP4 and a faithful editable Figma presentation. This isolated HTML concept is ready to demonstrate visually, but **is not** a finished Figma file or video.
+4. Any updates to the functional website must be separately proposed, implemented and tested; they are not part of this client-safe static concept.
+5. Event cards are illustrative rather than actual scheduled events. The content assets remain concept photography.
+
+Main/demo environment and production content remained unchanged throughout this work.
