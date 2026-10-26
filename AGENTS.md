@@ -21,11 +21,11 @@ Use their ideas for a structured design audit, realistic copy, optical alignment
 ## Strict isolation
 - Never modify main, production or the existing Cloudflare Worker `nova-lounge-demo` as part of this branch.
 - Never change AVE resources, NOVA production D1/R2, secrets, DNS or domain settings.
-- The design concept is standalone static `public/concept.html`, `public/concept.css`, `public/concept.js`. It must not make authenticated or CMS writes; no live booking or client data.
+- The **original NOVA site** is the primary surface for improvement. Root `/`, `/spaces/*` and `/events` serve the original `public/index.html` and `public/events.html` through a completely isolated read-only `src/design-lab.js` Worker. `public/concept.html` is a secondary archived presentation, not the primary project. No authenticated or CMS writes, real booking, or client data.
 - Demo event titles are fictional and must be labelled accordingly.
 - Do not expose the site's repository, admin, deployment status or demo URL in client-facing materials.
 - A Git branch is not a separate deployment. Before sharing a preview URL, verify it is branch-scoped and cannot update the demo Worker or write to production data.
-- Run `npm run check`, concept static checks and mobile / reduced-motion visual QA before release.
+- Run `npm run check:design-lab` plus mobile / desktop / reduced-motion visual QA before release. Keep the Worker restricted to static assets, read-only content/events responses and public website routes.
 
 ## Motion
 - Default curve: cubic-bezier(.22,1,.36,1).
@@ -36,4 +36,4 @@ Use their ideas for a structured design audit, realistic copy, optical alignment
 
 ## Delivery
 - Audit first, approve major composition changes, then implement in reviewable commits.
-- Client-facing concept is not the actual functioning website. Keep this distinction explicit in internal docs, but do not present implementation status to the client.
+- Original website visuals and page structure must be improved, not replaced with a new presentation site. When creating client-facing outputs, omit deployment implementation details and clearly distinguish fictional sample events and nonfunctional booking. No merge to `main` without separate approval.
