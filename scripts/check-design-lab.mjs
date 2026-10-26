@@ -96,3 +96,18 @@ const dSource=readFileSync('public/app.js','utf8');
 const dCSS=readFileSync('public/design-lab.css','utf8');
 for(const token of ["lab-detail-${id}","venue_${id}_subtitle","venue_${id}_desc","venue_${id}_second","venue_${id}_features","address_${id}","data-modal='menu-location'","data-modal='contacts'","data-modal='booking'","data-place='${other}'"])assert.ok(dSource.includes(token),'Missing detail view hook: '+token);
 for(const token of ['.lab-detail-intro','.lab-detail-photo','.lab-detail-action-strip','.lab-detail-story','.lab-detail-next','.lab-detail-pob','.lab-detail-east'])assert.ok(dCSS.includes(token),'Missing venue style: '+token);
+
+ 
+// Sprint 3 content audit: two gallery images per venue must be distinct,
+// included in the repository, and preserve the same source in RU / EN.
+const imageDefaults=JSON.parse(readFileSync('public/content-defaults.json','utf8'));
+for(const id of ['zyb','pob','east']){
+  for(const index of [1,2]){
+    const key='gallery_'+id+'_'+index+'_image';
+    const ru=imageDefaults.content[key],en=imageDefaults.content_en[key];
+    assert.equal(ru,en,'Image differs across languages: '+key);
+    assert.ok(typeof ru==='string'&&ru.startsWith('/media/'),'Missing media path: '+key);
+    assert.ok(existsSync(resolve('public',ru.slice(1))),'Missing referenced gallery image: '+ru);
+  }
+  assert.notEqual(imageDefaults.content['gallery_'+id+'_1_image'],imageDefaults.content['gallery_'+id+'_2_image'],'Duplicate image in gallery '+id);
+}
