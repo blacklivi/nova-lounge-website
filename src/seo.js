@@ -71,7 +71,7 @@ function firstPaint(route, defaults){
   // viewport percentage. Runs before first paint; the same CSS variable styles
   // the bootstrap hero and its interactive replacement.
   '<script>(function(){'+
-  'function align(){if(innerWidth<=900)return;var h=document.querySelector("#nova-boot-hero h1");'+
+  'function align(){if(innerWidth<=900)return;var h=document.querySelector("#nova-boot-hero h1")||document.querySelector("#app .hero h1");'+
   'if(!h||!h.firstChild||h.firstChild.nodeType!==3)return;'+
   'var hero=h.closest(".hero"),r=document.createRange();r.setStart(h.firstChild,2);r.setEnd(h.firstChild,3);'+
   'var box=r.getBoundingClientRect(),base=hero.getBoundingClientRect();'+
