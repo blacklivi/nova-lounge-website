@@ -1,3 +1,29 @@
+
+/* Elements are hidden from the FIRST paint, before JS starts observing them.
+   They are revealed only when the visitor actually scrolls toward the venues.
+   This prevents the previous visible -> hidden -> visible flash. */
+html.nova-js #app .venues .venues-heading,
+html.nova-js #app .venues .venue-card{
+ opacity:0;
+ transition:opacity 1000ms cubic-bezier(.35,.65,.35,1);
+}
+html.nova-js #app .venues.lab-venues-visible .venues-heading,
+html.nova-js #app .venues.lab-venues-visible .venue-card{
+ opacity:1;
+}
+html.nova-js #app .venues.lab-venues-visible .venue-card:nth-of-type(1){
+ transition-delay:95ms;
+}
+html.nova-js #app .venues.lab-venues-visible .venue-card:nth-of-type(2){
+ transition-delay:195ms;
+}
+html.nova-js #app .venues.lab-venues-visible .venue-card:nth-of-type(3){
+ transition-delay:295ms;
+}
+@media (prefers-reduced-motion:reduce){
+ html.nova-js #app .venues .venues-heading,
+ html.nova-js #app .venues .venue-card{opacity:1!important;transition:none!important}
+}
 /* First visual frame, drawn by the Worker while the interactive bundle loads. */
 #nova-first-paint {
  position:absolute;top:0;left:0;width:100%;z-index:95;
@@ -5,6 +31,13 @@
  background:transparent;pointer-events:none;isolation:isolate;
 }
 
+/* The last A extends beyond its text advance because of negative tracking.
+   Reserve real paintable space inside the clipping box on both copies. */
+#nova-first-paint .hero h1,
+#app .hero h1 {
+  padding-inline-end:.12em;
+  margin-inline-end:-.12em;
+}
 /* Identical image geometry on both layers makes the hand-off imperceptible. */
 #nova-first-paint .hero-photo img {
  transform:translate3d(0,0,0) scale(1.035);
@@ -15,7 +48,8 @@
  #nova-first-paint .hero, #app .hero {
   /* Bootstrap finds the visual centre of the V and shares this exact edge. */
   grid-template-columns:var(--nova-hero-split,35.5%) minmax(0,1fr);
-  transition:grid-template-columns 700ms cubic-bezier(.35,.65,.35,1);
+  /* Avoid reflow of the image while the logo is being uncovered. */
+  transition:none;
  }
 }
 /* The live DOM keeps its layout but does not show through the bootstrap animation. */
@@ -37,7 +71,7 @@ html[data-nova-boot-lang=en] #nova-first-paint .language span:last-child {
 }
 #nova-first-paint .hero {height:clamp(540px,43vw,960px);}
 html.nova-js:not(.nova-deep-link) #nova-first-paint .hero h1{
- animation:nova-boot-headline 1200ms cubic-bezier(.47,.06,.56,.96) 90ms both;
+ animation:nova-boot-headline 1420ms cubic-bezier(.42,0,.38,1) 90ms both;
  will-change:clip-path;
 }
 html.nova-js:not(.nova-deep-link) #nova-first-paint .hero-photo{
@@ -52,9 +86,9 @@ html.nova-js:not(.nova-deep-link) #nova-first-paint .photo-side{
 #nova-first-paint .hero-tagline{animation-delay:480ms!important}
 #nova-first-paint .photo-side{animation-delay:670ms!important}
 @keyframes nova-boot-headline {
- /* Reveal the intact word; changing its transform/geometry at the end caused the A to jump. */
+ /* Clip travels across the FULL ink width, including the A's terminal stroke. */
  from{clip-path:inset(0 100% 0 0)}
- to{clip-path:inset(0 0 0 0)}
+ to{clip-path:inset(0 -0.02em 0 0)}
 }
 @keyframes nova-boot-picture {
  from{opacity:0;transform:translate3d(0,9px,0)}
