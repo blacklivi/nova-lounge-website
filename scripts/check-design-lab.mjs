@@ -90,3 +90,9 @@ for(const token of ['.events-intro','.events-list','.events-section.archive'])
 assert.match(eventPageSource,/function eventsPage\(\)/);
 assert.match(eventPageSource,/eventCard\(e\)/);
 assert.match(eventPageSource,/events-demo-notice/);
+
+// Sprint 3: venue-page routes, CMS keys, modal actions, galleries.
+const dSource=readFileSync('public/app.js','utf8');
+const dCSS=readFileSync('public/design-lab.css','utf8');
+for(const token of ["lab-detail-${id}","venue_${id}_subtitle","venue_${id}_desc","venue_${id}_second","venue_${id}_features","address_${id}","data-modal='menu-location'","data-modal='contacts'","data-modal='booking'","data-place='${other}'"])assert.ok(dSource.includes(token),'Missing detail view hook: '+token);
+for(const token of ['.lab-detail-intro','.lab-detail-photo','.lab-detail-action-strip','.lab-detail-story','.lab-detail-next','.lab-detail-pob','.lab-detail-east'])assert.ok(dCSS.includes(token),'Missing venue style: '+token);

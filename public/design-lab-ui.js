@@ -4,7 +4,7 @@
   const app=document.querySelector('#app');
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   if(!app||!('IntersectionObserver' in window)||reduced.matches)return;
-  const selector='.venues-heading,.venue-card,.story-editorial-heading,.story-copy,.story-photo,.home-events-top,.home-events .event-card,.book-main,.detail-grid,.detail-bottom,.events-intro,.events-section';
+  const selector='.venues-heading,.venue-card,.story-editorial-heading,.story-copy,.story-photo,.home-events-top,.home-events .event-card,.book-main,.lab-detail-story-copy,.lab-detail-gallery,.lab-detail-next,.events-intro,.events-section';
   const observer=new IntersectionObserver(entries=>{
     for(const entry of entries){
       if(!entry.isIntersecting)continue;
