@@ -111,3 +111,23 @@ for(const id of ['zyb','pob','east']){
   }
   assert.notEqual(imageDefaults.content['gallery_'+id+'_1_image'],imageDefaults.content['gallery_'+id+'_2_image'],'Duplicate image in gallery '+id);
 }
+
+
+// Compact editorial density applies to every public chapter, only in the lab.
+const densityCSS=readFileSync('public/design-lab.css','utf8');
+assert.match(densityCSS,/COMPACT EDITORIAL SYSTEM/);
+for(const target of [
+  '.hero-editorial',
+  '.venues-editorial',
+  '.venue-card-editorial',
+  '.story-editorial',
+  '.home-events-editorial',
+  '.book-strip-editorial',
+  '.events-page',
+  '.lab-detail-intro',
+  '.lab-detail-photo',
+  '.lab-detail-story',
+  '.lab-detail-next'
+])assert.ok(densityCSS.includes(target),'Density missing: '+target);
+assert.match(densityCSS,/body\[data-design-lab=true\]/);
+assert.match(densityCSS,/prefers-reduced-motion:reduce/);

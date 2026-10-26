@@ -780,3 +780,504 @@ body[data-design-lab=true] .lab-detail-east .lab-detail-story{background:#edf0e9
 @media(prefers-reduced-motion:reduce){
  body[data-design-lab=true] .lab-detail-gallery-photo img{transition:none!important;transform:none!important}
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   NOVA DESIGN LAB · COMPACT EDITORIAL SYSTEM · 2026-10-26
+   Deliberately smaller chapters, not smaller tap targets.
+   Isolated to body[data-design-lab=true]. Reversible in one commit.
+   ═══════════════════════════════════════════════════════════════════ */
+
+body[data-design-lab=true]{
+  --lab-chapter-pad:clamp(60px,6.2vw,106px);
+  --lab-chapter-gap:clamp(40px,5vw,90px);
+}
+
+/* Cover: retain an impactful full-bleed photograph but avoid an
+   unnecessarily full-viewport poster on ordinary laptop screens. */
+body[data-design-lab=true] .hero-editorial{
+  height:clamp(520px,78svh,760px);
+  min-height:520px;max-height:760px;
+}
+body[data-design-lab=true] .hero-editorial .hero-copy{
+  padding:clamp(27px,3.4vw,65px) var(--gutter) 101px;
+}
+body[data-design-lab=true] .hero-editorial h1{
+  font-size:clamp(135px,19.5vw,318px);
+  margin:clamp(37px,6.5vh,78px) 0 0 -.052em;
+}
+body[data-design-lab=true] .hero-editorial .hero-tagline{
+  font-size:clamp(19px,1.9vw,28px);
+}
+body[data-design-lab=true] .hero-spaces{min-height:66px}
+body[data-design-lab=true] .hero-space-link{padding-top:12px;padding-bottom:12px}
+
+/* Three venues: shorter imagery, tightened chapter rhythm, still asymmetrical. */
+body[data-design-lab=true] .venues-editorial{
+  padding:var(--lab-chapter-pad) var(--gutter) clamp(60px,6.5vw,108px);
+}
+body[data-design-lab=true] .venues-editorial-intro{
+  margin-bottom:clamp(42px,5vw,78px);
+  row-gap:22px;
+}
+body[data-design-lab=true] .venues-editorial .venues-heading{
+  font-size:clamp(45px,5vw,79px);
+  line-height:1.08;
+}
+body[data-design-lab=true] .venue-card-editorial{
+  min-height:0;
+  margin-bottom:var(--lab-chapter-gap);
+  gap:clamp(30px,4.3vw,85px);
+}
+body[data-design-lab=true] .venue-card-editorial .venue-img{
+  height:clamp(350px,35vw,555px);
+}
+body[data-design-lab=true] .venue-card-editorial .venue-foot{
+  padding:clamp(20px,3vw,46px) 0;
+}
+body[data-design-lab=true] .venue-serial{
+  margin-bottom:clamp(24px,3.7vw,65px);
+}
+body[data-design-lab=true] .venue-card-editorial .venue-title{
+  font-size:clamp(37px,4.1vw,66px);
+}
+body[data-design-lab=true] .venue-card-editorial .venue-description{
+  margin-top:18px;font-size:clamp(14px,1.1vw,17px);
+}
+body[data-design-lab=true] .venue-discover{
+  margin-top:clamp(23px,3vw,48px);
+}
+body[data-design-lab=true] .venue-card-editorial-east{
+  height:clamp(430px,39vw,590px);min-height:0;margin-bottom:0;
+}
+body[data-design-lab=true] .venue-card-editorial-east .venue-img{
+  height:100%;
+}
+body[data-design-lab=true] .venue-card-editorial-east .venue-foot{
+  min-height:0;height:100%;
+  padding:clamp(32px,4vw,68px);
+}
+body[data-design-lab=true] .venue-card-editorial-east .venue-serial{
+  margin-bottom:auto;
+}
+
+/* The story is a magazine feature, not a full-height chapter per sentence. */
+body[data-design-lab=true] .story-editorial{
+  padding:var(--lab-chapter-pad) var(--gutter) clamp(70px,7vw,116px);
+  row-gap:clamp(27px,4vw,57px);
+  column-gap:clamp(32px,5vw,90px);
+}
+body[data-design-lab=true] .story-editorial h2{
+  font-size:clamp(67px,8vw,132px);
+  line-height:1.02;
+}
+body[data-design-lab=true] .story-editorial-heading{
+  gap:clamp(15px,2vw,27px);
+}
+body[data-design-lab=true] .story-editorial .story-photo img{
+  aspect-ratio:1.55;
+}
+body[data-design-lab=true] .story-editorial .story-copy{
+  padding-bottom:clamp(12px,2.5vw,42px);
+}
+body[data-design-lab=true] .story-copy-number{
+  margin-bottom:clamp(19px,2.6vw,39px);
+}
+body[data-design-lab=true] .story-editorial .story-copy p{
+  font-size:clamp(16px,1.25vw,20px);
+  margin-bottom:30px;
+}
+
+/* Events: smaller photos, less empty staging, typography retains hierarchy. */
+body[data-design-lab=true] .home-events-editorial{
+  padding:var(--lab-chapter-pad) var(--gutter) clamp(65px,6.8vw,111px);
+}
+body[data-design-lab=true] .home-events-top{
+  padding-bottom:clamp(30px,4vw,61px);
+  row-gap:clamp(15px,2.5vw,30px);
+}
+body[data-design-lab=true] .home-events-top .section-link h2{
+  font-size:clamp(69px,7.3vw,116px);
+}
+body[data-design-lab=true] .home-events-lead{
+  font-size:clamp(16px,1.22vw,19px);
+}
+body[data-design-lab=true] .home-events-gallery{
+  gap:clamp(22px,2.8vw,44px);
+}
+body[data-design-lab=true] .home-events-gallery .event-media{
+  aspect-ratio:1.48;
+}
+body[data-design-lab=true] .home-events-gallery .event-editorial-entry-2{
+  padding-top:clamp(28px,4vw,68px);
+}
+body[data-design-lab=true] .home-events-gallery .event-editorial-entry-2 .event-media{
+  aspect-ratio:1.07;
+}
+body[data-design-lab=true] .home-events-gallery .event-info h3{
+  font-size:clamp(22px,2.2vw,34px);
+}
+body[data-design-lab=true] .home-events-bottom{
+  margin-top:clamp(35px,4vw,64px);
+}
+
+/* Booking: still a large, readable CTA, but no longer an 860px wall. */
+body[data-design-lab=true] .book-strip-editorial{
+  min-height:clamp(410px,39vw,625px);
+}
+body[data-design-lab=true] .book-strip-editorial .book-main{
+  padding:clamp(32px,4vw,66px) var(--gutter);
+  gap:clamp(18px,3vw,47px);
+}
+body[data-design-lab=true] .book-strip-editorial .book-welcome{
+  font-size:clamp(37px,4.1vw,73px);
+  max-width:17ch;
+}
+body[data-design-lab=true] .book-strip-editorial .book-image{
+  min-height:0;
+}
+
+/* Events page: publication-like, not a sequence of oversized posters. */
+body[data-design-lab=true] .events-page{
+  padding:clamp(55px,6.4vw,105px) var(--gutter) clamp(70px,7vw,120px);
+}
+body[data-design-lab=true] .events-intro{
+  padding-bottom:clamp(37px,4.5vw,70px);
+}
+body[data-design-lab=true] .events-intro h1{
+  font-size:clamp(72px,10vw,172px);
+  margin:clamp(23px,3vw,50px) 0 clamp(22px,3vw,45px);
+}
+body[data-design-lab=true] .events-intro>p{
+  font-size:clamp(17px,1.4vw,23px);
+}
+body[data-design-lab=true] .events-section{
+  padding-top:clamp(38px,5vw,79px);
+}
+body[data-design-lab=true] .events-section h2{
+  margin-bottom:clamp(26px,3.5vw,52px);
+}
+body[data-design-lab=true] .events-list{
+  gap:clamp(24px,3vw,48px);
+}
+body[data-design-lab=true] .events-list .event-card .event-media{
+  aspect-ratio:1.48;
+}
+body[data-design-lab=true] .events-list .event-card:nth-child(even){
+  padding-top:clamp(22px,3.8vw,66px);
+}
+body[data-design-lab=true] .events-list .event-card:nth-child(even) .event-media{
+  aspect-ratio:1.12;
+}
+body[data-design-lab=true] .events-section.archive{
+  margin-top:clamp(42px,5vw,84px);
+}
+
+/* Details: stronger proportion between title, image, contact, photo gallery. */
+body[data-design-lab=true] .lab-detail-intro{
+  padding:clamp(24px,3vw,49px) var(--gutter) clamp(35px,4.8vw,80px);
+}
+body[data-design-lab=true] .lab-detail-intro-grid{
+  padding-top:clamp(37px,5.2vw,88px);
+  gap:clamp(27px,4vw,75px);
+}
+body[data-design-lab=true] .lab-detail-intro h1{
+  font-size:clamp(59px,6.8vw,114px);
+}
+body[data-design-lab=true] .lab-detail-kicker{
+  margin-bottom:clamp(14px,2vw,29px);
+}
+body[data-design-lab=true] .lab-detail-subtitle{
+  margin-top:clamp(18px,2.2vw,34px);
+}
+body[data-design-lab=true] .lab-detail-desc{
+  font-size:clamp(16px,1.3vw,20px);
+}
+body[data-design-lab=true] .lab-detail-photo,
+body[data-design-lab=true] .lab-detail-pob .lab-detail-photo,
+body[data-design-lab=true] .lab-detail-east .lab-detail-photo{
+  height:clamp(420px,45vw,690px);
+}
+body[data-design-lab=true] .lab-detail-pob .lab-detail-photo{
+  height:clamp(405px,42vw,640px);
+}
+body[data-design-lab=true] .lab-detail-action-strip{
+  padding:clamp(26px,3.3vw,53px) var(--gutter);
+}
+body[data-design-lab=true] .lab-detail-story{
+  padding:var(--lab-chapter-pad) var(--gutter);
+  gap:clamp(34px,5vw,88px);
+}
+body[data-design-lab=true] .lab-detail-story-copy h2{
+  font-size:clamp(49px,5vw,85px);
+  margin-bottom:clamp(24px,3vw,50px);
+}
+body[data-design-lab=true] .lab-detail-story-copy>p:not(.features){
+  font-size:clamp(16px,1.25vw,20px);
+}
+body[data-design-lab=true] .lab-detail-story-copy .features{
+  margin-bottom:clamp(28px,3.4vw,52px);
+}
+body[data-design-lab=true] .lab-detail-gallery-photo{
+  aspect-ratio:1.07;
+}
+body[data-design-lab=true] .lab-detail-gallery-photo:nth-child(2){
+  aspect-ratio:1;
+  margin-top:clamp(23px,4vw,65px);
+}
+body[data-design-lab=true] .lab-detail-next{
+  padding:var(--lab-chapter-pad) var(--gutter);
+  gap:clamp(28px,4vw,79px);
+}
+body[data-design-lab=true] .lab-detail-next h2{
+  font-size:clamp(42px,5.2vw,84px);
+}
+body[data-design-lab=true] .lab-detail-other-links{
+  padding-top:clamp(18px,2.5vw,40px);
+}
+body[data-design-lab=true] .lab-detail-other-link{
+  padding:clamp(19px,2.1vw,32px) 0;
+}
+body[data-design-lab=true] .lab-detail-other-link strong{
+  font-size:clamp(22px,2.2vw,36px);
+}
+
+/* Compact tablet: do not collapse the original editorial column hierarchy. */
+@media(max-width:900px) and (min-width:601px){
+  body[data-design-lab=true] .venue-card-editorial .venue-img{
+    height:clamp(320px,41vw,425px);
+  }
+  body[data-design-lab=true] .venue-card-editorial-east{
+    height:clamp(370px,50vw,480px);
+  }
+  body[data-design-lab=true] .venue-card-editorial-east .venue-img{
+    height:100%;
+  }
+  body[data-design-lab=true] .venue-card-editorial-east .venue-foot{
+    height:100%;
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-title{
+    font-size:clamp(33px,4.5vw,48px);
+  }
+  body[data-design-lab=true] .lab-detail-intro h1{
+    font-size:clamp(51px,7.1vw,76px);
+  }
+  body[data-design-lab=true] .lab-detail-story-copy h2{
+    font-size:clamp(47px,6vw,61px);
+  }
+}
+
+/* Phone: each photographic chapter uses roughly one screen, not two.
+   Keep the hero asset stable and the sticky booking control untouched. */
+@media(max-width:600px){
+  body[data-design-lab=true]{
+    --lab-chapter-pad:60px;
+    --lab-chapter-gap:50px;
+  }
+  body[data-design-lab=true] .hero-editorial{
+    height:clamp(460px,68svh,640px);
+    min-height:460px;max-height:640px;
+  }
+  body[data-design-lab=true] .hero-editorial .hero-copy{
+    padding:clamp(22px,4vh,40px) 22px 98px;
+  }
+  body[data-design-lab=true] .hero-editorial h1{
+    font-size:25.5vw;
+    margin:clamp(31px,6vh,52px) 0 0 -.05em;
+  }
+  body[data-design-lab=true] .hero-editorial .hero-tagline{
+    font-size:clamp(17px,4.4vw,21px);
+  }
+  body[data-design-lab=true] .hero-spaces{
+    min-height:67px;
+  }
+  body[data-design-lab=true] .hero-space-link{
+    padding-top:9px;padding-bottom:9px;
+  }
+  body[data-design-lab=true] .venues-editorial{
+    padding:62px var(--gutter) 65px;
+  }
+  body[data-design-lab=true] .venues-editorial-intro{
+    margin-bottom:44px;
+  }
+  body[data-design-lab=true] .venues-editorial .venues-heading{
+    font-size:clamp(36px,9.3vw,50px);
+    margin:19px 0;
+  }
+  body[data-design-lab=true] .venue-card-editorial,
+  body[data-design-lab=true] .venue-card-editorial-pob{
+    margin-bottom:53px;gap:0;
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-img{
+    height:auto;aspect-ratio:1.13;
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-foot{
+    padding-top:20px;
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-serial{
+    margin-bottom:15px;
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-title{
+    font-size:clamp(33px,8.7vw,47px);
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-description{
+    margin-top:10px;
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-discover{
+    margin-top:18px;
+  }
+  body[data-design-lab=true] .venue-card-editorial-east{
+    min-height:0;height:425px;margin:0;
+  }
+  body[data-design-lab=true] .venue-card-editorial-east .venue-img{
+    height:100%;aspect-ratio:auto;
+  }
+  body[data-design-lab=true] .venue-card-editorial-east .venue-foot{
+    min-height:0;height:100%;padding:25px 22px;
+  }
+  body[data-design-lab=true] .story-editorial{
+    padding:62px var(--gutter) 72px;
+  }
+  body[data-design-lab=true] .story-editorial-heading{
+    gap:16px;margin:32px 0 31px;
+  }
+  body[data-design-lab=true] .story-editorial h2{
+    font-size:clamp(47px,11vw,61px);
+    line-height:1.06;
+  }
+  body[data-design-lab=true] .story-editorial .story-photo img{
+    aspect-ratio:1.08;
+  }
+  body[data-design-lab=true] .story-editorial .story-copy{
+    padding-top:25px;
+  }
+  body[data-design-lab=true] .story-copy-number{
+    margin-bottom:17px;
+  }
+  body[data-design-lab=true] .story-editorial .story-copy p{
+    margin-bottom:23px;
+  }
+  body[data-design-lab=true] .home-events-editorial{
+    padding:64px var(--gutter) 78px;
+  }
+  body[data-design-lab=true] .home-events-top{
+    padding-bottom:29px;
+  }
+  body[data-design-lab=true] .home-events-top .section-link h2{
+    font-size:clamp(57px,12.6vw,76px);
+  }
+  body[data-design-lab=true] .home-events-gallery{
+    gap:35px;
+  }
+  body[data-design-lab=true] .home-events-gallery .event-media,
+  body[data-design-lab=true] .home-events-gallery .event-editorial-entry-2 .event-media{
+    aspect-ratio:1.08;
+  }
+  body[data-design-lab=true] .home-events-bottom{
+    margin-top:36px;
+  }
+  body[data-design-lab=true] .book-strip-editorial{
+    min-height:0;
+  }
+  body[data-design-lab=true] .book-strip-editorial .book-main{
+    min-height:375px;
+    padding:34px var(--gutter) 30px;
+    gap:14px;
+  }
+  body[data-design-lab=true] .book-strip-editorial .book-welcome{
+    font-size:clamp(36px,9vw,46px);
+    margin:29px 0 24px;
+  }
+  body[data-design-lab=true] .book-strip-editorial .book-image{
+    height:180px;min-height:180px;
+  }
+  body[data-design-lab=true] .events-page{
+    padding:49px var(--gutter) 75px;
+  }
+  body[data-design-lab=true] .events-intro{
+    padding-bottom:43px;
+  }
+  body[data-design-lab=true] .events-intro h1{
+    font-size:clamp(56px,14vw,75px);
+    margin:25px 0 21px;
+  }
+  body[data-design-lab=true] .events-section{
+    padding-top:44px;
+  }
+  body[data-design-lab=true] .events-section h2{
+    font-size:29px;
+    margin-bottom:23px;
+  }
+  body[data-design-lab=true] .events-list{
+    gap:39px;
+  }
+  body[data-design-lab=true] .events-list .event-card .event-media,
+  body[data-design-lab=true] .events-list .event-card:nth-child(even) .event-media{
+    aspect-ratio:1.08;
+  }
+  body[data-design-lab=true] .events-section.archive{
+    margin-top:57px;
+  }
+  body[data-design-lab=true] .lab-detail-intro{
+    padding:23px var(--gutter) 35px;
+  }
+  body[data-design-lab=true] .lab-detail-intro-grid{
+    padding-top:38px;
+    gap:17px;
+  }
+  body[data-design-lab=true] .lab-detail-intro h1{
+    font-size:clamp(44px,10.7vw,65px);
+  }
+  body[data-design-lab=true] .lab-detail-kicker{
+    margin-bottom:14px;
+  }
+  body[data-design-lab=true] .lab-detail-subtitle{
+    margin-top:16px;
+  }
+  body[data-design-lab=true] .lab-detail-photo,
+  body[data-design-lab=true] .lab-detail-pob .lab-detail-photo,
+  body[data-design-lab=true] .lab-detail-east .lab-detail-photo{
+    height:clamp(340px,98vw,540px);
+  }
+  body[data-design-lab=true] .lab-detail-action-strip{
+    gap:17px;padding:27px var(--gutter) 31px;
+  }
+  body[data-design-lab=true] .lab-detail-story{
+    padding:62px var(--gutter) 74px;
+    gap:31px;
+  }
+  body[data-design-lab=true] .lab-detail-story-copy h2{
+    font-size:clamp(43px,10vw,61px);
+    margin-bottom:23px;
+  }
+  body[data-design-lab=true] .lab-detail-story-copy .features{
+    margin-bottom:26px;
+  }
+  body[data-design-lab=true] .lab-detail-gallery-photo{
+    aspect-ratio:1.05;
+  }
+  body[data-design-lab=true] .lab-detail-gallery-photo:nth-child(2){
+    aspect-ratio:1;
+    margin-top:27px;
+  }
+  body[data-design-lab=true] .lab-detail-next{
+    padding:63px var(--gutter) 76px;
+    gap:25px;
+  }
+  body[data-design-lab=true] .lab-detail-next h2{
+    font-size:clamp(42px,10.3vw,61px);
+  }
+  body[data-design-lab=true] .lab-detail-other-link{
+    padding:19px 0;
+  }
+}
+
+/* Protect readable text, untrimmed focus states, and accessibility. */
+@media(prefers-reduced-motion:reduce){
+  body[data-design-lab=true] .venue-card-editorial,
+  body[data-design-lab=true] .story-editorial,
+  body[data-design-lab=true] .home-events-editorial,
+  body[data-design-lab=true] .lab-detail-story{
+    animation:none!important;
+  }
+}
