@@ -1423,3 +1423,15 @@ html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-photo i
 
 /* Reserve the cover's dark visual canvas while SSR fallback is hydrated. */
 html.lab-js body[data-design-lab=true] #app:has(> #seo-fallback){min-height:100svh;background:var(--deep)}
+
+
+/* Hero title ink safety.
+   Negative tracking (-.084em) reduces the NOVA line's measured advance.
+   The A overhangs that width and was cut by the reveal mask at its right edge.
+   The mask is expanded without changing letter spacing, positioning or animation. */
+body[data-design-lab=true] .hero-title-mask{
+  padding-inline-end:.16em;
+  margin-inline-end:-.16em;
+  padding-bottom:.075em;
+  margin-bottom:-.075em;
+}

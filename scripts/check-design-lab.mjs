@@ -150,3 +150,11 @@ for(const token of ['01—03','04 / NOVA JOURNAL','05 / NOVA EVENTS','06 / NOVA 
 // Do not mistake server SEO fallback for the hydrated homepage.
 assert.match(readFileSync('public/index.html','utf8'),/main:not\(#seo-fallback\)/);
 assert.match(readFileSync('public/design-lab-ui.js','utf8'),/main:not\(#seo-fallback\)/);
+
+
+// Keep the final 'A' fully visible: negative letter spacing causes right overhang.
+const titleInkCSS=readFileSync('public/design-lab.css','utf8');
+assert.match(titleInkCSS,/Hero title ink safety/);
+assert.match(titleInkCSS,/padding-inline-end:\.16em/);
+assert.match(titleInkCSS,/margin-inline-end:-\.16em/);
+assert.match(titleInkCSS,/padding-bottom:\.075em/);
