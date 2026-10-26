@@ -42,3 +42,6 @@
 
 /* Keep all three brand swatches on one line even at iPhone SE width. */
 @media(max-width:350px){.tokens{gap:8px}.swatch{width:calc((100% - 16px)/3);height:80px}.swatch b{font-size:9px;left:7px}}
+
+/* Tablet navigation: keep the presentation title legible rather than compressing four links. */
+@media(min-width:761px) and (max-width:900px){.topbar-nav{display:none}.topbar-caption{margin-left:auto}}
