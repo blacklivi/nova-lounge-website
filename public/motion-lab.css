@@ -281,3 +281,46 @@ html.motion-lab .detail-gallery img {
     transform: none !important;
   }
 }
+
+/*
+ * Mobile first-paint parity (experimental branch only).
+ * The initial SSR hero used height:auto and animated the photo. That made
+ * its picture collapse to the text height before the real 100svh hero mounted.
+ * Keep the image fully present and the frame height identical from frame 1.
+ * Desktop (min-width:901px) is deliberately not modified.
+ */
+@media (max-width:900px) {
+  #nova-first-paint .hero {
+    height:560px;
+  }
+  #nova-first-paint .hero-photo img {
+    transform:none;
+  }
+  html.nova-js:not(.nova-deep-link) #nova-first-paint .hero-photo,
+  html.motion-lab #app .lab-intro .hero-photo {
+    animation:none;
+    opacity:1;
+    transform:none;
+  }
+}
+@media (max-width:600px) {
+  #nova-first-paint .hero {
+    display:block;
+    height:calc(100svh - var(--header) - 76px);
+    min-height:480px;
+    max-height:760px;
+  }
+  #nova-first-paint .hero-photo {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+  }
+  #nova-first-paint .hero-photo img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:58% center;
+    transform:none;
+  }
+}
