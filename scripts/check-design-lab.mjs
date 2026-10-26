@@ -146,3 +146,7 @@ assert.match(revisedUI,/lab-hero-ready/);
 assert.match(revisedUI,/document\.fonts\.load/);
 const visibleViews=revisedApp.slice(revisedApp.indexOf('function home(){'),revisedApp.indexOf('function eventsPage(){'));
 for(const token of ['01—03','04 / NOVA JOURNAL','05 / NOVA EVENTS','06 / NOVA RESERVATIONS','07 / NOVA MINSK','hero-space-number'])assert.ok(!visibleViews.includes(token),'Visible number remains: '+token);
+
+// Do not mistake server SEO fallback for the hydrated homepage.
+assert.match(readFileSync('public/index.html','utf8'),/main:not\(#seo-fallback\)/);
+assert.match(readFileSync('public/design-lab-ui.js','utf8'),/main:not\(#seo-fallback\)/);

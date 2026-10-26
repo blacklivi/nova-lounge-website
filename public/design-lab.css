@@ -1420,3 +1420,6 @@ html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-photo i
   opacity:1!important;transform:none!important;
  }
 }
+
+/* Reserve the cover's dark visual canvas while SSR fallback is hydrated. */
+html.lab-js body[data-design-lab=true] #app:has(> #seo-fallback){min-height:100svh;background:var(--deep)}

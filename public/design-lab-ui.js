@@ -10,7 +10,7 @@
    img.addEventListener('error',resolve,{once:true});
  });
  const onRender=()=>{
-   if(!app.querySelector('main'))return;
+   if(!app.querySelector('main:not(#seo-fallback)'))return;
    root.classList.add('lab-app-rendered');
    const hero=app.querySelector('.hero-editorial');
    if(!hero){root.classList.remove('lab-hero-preparing');return;}
