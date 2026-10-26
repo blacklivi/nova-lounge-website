@@ -28,7 +28,7 @@
     const total = Math.max(0,document.documentElement.scrollHeight - innerHeight);
     const destination = Math.min(total,Math.max(0,Math.round(target.getBoundingClientRect().top + scrollY - headingOffset)));
     if(reducedMotion.matches || Math.abs(destination-scrollY)<4){
-      scrollTo({top:destination,behavior:'instant'});
+      scrollTo({top:destination,behavior:'auto'});
       return;
     }
     const start=scrollY,delta=destination-start;
@@ -37,7 +37,7 @@
     const tick=now=>{
       const progress=Math.min(1,(now-begin)/duration);
       const eased=1-Math.pow(1-progress,3);
-      scrollTo({top:start+delta*eased,behavior:'instant'});
+      scrollTo({top:start+delta*eased,behavior:'auto'});
       if(progress<1)frame=requestAnimationFrame(tick);
       else frame=0;
     };
