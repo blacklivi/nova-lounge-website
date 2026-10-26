@@ -47,7 +47,7 @@ html.nova-js #app .venues.lab-venues-visible .venue-card:nth-of-type(3){
 @media (min-width:901px){
  #nova-first-paint .hero, #app .hero {
   /* Bootstrap finds the visual centre of the V and shares this exact edge. */
-  grid-template-columns:var(--nova-hero-split,35.5%) minmax(0,1fr);
+  grid-template-columns:var(--nova-hero-split,36.1%) minmax(0,1fr);
   /* Avoid reflow of the image while the logo is being uncovered. */
   transition:none;
  }
