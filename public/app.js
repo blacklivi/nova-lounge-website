@@ -318,14 +318,18 @@ if(firstPaint) {
  // The actual first-paint hero already played the entrance animation.
  // Keep it visible until its sequence finishes; hand over to identical live UI.
  const elapsed=performance.now()-(window.__novaBootStarted||performance.now());
- const hold=Math.max(0,1550-elapsed);
+ const hold=Math.max(0,1710-elapsed);
  setTimeout(()=>{
+  // Both heroes now have the same V-aligned grid and image scale. Reveal
+  // the live DOM under the bootstrap while fading out only the top layer.
+  document.documentElement.classList.remove('nova-booting');
   if(firstPaint.isConnected){
    firstPaint.classList.add('nova-boot-exit');
-   setTimeout(()=>firstPaint.remove(),340);
+   setTimeout(()=>firstPaint.remove(),480);
   }
  }, matchMedia('(prefers-reduced-motion: reduce)').matches||location.hash?0:hold);
 } else {
+ document.documentElement.classList.remove('nova-booting');
  enterMotionHome();
 }
 if(pendingRefresh) {
