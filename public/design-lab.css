@@ -194,3 +194,15 @@ body[data-design-lab=true] .venue-card-editorial-east .venue-discover{border-col
 @media(prefers-reduced-motion:reduce){
  body[data-design-lab=true] .hero-editorial h1,body[data-design-lab=true] .venue-card-editorial{animation:none!important;transition:none!important}
 }
+
+
+/* Editorial optical alignment: heading and lead occupy separate grid tracks. */
+@media(min-width:601px){
+ body[data-design-lab=true] .venues-editorial-intro>.venues-heading{grid-column:1/2;grid-row:2}
+ body[data-design-lab=true] .venues-editorial-intro>.venues-editorial-lead{grid-column:2/3;grid-row:2}
+}
+body[data-design-lab=true] .hero-space-link:active{background:#ffffff28}
+body[data-design-lab=true] .venue-card-editorial:focus-visible{outline:2px solid var(--olive);outline-offset:7px}
+@media(max-width:600px){
+ body[data-design-lab=true] .hero-space-name{font-size:clamp(10px,2.8vw,12px)}
+}
