@@ -40,6 +40,21 @@ function animateParallax() {
   photo.style.setProperty('--lab-drift', parallaxCurrent.toFixed(2) + 'px');
 }
 
+function updateVenueVisibility() {
+ const venue=document.querySelector('#app .venues');
+ if (!venue) return;
+ if (reducedMotion.matches) {
+   venue.classList.add('lab-venues-visible');
+   return;
+ }
+ // On a fresh load the heading and cards remain hidden even if the viewport
+ // happens to include their top edge. Reveal only during a real downward scroll.
+ const bounds=venue.getBoundingClientRect();
+ if (window.scrollY > 70 && bounds.top < innerHeight * 0.96 && bounds.bottom > 0) {
+   venue.classList.add('lab-venues-visible');
+ }
+}
+
 function revealSections() {
   if (observer) observer.disconnect();
   document.querySelectorAll('.lab-reveal').forEach(el => {
@@ -57,7 +72,7 @@ function revealSections() {
   }, {rootMargin: '0px 0px -10% 0px', threshold: 0.08});
 
   const selectors = [
-    '.venues-heading', '.venue-card', '.story-copy', '.story-photo',
+    '.story-copy', '.story-photo',
     '.home-events .section-link', '.home-events .event-card',
     '.book-strip .book-image', '.book-strip .book-main',
     '.events-intro', '.events-section',
@@ -84,17 +99,23 @@ export function initMotionLab() {
     document.documentElement.classList.remove('motion-lab');
     observer?.disconnect();
     document.querySelectorAll('.lab-reveal').forEach(el => el.classList.add('lab-visible'));
+    updateVenueVisibility();
     updateParallaxTarget();
     return;
   }
   document.documentElement.classList.add('motion-lab');
+  // The venue cards are controlled by scroll gating instead of the generic
+  // observer, so they cannot show for one frame and then disappear.
+  updateVenueVisibility();
   revealSections();
   updateParallaxTarget();
 
   if (!listenersInstalled) {
     listenersInstalled = true;
     window.addEventListener('scroll', updateParallaxTarget, {passive:true});
+    window.addEventListener('scroll', updateVenueVisibility, {passive:true});
     window.addEventListener('resize', updateParallaxTarget, {passive:true});
+    window.addEventListener('resize', updateVenueVisibility, {passive:true});
     desktopMotion.addEventListener('change', updateParallaxTarget);
     reducedMotion.addEventListener('change', initMotionLab);
   }
