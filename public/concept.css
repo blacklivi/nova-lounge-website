@@ -23,3 +23,16 @@
 
 /* Mobile QA fix (320–430px): prevent the long Russian headline from widening the grid track. */
 @media(max-width:430px){.intro{grid-template-columns:minmax(0,1fr)}.intro-content{min-width:0}.intro-content h2{font-size:clamp(38px,11.4vw,49px)}}
+/* Design Lab: present the full 710px desktop artboard as a touch-scrollable specimen on narrow phones. A clipped scaled frame misleadingly hid its right half. */
+.exhibit-swipe{display:none}
+@media(max-width:430px){
+  .exhibit-label{align-items:end}
+  .exhibit-label>span:nth-child(2){display:none}
+  .exhibit-swipe{display:block;font-size:9px;letter-spacing:.07em;text-align:right;color:var(--muted)}
+  .browser-stage{overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:thin;scrollbar-color:#9ca995 #e4e8e0;-webkit-overflow-scrolling:touch}
+  .browser-frame{width:710px;min-width:710px;max-width:none;transform:none;margin-bottom:0;box-shadow:none}
+  .browser-stage::-webkit-scrollbar{height:5px}
+  .browser-stage::-webkit-scrollbar-thumb{background:#9ca995}
+  .browser-stage::-webkit-scrollbar-track{background:#e4e8e0}
+}
+
