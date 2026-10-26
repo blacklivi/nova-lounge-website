@@ -75,7 +75,8 @@ function firstPaint(route, defaults){
   'if(!h||!h.firstChild||h.firstChild.nodeType!==3)return;'+
   'var hero=h.closest(".hero"),r=document.createRange();r.setStart(h.firstChild,2);r.setEnd(h.firstChild,3);'+
   'var box=r.getBoundingClientRect(),base=hero.getBoundingClientRect();'+
-  'var x=box.left-base.left+box.width*.5;'+
+  'var inkCorrection=parseFloat(getComputedStyle(h).fontSize)*.065;'+
+  'var x=box.left-base.left+box.width*.5+inkCorrection;'+
   'if(x>base.width*.24&&x<base.width*.55)document.documentElement.style.setProperty("--nova-hero-split",x.toFixed(1)+"px");'+
   '}align();document.fonts.ready.then(align);'+
   'var raf=0;addEventListener("resize",function(){cancelAnimationFrame(raf);raf=requestAnimationFrame(align)},{passive:true});'+
