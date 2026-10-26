@@ -1,7 +1,20 @@
 /* First visual frame, drawn by the Worker while the interactive bundle loads. */
 #nova-first-paint {
- position:fixed;inset:0;z-index:95;overflow:hidden;background:#fff;
- pointer-events:none;isolation:isolate;
+ position:absolute;top:0;left:0;width:100%;z-index:95;
+ /* The boot hero covers only the real hero, not the venue cards below it. */
+ background:transparent;pointer-events:none;isolation:isolate;
+}
+
+/* Identical image geometry on both layers makes the hand-off imperceptible. */
+#nova-first-paint .hero-photo img {
+ transform:translate3d(0,0,0) scale(1.035);
+ transform-origin:center;
+}
+/* Match the split in the server hero and hydrated hero. It intersects the V midpoint. */
+@media (min-width:601px){
+ #nova-first-paint .hero, #app .hero {
+  grid-template-columns:35.5% minmax(0,1fr);
+ }
 }
 #nova-first-paint .site-header { position:relative;z-index:2; }
 #nova-first-paint [data-boot-lang=en]{display:none}
@@ -17,10 +30,11 @@ html[data-nova-boot-lang=en] #nova-first-paint .language span:last-child {
 }
 #nova-first-paint .hero {height:clamp(540px,43vw,960px);}
 html.nova-js:not(.nova-deep-link) #nova-first-paint .hero h1{
- animation:nova-boot-headline 1450ms cubic-bezier(.25,.72,.23,1) 100ms both;
+ animation:nova-boot-headline 1200ms cubic-bezier(.47,.06,.56,.96) 90ms both;
+ will-change:clip-path;
 }
 html.nova-js:not(.nova-deep-link) #nova-first-paint .hero-photo{
- animation:nova-boot-picture 1350ms cubic-bezier(.25,.72,.23,1) 100ms both;
+ animation:nova-boot-picture 1260ms cubic-bezier(.35,.55,.32,1) 90ms both;
 }
 html.nova-js:not(.nova-deep-link) #nova-first-paint .hero-copy .eyebrow,
 html.nova-js:not(.nova-deep-link) #nova-first-paint .hero-tagline,
@@ -31,12 +45,13 @@ html.nova-js:not(.nova-deep-link) #nova-first-paint .photo-side{
 #nova-first-paint .hero-tagline{animation-delay:480ms!important}
 #nova-first-paint .photo-side{animation-delay:670ms!important}
 @keyframes nova-boot-headline {
- from{opacity:.25;clip-path:inset(0 100% 0 0);transform:translate3d(0,12px,0)}
- to{opacity:1;clip-path:inset(0 0 0 0);transform:translate3d(0,0,0)}
+ /* Reveal the intact word; changing its transform/geometry at the end caused the A to jump. */
+ from{clip-path:inset(0 100% 0 0)}
+ to{clip-path:inset(0 0 0 0)}
 }
 @keyframes nova-boot-picture {
- from{opacity:0;transform:translate3d(0,20px,0) scale(1.015)}
- to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+ from{opacity:0;transform:translate3d(0,9px,0)}
+ to{opacity:1;transform:translate3d(0,0,0)}
 }
 @keyframes nova-boot-details{
  from{opacity:0;transform:translate3d(0,9px,0)}
@@ -44,7 +59,7 @@ html.nova-js:not(.nova-deep-link) #nova-first-paint .photo-side{
 }
 #nova-first-paint.nova-boot-exit {
  opacity:0;
- transition:opacity 300ms cubic-bezier(.4,0,.2,1);
+ transition:opacity 440ms cubic-bezier(.36,0,.34,1);
 }
 html.nova-deep-link #nova-first-paint{display:none}
 @media (max-width:900px) {
@@ -96,7 +111,7 @@ html.motion-lab #app .hero.lab-intro h1 {
 /* Photo frame and image now have independent jobs: entry vs. parallax.
    No competing transform animations and no expensive full-width clip-path wipe. */
 html.motion-lab #app .hero-photo img {
-  transform: translate3d(0, var(--lab-drift, 0px), 0) scale(1.05);
+  transform: translate3d(0, var(--lab-drift, 0px), 0) scale(1.035);
   transform-origin: center;
   will-change: transform;
 }
@@ -125,14 +140,19 @@ html.motion-lab #app .lab-intro .photo-side { animation-delay: 640ms; }
    The observer only hides elements that begin fully beyond the viewport. */
 html.motion-lab .lab-reveal {
   opacity: 0;
-  transform: translate3d(0, 12px, 0);
+  transform: translate3d(0, 7px, 0);
   transition:
-    opacity 900ms cubic-bezier(.25, .65, .30, 1),
-    transform 980ms cubic-bezier(.25, .65, .30, 1);
+    opacity 1000ms cubic-bezier(.33, .68, .38, 1),
+    transform 1050ms cubic-bezier(.33, .68, .38, 1);
   transition-delay: 0ms;
 }
+/* Cards fade in-place rather than jumping up from below the fold. */
 html.motion-lab .lab-reveal.venue-card {
-  transition-delay: calc(var(--lab-order, 0) * 55ms);
+  transform:none;
+  transition:opacity 1120ms cubic-bezier(.32,.67,.4,1);
+}
+html.motion-lab .lab-reveal.venue-card {
+  transition-delay: calc(var(--lab-order, 0) * 105ms);
 }
 html.motion-lab .lab-reveal.lab-visible {
   opacity: 1;
