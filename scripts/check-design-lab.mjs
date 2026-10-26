@@ -1,4 +1,4 @@
-// Static checks that prevent accidental client-facing API or deployment leakage.
+// Static build checks for the client-safe NOVA concept.
 import {readFileSync, existsSync} from 'node:fs';
 import {resolve} from 'node:path';
 import assert from 'node:assert/strict';
@@ -8,22 +8,23 @@ const js=readFileSync('public/concept.js','utf8');
 const worker=readFileSync('src/design-lab.js','utf8');
 const cfg=JSON.parse(readFileSync('wrangler.design-lab.jsonc','utf8'));
 const sections=['cover','story','spaces','moments','mobile'];
-const ids=[...html.matchAll(/\\bid="([^"]+)"/g)].map(x=>x[1]);
+const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(new Set(ids).size,ids.length,'Duplicate ID');
-for(const id of sections)assert.ok(ids.includes(id),`Missing concept section: ${id}`);
-for(const href of html.matchAll(/href="#([^"]+)"/g))assert.ok(ids.includes(href[1]),`Unresolved anchor ${href[1]}`);
-for(const [,src] of html.matchAll(/(?:src|href)="(\\/(?:media|fonts)\\/[^"]+)"/g))assert.ok(existsSync(resolve('public',src.slice(1))),`Missing asset: ${src}`);
-for(const file of ['concept.css','concept.js'])assert.ok(existsSync(resolve('public',file)),'Missing '+file);
+for(const id of sections)assert.ok(ids.includes(id),'Missing concept section: '+id);
+for(const href of html.matchAll(/href="#([^"]+)"/g))assert.ok(ids.includes(href[1]),'Unresolved anchor '+href[1]);
+for(const [,src] of html.matchAll(/(?:src|href)="(\/(?:media|fonts)\/[^"]+)"/g))
+  assert.ok(existsSync(resolve('public',src.slice(1))),'Missing asset: '+src);
+for(const file of ['concept.css','concept.js']) assert.ok(existsSync(resolve('public',file)),'Missing '+file);
 assert.match(html,/name="robots" content="noindex,nofollow"/);
 assert.match(html,/КОНЦЕПЦИЯ АФИШИ/);
 assert.match(html,/class="browser-stage reveal"/);
 assert.match(css,/prefers-reduced-motion:reduce/);
-assert.match(css,/browser-stage\\{overflow-x:auto/);
+assert.match(css,/browser-stage\{overflow-x:auto/);
 assert.match(js,/IntersectionObserver/);
 assert.equal(cfg.name,'nova-design-lab');
 assert.equal(cfg.main,'./src/design-lab.js');
 assert.equal(cfg.preview_urls,false);
-assert.ok(!('d1_databases' in cfg || 'r2_buckets' in cfg || 'vars' in cfg),'Concept worker must have no database or secrets');
+assert.ok(!('d1_databases' in cfg||'r2_buckets' in cfg||'vars' in cfg),'Concept must have no database or secrets');
 assert.match(worker,/Method not allowed/);
-assert.ok(!/fetch\\(['"]\\/api\\//.test(html+'\\n'+js),'Concept should not contact API');
+assert.ok(!/fetch\(['"]\/api\//.test(html+'\n'+js),'Concept must not contact APIs');
 console.log('NOVA Design Lab: static safety & asset checks passed.');
