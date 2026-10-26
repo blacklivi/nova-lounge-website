@@ -57,3 +57,26 @@ assert.match(editorialCSS,/\.venues-editorial/);
 assert.match(editorialCSS,/\.venue-card-editorial-pob/);
 assert.match(editorialCSS,/\.venue-card-editorial-east/);
 assert.match(editorialCSS,/\.hero-editorial \.hero-photo img/);
+
+
+// Sprint 2: retain CMS translation hooks, real event links, and original modal routes.
+const editorial2=readFileSync('public/app.js','utf8');
+const editorial2css=readFileSync('public/design-lab.css','utf8');
+for(const token of [
+  "story story-editorial",
+  "home-events home-events-editorial",
+  "book-strip book-strip-editorial",
+  "data-content='story_title'",
+  "data-content='story_description'",
+  "data-content='booking_title'",
+  "data-modal='menu'",
+  "data-modal='booking'",
+  "splitEvents(displayEvents()).upcoming.slice(0,2)",
+  "eventCard(event,true)"
+]) assert.ok(editorial2.includes(token),'Missing sprint 2 hook: '+token);
+for(const token of [
+  ".story-editorial",
+  ".home-events-gallery",
+  ".book-strip-editorial",
+  "@media(prefers-reduced-motion:reduce)"
+]) assert.ok(editorial2css.includes(token),'Missing sprint 2 style: '+token);
