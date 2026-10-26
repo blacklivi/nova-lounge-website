@@ -18,6 +18,11 @@
   transition:grid-template-columns 700ms cubic-bezier(.35,.65,.35,1);
  }
 }
+/* The live DOM keeps its layout but does not show through the bootstrap animation. */
+html.nova-booting #app > .site-header,
+html.nova-booting #app main .hero {
+ visibility:hidden;
+}
 #nova-first-paint .site-header { position:relative;z-index:2; }
 #nova-first-paint [data-boot-lang=en]{display:none}
 html[data-nova-boot-lang=en] #nova-first-paint [data-boot-lang=ru]{display:none}
@@ -72,6 +77,7 @@ html.nova-deep-link #nova-first-paint{display:none}
 }
 @media (prefers-reduced-motion:reduce){
  #nova-first-paint *,#nova-first-paint{animation:none!important;transition:none!important}
+ #nova-first-paint .hero,#app .hero{transition:none!important}
 }
 html:not(.nova-js) #nova-first-paint{display:none}
 
