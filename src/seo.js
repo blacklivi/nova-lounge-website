@@ -66,7 +66,20 @@ function firstPaint(route, defaults){
   '<p class="hero-tagline">'+bilingual(ru.hero_tagline||'Три пространства.\nОдин ритм.',en.hero_tagline||'Three spaces.\nOne rhythm.')+'</p></div>'+
   '<div class="hero-photo"><img src="'+htmlEscape(picture)+'" alt="" width="1200" height="900" fetchpriority="high" decoding="async">'+
   '<div class="photo-side">'+bilingual('Еда<br>Люди<br>Музыка<br>Атмосфера','Food<br>People<br>Music<br>Atmosphere').replaceAll('&lt;br&gt;','<br>')+'</div>'+
-  '</div></section></main></div>';
+  '</div></section></main></div>'+
+  // Match the photograph's left edge to the actual V glyph, not an approximate
+  // viewport percentage. Runs before first paint; the same CSS variable styles
+  // the bootstrap hero and its interactive replacement.
+  '<script>(function(){'+
+  'function align(){if(innerWidth<=900)return;var h=document.querySelector("#nova-boot-hero h1");'+
+  'if(!h||!h.firstChild||h.firstChild.nodeType!==3)return;'+
+  'var hero=h.closest(".hero"),r=document.createRange();r.setStart(h.firstChild,2);r.setEnd(h.firstChild,3);'+
+  'var box=r.getBoundingClientRect(),base=hero.getBoundingClientRect();'+
+  'var x=box.left-base.left+box.width*.5;'+
+  'if(x>base.width*.24&&x<base.width*.55)document.documentElement.style.setProperty("--nova-hero-split",x.toFixed(1)+"px");'+
+  '}align();document.fonts.ready.then(align);'+
+  'var raf=0;addEventListener("resize",function(){cancelAnimationFrame(raf);raf=requestAnimationFrame(align)},{passive:true});'+
+  '})();</script>';
 }
 export async function publicPage(request,env,route){
  const url=new URL(request.url),v=VENUES[route.split('/')[2]],origin=url.origin;
