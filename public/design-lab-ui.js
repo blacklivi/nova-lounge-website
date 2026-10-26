@@ -17,7 +17,7 @@
   const refresh=()=>{
     queued=false;
     for(const el of app.querySelectorAll(selector)){
-      if(el.dataset.labObserved)return;
+      if(el.dataset.labObserved)continue;
       el.dataset.labObserved='1';
       el.classList.add('lab-reveal');
       const top=el.getBoundingClientRect().top;
