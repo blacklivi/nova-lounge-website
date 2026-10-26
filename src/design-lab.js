@@ -19,7 +19,7 @@ export default {
     const asset=await env.ASSETS.fetch(request);
     const headers=new Headers(asset.headers);
     for(const [name,value] of Object.entries(noindex))headers.set(name,value);
-    headers.set('Cache-Control',url.pathname==='/concept.html'?'no-store':'public, max-age=3600');
+    headers.set('Cache-Control',/^\/concept\.(?:html|css|js)$/.test(url.pathname)?'no-cache, must-revalidate':'public, max-age=3600');
     return new Response(asset.body,{status:asset.status,statusText:asset.statusText,headers});
   }
 };
