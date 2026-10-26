@@ -1435,3 +1435,168 @@ body[data-design-lab=true] .hero-title-mask{
   padding-bottom:.075em;
   margin-bottom:-.075em;
 }
+
+
+/* ════════════════════════════════════════════════════════════════
+   NOVA TYPE / Editorial typography and simplified affordances
+   Lab-only. 2026-10-26.
+   ════════════════════════════════════════════════════════════════ */
+
+/* Manrope works better with mostly neutral spacing in Cyrillic.
+   Previous negative tracking (-.04em to -.08em) crowded long names. */
+body[data-design-lab=true]{
+  letter-spacing:.002em;
+}
+body[data-design-lab=true] .hero-editorial h1{
+  letter-spacing:-.06em;
+}
+body[data-design-lab=true] .brand{
+  letter-spacing:-.025em;
+}
+body[data-design-lab=true] :is(
+  .venue-card-editorial .venue-title,
+  .lab-detail-intro h1,
+  .lab-detail-other-link strong
+){
+  letter-spacing:.006em;
+  word-break:normal;
+  overflow-wrap:normal;
+  hyphens:none;
+}
+body[data-design-lab=true] :is(
+  .venues-editorial .venues-heading,
+  .story-editorial h2,
+  .home-events-top .section-link h2,
+  .book-strip-editorial .book-welcome,
+  .events-intro h1,
+  .lab-detail-story-copy h2,
+  .lab-detail-next h2
+){
+  letter-spacing:-.012em;
+  line-height:1.12;
+  text-wrap:balance;
+  word-break:normal;
+  hyphens:none;
+}
+body[data-design-lab=true] :is(
+  .home-events-gallery .event-info h3,
+  .events-list .event-card .event-info h3,
+  .events-section h2
+){
+  letter-spacing:-.005em;
+  line-height:1.23;
+  text-wrap:balance;
+}
+body[data-design-lab=true] :is(
+  .venues-editorial-lead,
+  .venue-description,
+  .story-editorial .story-copy p,
+  .home-events-lead,
+  .lab-detail-desc,
+  .lab-detail-story-copy>p,
+  .event-info>p,
+  .book-cta,
+  .site-footer p
+){
+  letter-spacing:.005em;
+  line-height:1.65;
+  overflow-wrap:normal;
+}
+body[data-design-lab=true] .hero-editorial .hero-tagline{
+  letter-spacing:0;
+  line-height:1.4;
+}
+
+/* One meaningful signal per interaction.
+   Cards link in their entirety. Keep the quiet CTA underline, remove
+   decorative title arrows. Events headline is a clear text link. */
+body[data-design-lab=true] .venue-name-line{
+  display:block;
+}
+body[data-design-lab=true] .venue-discover{
+  display:inline-block;
+  letter-spacing:.015em;
+  padding-bottom:8px;
+  border-bottom:1px solid currentColor;
+  transition:opacity .22s ease,border-color .22s ease;
+}
+body[data-design-lab=true] .venue-card-editorial:hover .venue-discover,
+body[data-design-lab=true] .venue-card-editorial:focus-visible .venue-discover{
+  opacity:.7;
+}
+body[data-design-lab=true] .hero-space-link{
+  gap:0;
+  transition:background-color .25s ease;
+}
+body[data-design-lab=true] .hero-space-link:hover{
+  background:rgba(255,255,255,.09);
+}
+body[data-design-lab=true] .hero-editorial-book{
+  gap:0;
+  letter-spacing:.01em;
+}
+body[data-design-lab=true] .home-events-top .section-link{
+  display:inline-block;
+  width:fit-content;
+  max-width:100%;
+  text-decoration:none;
+}
+body[data-design-lab=true] .home-events-top .section-link h2{
+  display:inline;
+  border-bottom:1px solid transparent;
+  transition:border-color .25s ease;
+}
+body[data-design-lab=true] .home-events-top .section-link:hover h2,
+body[data-design-lab=true] .home-events-top .section-link:focus-visible h2{
+  border-bottom-color:currentColor;
+}
+body[data-design-lab=true] :is(.story-menu-link,.events-all-link,.lab-detail-contacts){
+  gap:0;
+  text-decoration:none;
+  border-bottom:1px solid currentColor;
+}
+body[data-design-lab=true] .lab-detail-actions button{
+  gap:0;
+  justify-content:flex-start;
+}
+body[data-design-lab=true] .lab-detail-other-link{
+  display:block;
+  padding:clamp(19px,2.1vw,32px) 0;
+  border-bottom:1px solid var(--line);
+  min-width:0;
+  transition:color .25s ease;
+}
+body[data-design-lab=true] .lab-detail-other-link strong{
+  display:block;
+  font-weight:400;
+}
+body[data-design-lab=true] .lab-detail-other-link:hover{
+  color:var(--olive);
+}
+
+/* Rebalance the longest Cyrillic location within narrow layouts. */
+body[data-design-lab=true] .venue-card-editorial-pob .venue-title{
+  font-size:clamp(33px,3.7vw,60px);
+}
+@media(max-width:900px) and (min-width:601px){
+  body[data-design-lab=true] .venue-card-editorial-pob .venue-title{
+    font-size:clamp(29px,3.45vw,42px);
+  }
+}
+@media(max-width:600px){
+  body[data-design-lab=true] .hero-editorial h1{
+    letter-spacing:-.055em;
+  }
+  body[data-design-lab=true] .venue-card-editorial-pob .venue-title{
+    font-size:clamp(30px,8.3vw,42px);
+  }
+  body[data-design-lab=true] .lab-detail-intro h1{
+    letter-spacing:0;
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-title{
+    line-height:1.17;
+  }
+  body[data-design-lab=true] .home-events-top .section-link h2{
+    line-height:1.12;
+  }
+}

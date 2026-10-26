@@ -17,7 +17,7 @@ let keyboardModalInteraction = false;
 document.addEventListener('pointerdown',()=>{keyboardModalInteraction=false;},{capture:true});
 document.addEventListener('touchstart',()=>{keyboardModalInteraction=false;},{capture:true,passive:true});
 document.addEventListener('keydown',e=>{if(['Tab','Enter',' ','Escape'].includes(e.key))keyboardModalInteraction=true;},{capture:true});
-const t = (ru,en) => language === 'en' ? en : ru;
+const t = (ru,en) => typography(language === 'en' ? en : ru,language);
 const text = value => esc(typography(value,language));
 const name = id => names[language][id] || 'NOVA';
 const value = key => localizedValue(key,language,defaults,source);
@@ -74,14 +74,14 @@ function eventCard(e,home=false){
 }
 function home(){
  const next=splitEvents(displayEvents()).upcoming[0];
- const heroLinks=ids.map(id=>`<a class='hero-space-link' href='${venueURL(id)}' data-place='${id}' aria-label='${t('Открыть','Open')} NOVA ${name(id)}'><span class='hero-space-name'>${name(id)}</span><span class='hero-space-arr' aria-hidden='true'>↗</span></a>`).join('');
- const venueRows=ids.map(id=>`<a class='venue-card venue-card-editorial venue-card-editorial-${id}' href='${venueURL(id)}' data-place='${id}' aria-label='${t('Открыть NOVA','Explore NOVA')} ${name(id)}'><div class='venue-img'>${image('venue_'+id+'_image',t('Концепция пространства ','Space concept: ')+name(id))}</div><div class='venue-foot'><span class='venue-serial'>NOVA MINSK</span><div class='venue-name-line'><h3 class='venue-title'>${name(id)}</h3><span class='venue-name-arrow' aria-hidden='true'>↗</span></div><p class='venue-description' data-content='venue_${id}_subtitle'>${content('venue_'+id+'_subtitle')}</p><span class='venue-discover'>${t('Открыть пространство','Explore this space')} <span aria-hidden='true'>↗</span></span></div></a>`).join('');
+ const heroLinks=ids.map(id=>`<a class='hero-space-link' href='${venueURL(id)}' data-place='${id}' aria-label='${t('Открыть','Open')} NOVA ${name(id)}'><span class='hero-space-name'>${name(id)}</span></a>`).join('');
+ const venueRows=ids.map(id=>`<a class='venue-card venue-card-editorial venue-card-editorial-${id}' href='${venueURL(id)}' data-place='${id}' aria-label='${t('Открыть NOVA','Explore NOVA')} ${name(id)}'><div class='venue-img'>${image('venue_'+id+'_image',t('Концепция пространства ','Space concept: ')+name(id))}</div><div class='venue-foot'><span class='venue-serial'>NOVA MINSK</span><div class='venue-name-line'><h3 class='venue-title'>${name(id)}</h3></div><p class='venue-description' data-content='venue_${id}_subtitle'>${content('venue_'+id+'_subtitle')}</p><span class='venue-discover'>${t('Открыть пространство','Explore this space')}</span></div></a>`).join('');
  return `<section class='hero hero-editorial' id='top' aria-labelledby='nova-hero-title'>
  <div class='hero-photo'>${image('hero_image',t('NOVA: интерьер и коктейль','NOVA: interior and cocktail'),true)}</div>
  <div class='hero-overlay' aria-hidden='true'></div>
  <div class='hero-copy'><span class='eyebrow' data-content='hero_kicker'>${content('hero_kicker')}</span><h1 id='nova-hero-title' class='hero-title'><span class='hero-title-mask'><span class='hero-title-word'>NOVA</span></span></h1>
  <div class='hero-editorial-bottom'><p class='hero-tagline' data-content='hero_tagline'>${content('hero_tagline')}</p>
- <button type='button' class='hero-editorial-book' data-modal='booking'>${bookingLabel()} <span aria-hidden='true'>↗</span></button></div></div>
+ <button type='button' class='hero-editorial-book' data-modal='booking'>${bookingLabel()}</button></div></div>
  <nav class='hero-spaces' aria-label='${t('Выберите пространство NOVA','Choose a NOVA space')}'>${heroLinks}</nav>
  </section>
  <section class='venues venues-editorial' id='venues' aria-labelledby='venues-heading'>
@@ -92,14 +92,14 @@ function home(){
  <div class='story-editorial-top'><span class='story-editorial-index'>NOVA JOURNAL</span><span class='story-editorial-note'>MINSK · LOUNGE CAFÉ</span></div>
  <div class='story-editorial-heading'><span class='eyebrow muted' data-content='story_kicker'>${content('story_kicker')}</span><h2 id='story-editorial-heading' data-content='story_title'>${content('story_title')}</h2></div>
  <figure class='story-photo'>${image('story_image',t('Подача блюда — демонстрационное изображение','Food presentation — concept image'))}<figcaption class='image-note' data-content='media_note'>${content('media_note')}</figcaption></figure>
- <div class='story-copy'><p data-content='story_description'>${content('story_description')}</p><button type='button' class='text-link story-menu-link' data-modal='menu'>${t('Посмотреть меню','View the menu')} <span aria-hidden='true'>↗</span></button></div>
+ <div class='story-copy'><p data-content='story_description'>${content('story_description')}</p><button type='button' class='text-link story-menu-link' data-modal='menu'>${t('Посмотреть меню','View the menu')}</button></div>
 </section>
 <section class='home-events home-events-editorial' aria-labelledby='home-events-heading'>
  <div class='home-events-top'><span class='events-editorial-index'>NOVA EVENTS</span>
- <a class='section-link' href='/events' aria-label='${t('Посмотреть события NOVA','View NOVA events')}'><h2 id='home-events-heading'>${t('События','Events')}</h2><span class='events-editorial-arrow' aria-hidden='true'>↗</span></a>
+ <a class='section-link' href='/events' aria-label='${t('Посмотреть события NOVA','View NOVA events')}'><h2 id='home-events-heading'>${t('События','Events')}</h2></a>
  <p class='home-events-lead'>${t('Музыка, встречи и то, ради чего хочется остаться подольше.','Music, people and the moments worth staying for.')}</p></div>
  <div class='home-events-gallery'>${splitEvents(displayEvents()).upcoming.slice(0,2).map((event,i)=>`<div class='event-editorial-entry event-editorial-entry-${i+1}'>${eventCard(event,true)}</div>`).join('')||`<p class='event-empty'>${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):t('Афиша пока пуста.','No events yet.')}</p>`}</div>
- <div class='home-events-bottom'><a class='events-all-link' href='/events'>${t('Вся афиша','View all events')} <span aria-hidden='true'>↗</span></a></div>
+ <div class='home-events-bottom'><a class='events-all-link' href='/events'>${t('Вся афиша','View all events')}</a></div>
 </section>
 <section class='book-strip book-strip-editorial' id='booking' aria-label='${t('Бронирование столика','Table reservation')}'>
  <div class='book-image'>${image('booking_image',t('Детали интерьера — концепция','Interior details — concept image'))}</div>
@@ -110,7 +110,7 @@ function home(){
 </section>`;}
 function detail(id){
  const images=[1,2].map(i=>`<figure class='lab-detail-gallery-photo'>${image('gallery_'+id+'_'+i+'_image',t('Демонстрационная фотография пространства','Concept photo of this space'))}</figure>`).join('');
- const more=ids.filter(other=>other!==id).map(other=>`<a class='lab-detail-other-link' href='${venueURL(other)}' data-place='${other}'><strong>${name(other)}</strong><b aria-hidden='true'>↗</b></a>`).join('');
+ const more=ids.filter(other=>other!==id).map(other=>`<a class='lab-detail-other-link' href='${venueURL(other)}' data-place='${other}'><strong>${name(other)}</strong></a>`).join('');
  return `<article class='detail lab-detail lab-detail-${id}'>
  <section class='lab-detail-intro' aria-labelledby='lab-detail-title'>
   <div class='lab-detail-topline'><a class='detail-back' href='/#venues' data-home='venues'>${arrow}${t('Все пространства NOVA','All NOVA spaces')}</a><span>NOVA MINSK</span></div>
@@ -118,8 +118,8 @@ function detail(id){
   <p class='lab-detail-desc' data-content='venue_${id}_desc'>${content('venue_'+id+'_desc',t('Описание готовится.','Details coming soon.'))}</p></div>
  </section>
  <section class='lab-detail-photo' aria-label='${t('Фотография пространства NOVA','NOVA venue photograph')}'>${image('venue_'+id+'_image',t('Пространство NOVA ','NOVA venue ')+name(id),true)}<div class='lab-detail-photo-label'><span>NOVA / MINSK</span><span>${name(id)}</span></div></section>
- <section class='lab-detail-action-strip' aria-label='${t('Информация и действия','Information and actions')}'><div class='lab-detail-address'><span>${t('АДРЕС','ADDRESS')}</span><p data-content='address_${id}'>${content('address_'+id)}</p></div><div class='lab-detail-actions'><button type='button' data-modal='booking' data-venue='${id}'>${bookingLabel()} <span aria-hidden='true'>↗</span></button><button type='button' data-modal='menu-location' data-venue='${id}'>${t('Посмотреть меню','View the menu')} <span aria-hidden='true'>↗</span></button></div></section>
- <section class='lab-detail-story' aria-labelledby='lab-detail-story-title'><div class='lab-detail-story-copy'><span class='lab-detail-kicker'>${t('АТМОСФЕРА','ATMOSPHERE')}</span><h2 id='lab-detail-story-title'>${t('В своём ритме.','Your kind of evening.')}</h2><p data-content='venue_${id}_second'>${content('venue_'+id+'_second')}</p><p class='features' data-content='venue_${id}_features'>${content('venue_'+id+'_features')}</p><button type='button' class='text-link lab-detail-contacts' data-modal='contacts' data-venue='${id}'>${t('Контакты и расположение','Contacts and directions')} <span aria-hidden='true'>↗</span></button></div><div class='lab-detail-gallery'>${images}<p class='image-note' data-content='media_note'>${content('media_note')}</p></div></section>
+ <section class='lab-detail-action-strip' aria-label='${t('Информация и действия','Information and actions')}'><div class='lab-detail-address'><span>${t('АДРЕС','ADDRESS')}</span><p data-content='address_${id}'>${content('address_'+id)}</p></div><div class='lab-detail-actions'><button type='button' data-modal='booking' data-venue='${id}'>${bookingLabel()}</button><button type='button' data-modal='menu-location' data-venue='${id}'>${t('Посмотреть меню','View the menu')}</button></div></section>
+ <section class='lab-detail-story' aria-labelledby='lab-detail-story-title'><div class='lab-detail-story-copy'><span class='lab-detail-kicker'>${t('АТМОСФЕРА','ATMOSPHERE')}</span><h2 id='lab-detail-story-title'>${t('В своём ритме.','Your kind of evening.')}</h2><p data-content='venue_${id}_second'>${content('venue_'+id+'_second')}</p><p class='features' data-content='venue_${id}_features'>${content('venue_'+id+'_features')}</p><button type='button' class='text-link lab-detail-contacts' data-modal='contacts' data-venue='${id}'>${t('Контакты и расположение','Contacts and directions')}</button></div><div class='lab-detail-gallery'>${images}<p class='image-note' data-content='media_note'>${content('media_note')}</p></div></section>
  <nav class='lab-detail-next' aria-label='${t('Другие пространства NOVA','Other NOVA venues')}'><div><span class='lab-detail-kicker'>NOVA MINSK</span><h2>${t('Другое настроение.','Another kind of night.')}</h2></div><div class='lab-detail-other-links'>${more}</div></nav>
  </article>`;
 }

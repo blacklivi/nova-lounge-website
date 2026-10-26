@@ -158,3 +158,18 @@ assert.match(titleInkCSS,/Hero title ink safety/);
 assert.match(titleInkCSS,/padding-inline-end:\.16em/);
 assert.match(titleInkCSS,/margin-inline-end:-\.16em/);
 assert.match(titleInkCSS,/padding-bottom:\.075em/);
+
+
+// Editorial typography and single-affordance rule.
+import {typography as protectShortWords} from '../public/core.js';
+assert.equal(protectShortWords('Ждём вас в NOVA','ru'),'Ждём вас в\u00a0NOVA');
+assert.equal(protectShortWords('Встречи и музыка в Минске','ru'),'Встречи и\u00a0музыка в\u00a0Минске');
+assert.equal(protectShortWords('Место для встреч и разговоров','ru'),'Место для\u00a0встреч и\u00a0разговоров');
+assert.equal(protectShortWords('Мы идём и в кафе','ru'),'Мы идём и\u00a0в\u00a0кафе');
+assert.equal(protectShortWords('Музыка in the city','en'),'Музыка in\u00a0the\u00a0city');
+const editorialApp=readFileSync('public/app.js','utf8');
+const pages=editorialApp.slice(editorialApp.indexOf('function home(){'),editorialApp.indexOf('function eventsPage(){'));
+assert.ok(!pages.includes('↗'),'Redundant visible diagonal arrow in editorial pages');
+assert.match(editorialApp,/const t = \(ru,en\) => typography\(/);
+assert.match(readFileSync('public/design-lab.css','utf8'),/NOVA TYPE \/ Editorial typography/);
+assert.match(readFileSync('public/design-lab.css','utf8'),/letter-spacing:\.006em/);

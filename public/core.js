@@ -3,10 +3,16 @@ export function escapeHTML(value = '') {
   return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 export function typography(value, language = 'ru') {
-  const s = String(value ?? '').replace(/\u00a0/g, ' ');
-  if (language !== 'ru') return s;
-  // Bind one short word to its neighbour, without creating unbreakable chains.
-  return s.replace(/(^|[\s(«])((?:[вксуаои]|на|по|за|из|от|до|об|не|но|со|во|ко|под|при)) +(?=[А-Яа-яЁёA-Za-z0-9])/giu, '$1$2\u00a0');
+  // Non-breaking joins only for genuinely short connective words, never
+  // entire sentences: improves optical line breaks without creating huge spans.
+  const original = String(value ?? '').replace(/\u00a0/g, ' ');
+  const words = language === 'ru'
+    ? /(^|[\s(«„])((?:в|во|с|со|к|ко|у|о|об|обо|а|и|за|по|до|от|из|над|под|при|про|без|для|не|ни|но|же|ли|бы)) +(?!\s)(?=[\p{L}\p{N}])/giu
+    : /(^|[\s(“«])((?:a|an|the|in|on|at|to|of|by|or)) +(?!\s)(?=[\p{L}\p{N}])/giu;
+  // A second pass also protects sequences such as "и в ресторане".
+  let formatted = original;
+  for (let i = 0; i < 2; i++) formatted = formatted.replace(words, '$1$2\u00a0');
+  return formatted;
 }
 export function cleanPhone(value) {
   return String(value).replace(/[^\d+()\s-]/g, '').replace(/(?!^)\+/g, '').slice(0, 30);
