@@ -80,3 +80,13 @@ for(const token of [
   ".book-strip-editorial",
   "@media(prefers-reduced-motion:reduce)"
 ]) assert.ok(editorial2css.includes(token),'Missing sprint 2 style: '+token);
+
+
+// Full events page remains present and follows the new editorial design system.
+const eventDesignCSS=readFileSync('public/design-lab.css','utf8');
+const eventPageSource=readFileSync('public/app.js','utf8');
+for(const token of ['.events-intro','.events-list','.events-section.archive'])
+  assert.ok(eventDesignCSS.includes(token),'Missing events page editorial styling: '+token);
+assert.match(eventPageSource,/function eventsPage\(\)/);
+assert.match(eventPageSource,/eventCard\(e\)/);
+assert.match(eventPageSource,/events-demo-notice/);
