@@ -40,3 +40,20 @@ assert.match(readFileSync('public/events.html','utf8'),/data-design-lab="true"/)
 assert.match(readFileSync('public/app.js','utf8'),/eventsLoaded=true;[\s\S]*?render\(\)/);
 assert.match(readFileSync('public/design-lab-ui.js','utf8'),/IntersectionObserver/);
 assert.match(readFileSync('public/design-lab.css','utf8'),/prefers-reduced-motion/);
+
+
+// Editorial v2 regression guard: one coherent homepage, three functioning routes.
+const homeSource=readFileSync('public/app.js','utf8');
+const editorialCSS=readFileSync('public/design-lab.css','utf8');
+assert.match(homeSource,/hero-editorial/);
+assert.match(homeSource,/hero-space-link/);
+assert.match(homeSource,/venue-card-editorial-/);
+assert.match(homeSource,/hero-editorial-book/);
+assert.match(homeSource,/data-modal='booking'/);
+assert.match(homeSource,/data-place='\$\{id\}'/);
+assert.match(homeSource,/data-content='hero_tagline'/);
+assert.match(homeSource,/data-content='venue_\$\{id\}_subtitle'/);
+assert.match(editorialCSS,/\.venues-editorial/);
+assert.match(editorialCSS,/\.venue-card-editorial-pob/);
+assert.match(editorialCSS,/\.venue-card-editorial-east/);
+assert.match(editorialCSS,/\.hero-editorial \.hero-photo img/);
