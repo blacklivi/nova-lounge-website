@@ -10,7 +10,7 @@ let parallaxTarget = 0;
 let introShown = false;
 
 function updateParallaxTarget() {
-  const photo = document.querySelector('.hero-photo');
+  const photo = document.querySelector('#app .hero-photo');
   if (!photo || reducedMotion.matches || !desktopMotion.matches) {
     parallaxTarget = 0;
   } else {
@@ -23,7 +23,7 @@ function updateParallaxTarget() {
 }
 
 function animateParallax() {
-  const photo = document.querySelector('.hero-photo');
+  const photo = document.querySelector('#app .hero-photo');
   if (!photo) {
     parallaxFrame = 0;
     parallaxCurrent = 0;
@@ -54,7 +54,7 @@ function revealSections() {
       entry.target.classList.add('lab-visible');
       activeObserver.unobserve(entry.target);
     }
-  }, {rootMargin: '0px 0px -6% 0px', threshold: 0.01});
+  }, {rootMargin: '0px 0px -10% 0px', threshold: 0.08});
 
   const selectors = [
     '.venues-heading', '.venue-card', '.story-copy', '.story-photo',
@@ -67,7 +67,7 @@ function revealSections() {
   for (const element of document.querySelectorAll(selectors)) {
     const rect = element.getBoundingClientRect();
     // Content already near the viewport must never blink out when we hydrate.
-    if (rect.top <= window.innerHeight + 24 || rect.bottom < 0) {
+    if (rect.top <= window.innerHeight * 0.48 || rect.bottom < 0) {
       element.classList.add('lab-visible');
       continue;
     }
