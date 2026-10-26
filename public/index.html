@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 <script>
 document.documentElement.classList.add('nova-js');
+if(location.pathname==='/'&&!location.hash)document.documentElement.classList.add('nova-booting');
 document.documentElement.dataset.novaBootLang='ru';
 try{if(localStorage.getItem('nova-language')==='en')document.documentElement.dataset.novaBootLang='en'}catch(e){}
 if(location.hash)document.documentElement.classList.add('nova-deep-link');
