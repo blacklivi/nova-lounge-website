@@ -26,7 +26,7 @@
       const target = document.getElementById(hash.slice(1));
       if (!target) return;
       event.preventDefault();
-      target.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: 'start' });
+      target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
       history.replaceState(null, '', hash);
     });
   });
