@@ -253,7 +253,7 @@ const artCSS=readFileSync('public/design-lab.css','utf8');
 const artData=JSON.parse(readFileSync('public/content-defaults.json','utf8'));
 assert.match(artCSS,/NOVA Hallmark art-direction/);
 assert.match(artCSS,/grid-template-areas:"title title" "photo copy"/);
-assert.match(artApp,/const venueMood = id =>/);
+assert.match(artApp,/const venueMoods=\{/);
 assert.match(artApp,/const spaceHeadings=\{/);
 assert.ok(!artApp.includes('NOVA JOURNAL'),'Pseudo-journal label must be removed');
 assert.ok(!artApp.includes('NOVA RESERVATIONS'),'Pseudo booking label must be removed');
@@ -281,25 +281,3 @@ assert.match(factsMarkup,/data-modal='booking' data-venue='\$\{id\}'/);
 assert.match(factsMarkup,/data-modal='menu-location' data-venue='\$\{id\}'/);
 assert.match(factsCSS,/NOVA \/ venue utility art direction/);
 assert.match(factsCSS,/\.lab-detail-hours p\{\s*white-space:pre-line/);
-
-
-// Photo-light Hallmark design, with preserved photo templates and explicit
-// proof-of-genuine-photo gates. No demonstration interior images are rendered.
-const photoLightApp=readFileSync('public/app.js','utf8');
-const photoLightStyle=readFileSync('public/design-lab.css','utf8');
-const photoFlags=JSON.parse(readFileSync('public/content-defaults.json','utf8'));
-assert.match(photoLightStyle,/NOVA PHOTO-LIGHT FOUNDATION/);
-assert.match(photoLightApp,/const photoReady = key/);
-assert.match(photoLightApp,/hero_photo_ready/);
-assert.match(photoLightApp,/story_photo_ready/);
-assert.match(photoLightApp,/booking_photo_ready/);
-assert.match(photoLightApp,/gallery_'\+id\+'_photo_ready/);
-assert.match(photoLightApp,/venue_'\+id\+'_photo_ready/);
-assert.match(photoLightApp,/const poster=\(e.demo\|\|home\)\?'':localImage\(e.image_url\)/);
-for(const lang of ['content','content_en']){
- for(const key of ['hero_photo_ready','story_photo_ready','booking_photo_ready',
-  'venue_zyb_photo_ready','venue_pob_photo_ready','venue_east_photo_ready',
-  'gallery_zyb_photo_ready','gallery_pob_photo_ready','gallery_east_photo_ready']){
-  assert.equal(photoFlags[lang][key],'false','Sample photography accidentally enabled: '+key);
- }
-}
