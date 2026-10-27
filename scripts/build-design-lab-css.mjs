@@ -51,7 +51,7 @@ assert.ok(output.length>40000,'Unexpected missing CSS sections');
 assert.match(output,/NOVA MOBILE VENUE OVERLAY PARITY/);
 assert.match(output,/NOVA RESTORED DARK CTA/);
 assert.match(output,/NOVA MOBILE DOCK/);
-assert.match(output,/NOVA \\/ Hallmark-inspired polish/);
+assert.ok(output.includes('NOVA / Hallmark-inspired polish'));
 assert.ok(existsSync(destination),'Generated output must be checked into the branch');
 if(checkOnly){
   const current=readFileSync(destination,'utf8');
