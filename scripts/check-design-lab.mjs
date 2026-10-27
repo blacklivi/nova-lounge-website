@@ -265,3 +265,19 @@ for(const lang of ['content','content_en']){
 for(const term of ["data-modal='booking'","data-modal='menu-location'","data-modal='contacts'","events-demo-notice","eventCard(event,true)","data-content='story_title'"]){
  assert.ok(artApp.includes(term),'Art-direction must keep '+term);
 }
+
+
+// Venue usability pass: existing CMS data drives visible location, hours,
+// and map action; no invented venue facts or added booking endpoints.
+const factsMarkup=readFileSync('public/app.js','utf8');
+const factsCSS=readFileSync('public/design-lab.css','utf8');
+assert.match(factsMarkup,/const mapURL=safeURL\(value\('map_'\+id\)\)/);
+assert.match(factsMarkup,/const venueHours=value\('hours_'\+id\)/);
+assert.match(factsMarkup,/lab-detail-facts/);
+assert.match(factsMarkup,/data-content='hours_\$\{id\}'/);
+assert.match(factsMarkup,/class='lab-detail-map-link'/);
+assert.match(factsMarkup,/target="_blank" rel="noopener noreferrer"/);
+assert.match(factsMarkup,/data-modal='booking' data-venue='\$\{id\}'/);
+assert.match(factsMarkup,/data-modal='menu-location' data-venue='\$\{id\}'/);
+assert.match(factsCSS,/NOVA \/ venue utility art direction/);
+assert.match(factsCSS,/\.lab-detail-hours p\{\s*white-space:pre-line/);

@@ -2601,3 +2601,108 @@ body[data-design-lab=true] .events-intro h1{margin-top:0;letter-spacing:-.045em}
   row-gap:32px;
  }
 }
+
+
+/* NOVA / venue utility art direction · 2026-10-27
+   Show already-configured opening hours and a real map destination where
+   people choose to book. No new decorative cards or competing buttons. */
+body[data-design-lab=true] .lab-detail-action-strip{
+ display:grid;
+ grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);
+ gap:clamp(24px,4vw,70px);
+ align-items:center;
+ padding-top:clamp(27px,3.2vw,46px);
+ padding-bottom:clamp(27px,3.2vw,46px);
+}
+body[data-design-lab=true] .lab-detail-facts{
+ display:grid;
+ grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+ gap:clamp(22px,3.6vw,57px);
+ align-items:start;
+ min-width:0;
+}
+body[data-design-lab=true] .lab-detail-facts>div{min-width:0}
+body[data-design-lab=true] .lab-detail-facts :is(.lab-detail-address,.lab-detail-hours)>span{
+ display:block;
+ margin:0 0 11px;
+ color:#CFD8C8;
+ font:500 11px/1.5 Manrope,sans-serif;
+ letter-spacing:.025em;
+ text-transform:none;
+ opacity:1;
+}
+body[data-design-lab=true] .lab-detail-facts :is(.lab-detail-address,.lab-detail-hours) p{
+ margin:0;
+ color:#F2F6EF;
+ font:400 clamp(13px,1.02vw,16px)/1.65 Manrope,sans-serif;
+ overflow-wrap:break-word;
+}
+body[data-design-lab=true] .lab-detail-hours p{
+ white-space:pre-line;
+ font-variant-numeric:tabular-nums;
+}
+body[data-design-lab=true] .lab-detail-map-link{
+ display:inline-flex;align-items:center;min-height:36px;
+ color:#DCE9D1;
+ font:500 12px/1.5 Manrope,sans-serif;
+ text-decoration:underline;
+ text-decoration-thickness:1px;
+ text-decoration-color:rgba(220,233,209,.6);
+ text-underline-offset:4px;
+ margin-top:8px;
+ transition:color .18s ease,text-decoration-color .18s ease;
+}
+body[data-design-lab=true] .lab-detail-map-link:hover{
+ color:#fff;text-decoration-color:#fff;
+}
+body[data-design-lab=true] .lab-detail-map-link:focus-visible{
+ outline:2px solid #fff;outline-offset:3px;
+}
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions{
+ justify-content:flex-end;
+ width:100%;
+ min-width:0;
+}
+@media(max-width:1000px){
+ body[data-design-lab=true] .lab-detail-action-strip{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:24px;
+ }
+ body[data-design-lab=true] .lab-detail-facts{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:20px;
+ }
+ body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions{
+  justify-content:stretch;
+ }
+}
+@media(max-width:600px){
+ body[data-design-lab=true] .lab-detail-action-strip{
+  padding:25px var(--gutter) 31px;
+  gap:20px;
+ }
+ body[data-design-lab=true] .lab-detail-facts{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:18px;
+ }
+ body[data-design-lab=true] .lab-detail-facts :is(.lab-detail-address,.lab-detail-hours)>span{
+  margin-bottom:8px;
+ }
+ body[data-design-lab=true] .lab-detail-facts :is(.lab-detail-address,.lab-detail-hours) p{
+  font-size:13px;line-height:1.6;
+ }
+ body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions{
+  width:100%;
+ }
+}
+@media(max-width:345px){
+ body[data-design-lab=true] .lab-detail-facts{
+  grid-template-columns:minmax(0,1fr);
+  gap:17px;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body[data-design-lab=true] .lab-detail-map-link{transition:none}
+}

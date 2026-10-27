@@ -109,6 +109,8 @@ function home(){
 </button>
 </section>`;}
 function detail(id){
+ const mapURL=safeURL(value('map_'+id));
+ const venueHours=value('hours_'+id);
  const spaceHeadings={zyb:t('После заката.','After dark.'),pob:t('Встречи без спешки.','Stay a little longer.'),east:t('Спокойный вечер.','A slower evening.')};
  const images=[1,2].map(i=>`<figure class='lab-detail-gallery-photo'>${image('gallery_'+id+'_'+i+'_image',t('Демонстрационная фотография пространства','Concept photo of this space'))}</figure>`).join('');
  const more=ids.filter(other=>other!==id).map(other=>`<a class='lab-detail-other-link' href='${venueURL(other)}' data-place='${other}'><strong>${name(other)}</strong></a>`).join('');
@@ -119,7 +121,13 @@ function detail(id){
   <p class='lab-detail-desc' data-content='venue_${id}_desc'>${content('venue_'+id+'_desc',t('Описание готовится.','Details coming soon.'))}</p></div>
  </section>
  <section class='lab-detail-photo' aria-label='${t('Фотография пространства NOVA','NOVA venue photograph')}'>${image('venue_'+id+'_image',t('Пространство NOVA ','NOVA venue ')+name(id),true)}<div class='lab-detail-photo-label'><span>NOVA / MINSK</span><span>${name(id)}</span></div></section>
- <section class='lab-detail-action-strip' aria-label='${t('Информация и действия','Information and actions')}'><div class='lab-detail-address'><span>${t('АДРЕС','ADDRESS')}</span><p data-content='address_${id}'>${content('address_'+id)}</p></div><div class='lab-detail-actions'><button type='button' data-modal='booking' data-venue='${id}'>${bookingLabel()}</button><button type='button' data-modal='menu-location' data-venue='${id}'>${t('Посмотреть меню','View the menu')}</button></div></section>
+ <section class='lab-detail-action-strip' aria-label='${t('Адрес, режим работы и бронирование','Address, opening hours and reservation')}'>
+  <div class='lab-detail-facts'>
+   <div class='lab-detail-address'><span>${t('Адрес','Address')}</span><p data-content='address_${id}'>${content('address_'+id)}</p>${mapURL?`<a class='lab-detail-map-link' href="${esc(mapURL)}" target="_blank" rel="noopener noreferrer">${t('На карте','View on map')}</a>`:''}</div>
+   ${venueHours?`<div class='lab-detail-hours'><span>${t('Режим работы','Opening hours')}</span><p data-content='hours_${id}'>${content('hours_'+id)}</p></div>`:''}
+  </div>
+  <div class='lab-detail-actions'><button type='button' data-modal='booking' data-venue='${id}'>${bookingLabel()}</button><button type='button' data-modal='menu-location' data-venue='${id}'>${t('Посмотреть меню','View the menu')}</button></div>
+ </section>
  <section class='lab-detail-story' aria-labelledby='lab-detail-story-title'><div class='lab-detail-story-copy'><h2 id='lab-detail-story-title'>${spaceHeadings[id]}</h2><p data-content='venue_${id}_second'>${content('venue_'+id+'_second')}</p><p class='features' data-content='venue_${id}_features'>${content('venue_'+id+'_features')}</p><button type='button' class='text-link lab-detail-contacts' data-modal='contacts' data-venue='${id}'>${t('Контакты и расположение','Contacts and directions')}</button></div><div class='lab-detail-gallery'>${images}<p class='image-note' data-content='media_note'>${content('media_note')}</p></div></section>
  <nav class='lab-detail-next' aria-label='${t('Другие пространства NOVA','Other NOVA venues')}'><div><h2>${t('Другие пространства.','Other NOVA spaces.')}</h2></div><div class='lab-detail-other-links'>${more}</div></nav>
  </article>`;

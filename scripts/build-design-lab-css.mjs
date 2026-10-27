@@ -19,6 +19,7 @@ const sources=[
   '05-interactions-and-mobile.css',
   '06-hallmark-accessibility.css',
   '07-art-direction.css',
+  '08-venue-utility.css',
 ].map(name=>resolve('styles/design-lab',name));
 const destination=resolve('public/design-lab.css');
 const checkOnly=process.argv.includes('--check');
