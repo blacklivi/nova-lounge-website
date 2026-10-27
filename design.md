@@ -41,3 +41,6 @@ Adapted in \`.agents/skills/nova-hallmark/SKILL.md\`; original source pinned in 
 
 ## CSS source files
 The editable ordered NOVA style modules are in `styles/design-lab/`; the actual `public/design-lab.css` is compiled without runtime `@import` by `npm run css:design-lab`. See `docs/NOVA-CSS-CONSOLIDATION.md` for the cascade-order contract and visual baseline. Do not manually append one-off patches to the generated file.
+
+## Hallmark art-direction iteration
+2026-10-27: experimental NOVA home and inner pages get distinct, grounded venue labels, shorter editorial chapters and fewer purely decorative slogans. Keep first screen, 425px mobile venue photo cards, booking dock, colours and Manrope intact. See docs/NOVA-HALLMARK-ART-DIRECTION-20261027.md and checkpoint nova-design-lab-pre-art-direction-20261027.

@@ -1,0 +1,150 @@
+
+
+/* NOVA Hallmark art-direction — editorial hierarchy, no re-theming.
+   Keep first cover, fixed booking dock, all mobile photographic venue cards. */
+body[data-design-lab=true] .venues-editorial .venues-editorial-kicker{
+ color:var(--olive);font:500 12px/1.5 Manrope,sans-serif;
+ letter-spacing:.014em;text-transform:none;
+}
+body[data-design-lab=true] .venue-card-editorial .venue-serial{
+ font:500 clamp(11px,.9vw,13px)/1.55 Manrope,sans-serif;
+ letter-spacing:.01em;text-transform:none;
+ margin-bottom:clamp(11px,1.3vw,21px);
+}
+body[data-design-lab=true] .venue-card-editorial-east .venue-serial{color:#E8EEE2}
+
+/* The story section is driven by its content/photo, not fake magazine labels. */
+body[data-design-lab=true] .story-editorial{
+ grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
+ grid-template-areas:"title title" "photo copy";
+ column-gap:clamp(32px,5.5vw,110px);row-gap:clamp(30px,4vw,60px);
+ padding-top:clamp(65px,7vw,115px);padding-bottom:clamp(70px,8vw,125px);
+}
+body[data-design-lab=true] .story-editorial-heading{gap:clamp(12px,1.8vw,24px)}
+body[data-design-lab=true] .story-editorial-heading .eyebrow{
+ font:500 12px/1.45 Manrope,sans-serif;letter-spacing:.015em;text-transform:none;
+}
+body[data-design-lab=true] .story-editorial h2{
+ font:300 clamp(56px,7.4vw,116px)/1.05 Manrope,sans-serif;
+ letter-spacing:-.035em;max-width:13ch;text-wrap:balance;
+}
+body[data-design-lab=true] .story-editorial .story-photo img{aspect-ratio:4/3}
+body[data-design-lab=true] .story-editorial .story-copy{
+ justify-content:center;align-self:stretch;padding-bottom:0;
+}
+body[data-design-lab=true] .story-editorial .story-copy p{
+ max-width:34ch;margin-bottom:clamp(24px,3vw,42px);
+ font:400 clamp(16px,1.35vw,21px)/1.65 Manrope,sans-serif;
+}
+
+/* The events listing is a practical chapter, not another giant poster title. */
+body[data-design-lab=true] .home-events-editorial{
+ padding-top:clamp(70px,7vw,120px);padding-bottom:clamp(80px,8vw,140px);
+}
+body[data-design-lab=true] .home-events-top{
+ grid-template-columns:minmax(0,1fr) minmax(0,.9fr);
+ column-gap:clamp(30px,6vw,90px);row-gap:0;
+ padding-bottom:clamp(34px,4vw,60px);
+}
+body[data-design-lab=true] .home-events-top .section-link h2{
+ font:300 clamp(59px,7.6vw,125px)/1.08 Manrope,sans-serif;
+ letter-spacing:-.035em;
+}
+body[data-design-lab=true] .home-events-lead{
+ font:400 clamp(16px,1.25vw,20px)/1.6 Manrope,sans-serif;
+ max-width:31ch;margin-bottom:8px;
+}
+body[data-design-lab=true] .home-events-gallery .event-editorial-entry-2{
+ padding-top:clamp(16px,3vw,48px);
+}
+
+/* Booking: one action, a shorter panel and no decorative brand sign-off. */
+body[data-design-lab=true] .book-strip-editorial{
+ min-height:clamp(430px,42vw,620px);
+ grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);
+}
+body[data-design-lab=true] .book-strip-editorial .book-main{
+ gap:clamp(28px,3.5vw,56px);
+ padding-top:clamp(38px,4.6vw,72px);padding-bottom:clamp(38px,4.6vw,72px);
+}
+body[data-design-lab=true] .book-editorial-index{
+ font:500 12px/1.5 Manrope,sans-serif;letter-spacing:.015em;text-transform:none;
+}
+body[data-design-lab=true] .book-strip-editorial .book-welcome{
+ font:300 clamp(40px,4.4vw,76px)/1.16 Manrope,sans-serif;
+ letter-spacing:-.035em;max-width:18ch;
+}
+
+/* Each inner page has a grounded headline; less needless vertical distance. */
+body[data-design-lab=true] .lab-detail-intro{padding-bottom:clamp(44px,5vw,88px)}
+body[data-design-lab=true] .lab-detail-intro-grid{padding-top:clamp(36px,5vw,78px)}
+body[data-design-lab=true] .lab-detail-story{
+ padding-top:clamp(75px,7.5vw,135px);padding-bottom:clamp(75px,7.5vw,135px);
+}
+body[data-design-lab=true] .lab-detail-story-copy h2{
+ font:300 clamp(50px,5.3vw,88px)/1.1 Manrope,sans-serif;
+ letter-spacing:-.035em;max-width:13ch;margin-bottom:clamp(24px,3.2vw,50px);
+}
+body[data-design-lab=true] .lab-detail-next{
+ padding-top:clamp(75px,8vw,130px);padding-bottom:clamp(75px,8vw,130px);
+}
+body[data-design-lab=true] .lab-detail-next h2{
+ font:300 clamp(44px,5.8vw,93px)/1.13 Manrope,sans-serif;letter-spacing:-.035em;
+}
+body[data-design-lab=true] .events-intro h1{margin-top:0;letter-spacing:-.045em}
+
+@media(max-width:600px){
+ body[data-design-lab=true] .venue-card-editorial .venue-serial{
+  color:rgba(255,255,255,.92);
+  font:500 11px/1.5 Manrope,sans-serif;letter-spacing:0;margin-bottom:10px;
+ }
+ body[data-design-lab=true] .story-editorial{
+  display:flex;flex-direction:column;gap:0;
+  padding:58px var(--gutter) 73px;
+ }
+ body[data-design-lab=true] .story-editorial-heading{margin:0 0 26px;gap:12px}
+ body[data-design-lab=true] .story-editorial h2{
+  font-size:clamp(46px,12vw,66px);line-height:1.11;
+  letter-spacing:-.025em;max-width:100%;
+ }
+ body[data-design-lab=true] .story-editorial .story-photo img{aspect-ratio:4/5}
+ body[data-design-lab=true] .story-editorial .story-copy{padding-top:25px}
+ body[data-design-lab=true] .story-editorial .story-copy p{
+  font-size:16px;line-height:1.66;margin-bottom:24px;
+ }
+ body[data-design-lab=true] .home-events-editorial{padding-top:68px;padding-bottom:85px}
+ body[data-design-lab=true] .home-events-top{
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:12px;padding-bottom:32px;
+ }
+ body[data-design-lab=true] .home-events-top .section-link h2{
+  font-size:clamp(51px,12vw,65px);line-height:1.12;
+ }
+ body[data-design-lab=true] .home-events-lead{font-size:15px;max-width:34ch;margin:0}
+ body[data-design-lab=true] .home-events-gallery .event-editorial-entry-2{padding-top:0}
+ body[data-design-lab=true] .book-strip-editorial{
+  display:flex;flex-direction:column;min-height:0;
+ }
+ body[data-design-lab=true] .book-strip-editorial .book-main{
+  min-height:320px;padding:37px var(--gutter) 34px;gap:22px;
+ }
+ body[data-design-lab=true] .book-strip-editorial .book-welcome{
+  margin:25px 0;font-size:clamp(31px,8vw,43px);
+  line-height:1.19;letter-spacing:-.02em;
+ }
+ body[data-design-lab=true] .book-strip-editorial .book-image{
+  height:200px;min-height:200px;
+ }
+ body[data-design-lab=true] .lab-detail-intro{padding-bottom:40px}
+ body[data-design-lab=true] .lab-detail-intro-grid{padding-top:32px}
+ body[data-design-lab=true] .lab-detail-story{padding-top:68px;padding-bottom:72px}
+ body[data-design-lab=true] .lab-detail-story-copy h2{
+  font-size:clamp(46px,11vw,58px);line-height:1.12;
+ }
+ body[data-design-lab=true] .lab-detail-next{padding-top:70px;padding-bottom:78px}
+ body[data-design-lab=true] .lab-detail-next h2{font-size:clamp(41px,10vw,56px)}
+}
+@media(prefers-reduced-motion:reduce){
+ body[data-design-lab=true] .story-editorial,
+ body[data-design-lab=true] .book-strip-editorial{scroll-behavior:auto}
+}

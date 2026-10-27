@@ -244,3 +244,24 @@ assert.match(parity,/filter:brightness\(\.73\)/);
 assert.match(parity,/pointer-events:none/);
 assert.match(parity,/min-height:44px/);
 assert.match(parity,/prefers-reduced-motion:reduce/);
+
+
+// Hallmark art direction: contentful venue labels, unique detail headings
+// and preserved booking/menu/events functionality.
+const artApp=readFileSync('public/app.js','utf8');
+const artCSS=readFileSync('public/design-lab.css','utf8');
+const artData=JSON.parse(readFileSync('public/content-defaults.json','utf8'));
+assert.match(artCSS,/NOVA Hallmark art-direction/);
+assert.match(artCSS,/grid-template-areas:"title title" "photo copy"/);
+assert.match(artApp,/const venueMoods=\{/);
+assert.match(artApp,/const spaceHeadings=\{/);
+assert.ok(!artApp.includes('NOVA JOURNAL'),'Pseudo-journal label must be removed');
+assert.ok(!artApp.includes('NOVA RESERVATIONS'),'Pseudo booking label must be removed');
+assert.ok(!artApp.includes('NOVA EVENTS'),'Pseudo-events label must be removed');
+for(const lang of ['content','content_en']){
+ const labels=['venue_zyb_subtitle','venue_pob_subtitle','venue_east_subtitle'].map(k=>artData[lang][k]);
+ assert.equal(new Set(labels).size,3);
+}
+for(const term of ["data-modal='booking'","data-modal='menu-location'","data-modal='contacts'","events-demo-notice","eventCard(event,true)","data-content='story_title'"]){
+ assert.ok(artApp.includes(term),'Art-direction must keep '+term);
+}
