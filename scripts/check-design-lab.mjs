@@ -194,3 +194,16 @@ for(const rule of [
 for(const token of ['--ui-sage:#DFE8D7','--ui-sage-text:#E8EEE2',
 'min-height:52px','min-height:56px',':focus-visible','prefers-reduced-motion:reduce'])
   assert.ok(uiCSS.includes(token),'Missing contrast or usability token: '+token);
+
+
+// Mobile cover-to-dock contract: no photo trailing beneath the venue links.
+const mobileHeroCSS=readFileSync('public/design-lab.css','utf8');
+const mobileHeroJS=readFileSync('public/design-lab-ui.js','utf8');
+assert.match(mobileHeroCSS,/NOVA MOBILE DOCK \/ VIEWPORT CONTRACT/);
+assert.match(mobileHeroCSS,/height:calc\(100svh - var\(--nova-mobile-dock-height/);
+assert.match(mobileHeroCSS,/\.hero-editorial \.hero-spaces\{\s*bottom:0/);
+assert.match(mobileHeroCSS,/\.mobile-cta \.button\{\s*background:#DCE9D1/);
+assert.match(mobileHeroCSS,/text-decoration-color:rgba\(231,241,220,.58\)/);
+assert.match(mobileHeroJS,/ResizeObserver/);
+assert.match(mobileHeroJS,/--nova-mobile-dock-height/);
+assert.match(mobileHeroJS,/new MutationObserver\(attach\)/);

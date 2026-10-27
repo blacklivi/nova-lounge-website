@@ -1,3 +1,44 @@
+// Keep the mobile hero's physical bottom aligned with the fixed booking
+// dock's top. Measure the dock, not the fluctuating Safari visual viewport:
+// 100svh stays stable while browser chrome opens/closes on scroll.
+(() => {
+  const root=document.documentElement;
+  const app=document.getElementById('app');
+  if(!app) return;
+  let dock=null;
+  let lastHeight=0;
+  const resizeObserver=typeof ResizeObserver==='function'
+    ?new ResizeObserver(()=>measure()):null;
+  function measure(){
+    if(!dock||!dock.isConnected) return;
+    if(getComputedStyle(dock).display==='none'){
+      if(lastHeight!==0){
+        root.style.removeProperty('--nova-mobile-dock-height');
+        lastHeight=0;
+      }
+      return;
+    }
+    const measured=Math.ceil(dock.getBoundingClientRect().height);
+    if(measured>0&&measured!==lastHeight){
+      root.style.setProperty('--nova-mobile-dock-height',measured+'px');
+      lastHeight=measured;
+    }
+  }
+  function attach(){
+    const next=app.querySelector('.mobile-cta');
+    if(next===dock){measure();return;}
+    if(dock&&resizeObserver) resizeObserver.unobserve(dock);
+    dock=next;
+    if(dock&&resizeObserver) resizeObserver.observe(dock);
+    measure();
+  }
+  const changes=new MutationObserver(attach);
+  changes.observe(app,{childList:true});
+  attach();
+  addEventListener('resize',measure,{passive:true});
+  addEventListener('orientationchange',measure,{passive:true});
+})();
+
 // One-time cinematic introduction; never hide functional content indefinitely.
 (() => {
  const root=document.documentElement,app=document.getElementById('app');
