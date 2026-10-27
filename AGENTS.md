@@ -37,3 +37,9 @@ Use their ideas for a structured design audit, realistic copy, optical alignment
 ## Delivery
 - Audit first, approve major composition changes, then implement in reviewable commits.
 - Original website visuals and page structure must be improved, not replaced with a new presentation site. When creating client-facing outputs, omit deployment implementation details and clearly distinguish fictional sample events and nonfunctional booking. No merge to `main` without separate approval.
+
+## Hallmark v2 · source-linked quality workflow
+- Project design lock: `design.md`; pinned original source and licence: `hallmark-source.json`.
+- Project-specific audit/polish adapter: `.agents/skills/nova-hallmark/SKILL.md`; baseline findings: `docs/HALLMARK-NOVA-AUDIT.md`.
+- Hallmark is an **agent design skill**, not runtime UI code. Do not install npm skill runners as a production or Cloudflare dependency. Read the pinned upstream originals for a full official Hallmark run.
+- First Hallmark-inspired safe polish: responsive text wrapping, focus visibility, clipping rather than hiding overflow, throttled sticky-header update. See audit. Never replace the approved olive/white brand or the three mobile photo overlays with generic Hallmark theme presets.

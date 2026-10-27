@@ -6,7 +6,7 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "check": "node --check src/index.js && node --check public/admin.js && node --check public/cms.js && node --check public/events.js",
-    "check:design-lab": "node --check public/core.js && node --check public/app.js && node --check public/design-lab-ui.js && node --check public/concept.js && node --check src/design-lab.js && node scripts/check-design-lab.mjs"
+    "check:design-lab": "node --check public/core.js && node --check public/app.js && node --check public/design-lab-ui.js && node --check public/concept.js && node --check src/design-lab.js && node scripts/check-design-lab.mjs && node scripts/check-nova-hallmark.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.102.0"

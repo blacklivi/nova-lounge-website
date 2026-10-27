@@ -2358,3 +2358,63 @@ body[data-design-lab=true] .modal .button.secondary:focus-visible{
     transition:none!important;
   }
 }
+
+
+/* NOVA / Hallmark-inspired polish: quiet craft, no theme substitution.
+   Source audit: docs/HALLMARK-NOVA-AUDIT.md.
+   Keep the established white, Manrope and dark-olive visual identity. */
+
+/* Clip horizontal ink, not page scroll: overflow:hidden on a root element
+   would change the containing block for sticky/fixed Safari UI. */
+html:has(body[data-design-lab=true]),
+body[data-design-lab=true]{
+  overflow-x:clip;
+}
+/* Better typographic endings without changing the deliberate display tracking. */
+body[data-design-lab=true] :is(
+  .venues-editorial-lead,
+  .venue-card-editorial .venue-description,
+  .story-copy>p,
+  .home-events-lead,
+  .events-intro>p,
+  .lab-detail-desc,
+  .lab-detail-story-copy>p:not(.features),
+  .lab-detail-subtitle
+){
+  text-wrap:pretty;
+}
+body[data-design-lab=true] :is(
+  .venues-heading,
+  .lab-detail-story-copy h2,
+  .lab-detail-next h2,
+  .story-editorial-heading h2
+){
+  text-wrap:balance;
+}
+/* Keyboard action affordance, with light-on-dark focus rings. */
+body[data-design-lab=true] :is(
+  .venue-card-editorial,
+  .events-all-link,
+  .story-menu-link,
+  .lab-detail-other-link,
+  .lab-detail-contacts,
+  .main-nav a,
+  .footer-route
+):focus-visible{
+  outline:2px solid var(--olive);
+  outline-offset:3px;
+}
+body[data-design-lab=true] :is(
+  .hero-space-link,
+  .venue-card-editorial-east,
+  .venue-card-editorial-zyb,
+  .venue-card-editorial-pob
+):focus-visible{
+  outline-color:#E8EEE2;
+  outline-offset:-3px;
+}
+@media(prefers-reduced-motion:reduce){
+  html:has(body[data-design-lab=true]){
+    scroll-behavior:auto;
+  }
+}

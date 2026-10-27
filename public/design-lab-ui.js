@@ -65,7 +65,14 @@
  };
  const change=new MutationObserver(onRender);
  change.observe(app,{childList:true});onRender();
- const onScroll=()=>document.body.classList.toggle('lab-hero-scrolled',scrollY>40);
+ let scrollFrame=0;
+ const onScroll=()=>{
+  if(scrollFrame)return;
+  scrollFrame=requestAnimationFrame(()=>{
+   scrollFrame=0;
+   document.body.classList.toggle('lab-hero-scrolled',scrollY>40);
+  });
+ };
  addEventListener('scroll',onScroll,{passive:true});onScroll();
  matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{
   if(e.matches){root.classList.remove('lab-hero-preparing');root.classList.add('lab-hero-ready');}
