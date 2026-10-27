@@ -1,0 +1,758 @@
+/* ═══════════════════════════════════════════════════════════════════
+   NOVA INTERACTION CONTRAST SYSTEM — 2026-10-27 / LAB ONLY
+   Quiet but unmistakable buttons, real text contrast and accessible focus.
+   Always scoped to the experimental site. No extra ornamental arrows.
+   ═══════════════════════════════════════════════════════════════════ */
+body[data-design-lab=true]{
+  --ui-sage:#DFE8D7;
+  --ui-sage-hover:#ECF1E6;
+  --ui-sage-ink:#20301A;
+  --ui-sage-text:#E8EEE2;
+  --ui-soft:#EEF2EA;
+  --ui-soft-hover:#E2E9DE;
+  --ui-dark:#384929;
+  --ui-dark-hover:#29391F;
+  --ui-control-radius:7px;
+  --ui-control-motion:background-color .2s ease,color .2s ease,
+      border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+
+/* Real venue address: old inherited ink was almost invisible on #1F2D13. */
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-address p{
+  color:var(--ui-sage-text);
+  opacity:1;
+  font-weight:500;
+  letter-spacing:.002em;
+}
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-address>span{
+  color:#D0DBC8;
+  opacity:1;
+}
+body[data-design-lab=true] .lab-detail-action-strip{
+  border-top:1px solid rgba(255,255,255,.08);
+}
+body[data-design-lab=true] .site-footer .venue-address{
+  color:#323C2D;
+}
+body[data-design-lab=true] .site-footer .venue-hours{
+  color:#535D4D;
+}
+
+/* Common button language across drawers, forms, modals, header and mobile.
+   Square-leaning softened corners are deliberate, not default pill buttons. */
+body[data-design-lab=true] .button,
+body[data-design-lab=true] .drawer .button,
+body[data-design-lab=true] .modal .button{
+  min-height:48px;
+  border-radius:var(--ui-control-radius);
+  background:var(--ui-dark);
+  border:1px solid var(--ui-dark);
+  color:#F5F7F1;
+  font-weight:500;
+  letter-spacing:.008em;
+  cursor:pointer;
+  transition:var(--ui-control-motion);
+}
+body[data-design-lab=true] .button:hover,
+body[data-design-lab=true] .drawer .button:hover,
+body[data-design-lab=true] .modal .button:hover{
+  background:var(--ui-dark-hover);
+  border-color:var(--ui-dark-hover);
+  color:#FFFFFF;
+}
+body[data-design-lab=true] .button.secondary,
+body[data-design-lab=true] .modal .button.secondary{
+  background:var(--ui-soft);
+  color:var(--ui-sage-ink);
+  border-color:#CCD6C5;
+}
+body[data-design-lab=true] .button.secondary:hover,
+body[data-design-lab=true] .modal .button.secondary:hover{
+  background:var(--ui-soft-hover);
+  border-color:#AFC2A7;
+  color:var(--ui-sage-ink);
+}
+body[data-design-lab=true] .button:focus-visible,
+body[data-design-lab=true] .modal button:focus-visible,
+body[data-design-lab=true] .drawer button:focus-visible{
+  outline:2px solid #67884D;
+  outline-offset:3px;
+}
+body[data-design-lab=true] .button:active,
+body[data-design-lab=true] .modal .button:active,
+body[data-design-lab=true] .drawer .button:active{
+  transform:translateY(1px);
+}
+
+/* The dark location bar has TWO clearly differentiated controls.
+   Primary: muted sage fill. Secondary: outlined tinted glass (not white). */
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions{
+  gap:clamp(11px,1.35vw,19px);
+  align-items:stretch;
+}
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  min-height:52px;
+  flex:1 1 0;
+  max-width:270px;
+  padding:13px clamp(10px,1.5vw,22px);
+  border-radius:var(--ui-control-radius);
+  font:500 clamp(12px,1vw,14px)/1.35 Manrope,sans-serif;
+  letter-spacing:.005em;
+  text-align:center;
+  white-space:normal;
+  cursor:pointer;
+  transition:var(--ui-control-motion);
+}
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions button:first-child{
+  color:var(--ui-sage-ink);
+  background:var(--ui-sage);
+  border:1px solid var(--ui-sage);
+}
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions button:first-child:hover{
+  color:var(--ui-sage-ink);
+  background:var(--ui-sage-hover);
+  border-color:var(--ui-sage-hover);
+  box-shadow:0 6px 20px rgba(0,0,0,.11);
+  gap:0;
+}
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions button:last-child{
+  color:var(--ui-sage-text);
+  background:rgba(221,234,212,.07);
+  border:1px solid rgba(223,232,215,.53);
+}
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions button:last-child:hover{
+  color:#FFFFFF;
+  background:rgba(223,232,215,.15);
+  border-color:rgba(223,232,215,.83);
+  gap:0;
+}
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions button:focus-visible{
+  outline:2px solid var(--ui-sage);
+  outline-offset:4px;
+}
+body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions button:active{
+  transform:translateY(1px);
+}
+
+/* Other page actions: calm sage-tinted control with an actual hit area. */
+body[data-design-lab=true] .story-editorial .story-menu-link,
+body[data-design-lab=true] .home-events-bottom .events-all-link,
+body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts{
+  display:inline-flex;
+  width:fit-content;
+  max-width:100%;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  margin-left:0;
+  padding:12px 19px;
+  border:1px solid #CCD7C6;
+  border-radius:var(--ui-control-radius);
+  background:var(--ui-soft);
+  color:var(--ui-sage-ink);
+  font:500 clamp(13px,1vw,15px)/1.4 Manrope,sans-serif;
+  letter-spacing:.008em;
+  white-space:normal;
+  text-align:center;
+  cursor:pointer;
+  transition:var(--ui-control-motion);
+}
+body[data-design-lab=true] .story-editorial .story-menu-link:hover,
+body[data-design-lab=true] .home-events-bottom .events-all-link:hover,
+body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts:hover{
+  background:var(--ui-soft-hover);
+  border-color:#A8BDA0;
+  color:var(--ui-sage-ink);
+}
+body[data-design-lab=true] .story-editorial .story-menu-link:focus-visible,
+body[data-design-lab=true] .home-events-bottom .events-all-link:focus-visible,
+body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts:focus-visible{
+  outline:2px solid #67884D;
+  outline-offset:3px;
+}
+
+/* Card remains a single full-surface link: the label is a visual affordance. */
+body[data-design-lab=true] .venue-card-editorial .venue-discover{
+  display:inline-flex;
+  width:fit-content;
+  max-width:100%;
+  min-height:44px;
+  margin-top:clamp(20px,3vw,44px);
+  padding:11px 17px;
+  align-items:center;
+  border:1px solid #CBD6C4;
+  border-radius:var(--ui-control-radius);
+  background:var(--ui-soft);
+  color:var(--ui-sage-ink);
+  font:500 13px/1.4 Manrope,sans-serif;
+  letter-spacing:.008em;
+  transition:var(--ui-control-motion);
+}
+body[data-design-lab=true] .venue-card-editorial:hover .venue-discover,
+body[data-design-lab=true] .venue-card-editorial:focus-visible .venue-discover{
+  opacity:1;
+  background:var(--ui-soft-hover);
+  border-color:#A8BDA0;
+  color:var(--ui-sage-ink);
+}
+body[data-design-lab=true] .venue-card-editorial-east .venue-discover{
+  color:var(--ui-sage-text);
+  border:1px solid rgba(223,232,215,.57);
+  background:rgba(223,232,215,.11);
+}
+body[data-design-lab=true] .venue-card-editorial-east:hover .venue-discover,
+body[data-design-lab=true] .venue-card-editorial-east:focus-visible .venue-discover{
+  color:#FFFFFF;
+  background:rgba(223,232,215,.2);
+  border-color:rgba(223,232,215,.85);
+}
+
+/* Photo cover and mobile sticky action: visible with no neon or pill aesthetic. */
+body[data-design-lab=true] .hero-editorial .hero-editorial-book{
+  min-height:48px;
+  padding:12px 19px;
+  border:1px solid rgba(231,237,225,.68);
+  border-radius:var(--ui-control-radius);
+  background:rgba(20,35,15,.28);
+  color:#F1F5EB;
+  font:500 14px/1.4 Manrope,sans-serif;
+  transition:var(--ui-control-motion);
+}
+body[data-design-lab=true] .hero-editorial .hero-editorial-book:hover{
+  border-color:rgba(232,239,225,.94);
+  background:rgba(223,232,215,.17);
+  color:#FFFFFF;
+}
+body[data-design-lab=true] .site-header-editorial .header-book{
+  min-height:44px;
+  border:1px solid rgba(236,243,232,.72);
+  background:rgba(223,232,215,.1);
+  color:#F4F7F0;
+}
+body[data-design-lab=true] .site-header-editorial .header-book:hover{
+  background:var(--ui-sage);
+  color:var(--ui-sage-ink);
+  border-color:var(--ui-sage);
+}
+body[data-design-lab=true] .mobile-cta .button{
+  width:100%;
+  min-height:52px;
+  border-radius:var(--ui-control-radius);
+  font-size:14px;
+  font-weight:600;
+  box-shadow:0 3px 12px rgba(20,34,15,.14);
+}
+body[data-design-lab=true] .mobile-cta .button:hover{
+  box-shadow:0 5px 17px rgba(20,34,15,.19);
+}
+
+/* The whole olive booking feature is a button; frame the actual action label. */
+body[data-design-lab=true] .book-strip-editorial .book-cta{
+  display:inline-flex;
+  align-items:center;
+  width:fit-content;
+  max-width:100%;
+  min-height:49px;
+  padding:11px 17px;
+  border:1px solid rgba(229,239,220,.72);
+  border-radius:var(--ui-control-radius);
+  background:rgba(223,232,215,.12);
+  color:#F1F5EB;
+  font-weight:500;
+  transition:var(--ui-control-motion);
+}
+body[data-design-lab=true] .book-strip-editorial .book-main:hover .book-cta,
+body[data-design-lab=true] .book-strip-editorial .book-main:focus-visible .book-cta{
+  border-color:var(--ui-sage);
+  background:rgba(223,232,215,.19);
+  color:#FFFFFF;
+}
+body[data-design-lab=true] .book-strip-editorial .book-main:focus-visible{
+  outline:2px solid var(--ui-sage);
+  outline-offset:-5px;
+}
+
+/* Small actionable controls should meet finger-friendly hit areas. */
+body[data-design-lab=true] .footer-social-icon,
+body[data-design-lab=true] .footer-route,
+body[data-design-lab=true] .to-top{
+  width:44px;min-width:44px;
+  height:44px;min-height:44px;
+}
+body[data-design-lab=true] .footer-social-icon:hover,
+body[data-design-lab=true] .to-top:hover{
+  background:var(--ui-soft);
+  color:var(--ui-dark);
+}
+body[data-design-lab=true] :is(.footer-social-icon,.footer-route,.to-top):focus-visible{
+  outline:2px solid #67884D;
+  outline-offset:3px;
+}
+@media(max-width:600px){
+  body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  body[data-design-lab=true] .lab-detail-action-strip .lab-detail-actions button{
+    min-height:56px;
+    max-width:none;
+    padding:12px 9px;
+    font-size:clamp(12px,3.15vw,13px);
+    line-height:1.33;
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-discover{
+    margin-top:18px;
+    min-height:44px;
+  }
+  body[data-design-lab=true] .story-editorial .story-menu-link,
+  body[data-design-lab=true] .home-events-bottom .events-all-link,
+  body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts{
+    min-height:48px;
+    padding:12px 17px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-design-lab=true] :is(
+    .lab-detail-actions button,
+    .story-menu-link,
+    .events-all-link,
+    .lab-detail-contacts,
+    .venue-discover,
+    .mobile-cta .button,
+    .hero-editorial-book,
+    .book-cta
+  ){
+    transition:none!important;
+    transform:none!important;
+  }
+}
+
+
+/* ━━━ NOVA MOBILE DOCK / VIEWPORT CONTRACT · 2026-10-27 ━━━
+   A full-screen cover on desktop; on mobile the photo ends exactly at
+   the fixed booking dock's top edge. No ghost photo strip below venue links.
+   Small viewport units prevent Safari toolbar animation from stretching it. */
+
+/* A navigation bar should look tappable even without ornamental arrows. */
+body[data-design-lab=true] .hero-editorial .hero-spaces{
+  background:rgba(12,23,12,.76);
+  -webkit-backdrop-filter:blur(7px);
+  backdrop-filter:blur(7px);
+  border-top:1px solid rgba(241,247,234,.55);
+}
+body[data-design-lab=true] .hero-editorial .hero-space-link{
+  min-width:0;
+  color:#F5F7F1;
+  cursor:pointer;
+  transition:background-color .18s ease;
+}
+body[data-design-lab=true] .hero-editorial .hero-space-name{
+  color:#F5F7F1;
+  text-decoration:underline;
+  text-decoration-color:rgba(231,241,220,.58);
+  text-underline-offset:6px;
+  text-decoration-thickness:1px;
+  transition:text-decoration-color .18s ease;
+}
+body[data-design-lab=true] .hero-editorial .hero-space-link:hover,
+body[data-design-lab=true] .hero-editorial .hero-space-link:focus-visible{
+  background:rgba(220,234,207,.15);
+}
+body[data-design-lab=true] .hero-editorial .hero-space-link:hover .hero-space-name,
+body[data-design-lab=true] .hero-editorial .hero-space-link:focus-visible .hero-space-name{
+  text-decoration-color:#FFFFFF;
+}
+body[data-design-lab=true] .hero-editorial .hero-space-link:active{
+  background:rgba(220,234,207,.27);
+}
+@media(max-width:600px){
+  /* Initial paint fallback matches the 52px button + 20px padding/border.
+     JS measures the actual dock height (including any iOS safe-area inset).
+     Only the experimental homepage uses this custom property. */
+  body[data-design-lab=true]{
+    --nova-hero-nav-height:76px;
+  }
+  body[data-design-lab=true] .hero-editorial{
+    height:calc(100vh - var(--nova-mobile-dock-height,calc(73px + env(safe-area-inset-bottom))));
+    min-height:0;
+    max-height:none;
+    position:relative;
+    overflow:hidden;
+  }
+  @supports (height:100svh){
+    body[data-design-lab=true] .hero-editorial{
+      height:calc(100svh - var(--nova-mobile-dock-height,calc(73px + env(safe-area-inset-bottom))));
+      min-height:0;
+      max-height:none;
+    }
+  }
+  body[data-design-lab=true] .hero-editorial .hero-photo,
+  body[data-design-lab=true] .hero-editorial .hero-photo img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:60% center;
+  }
+  body[data-design-lab=true] .hero-editorial .hero-copy{
+    height:100%;
+    padding-bottom:calc(var(--nova-hero-nav-height) + 22px);
+  }
+  body[data-design-lab=true] .hero-editorial .hero-spaces{
+    bottom:0;
+    height:var(--nova-hero-nav-height);
+    min-height:var(--nova-hero-nav-height);
+    margin:0;
+    padding:0 11px;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  body[data-design-lab=true] .hero-editorial .hero-space-link{
+    height:100%;
+    min-height:var(--nova-hero-nav-height);
+    padding:10px 8px;
+    justify-content:center;
+    align-items:flex-start;
+    gap:0;
+  }
+  body[data-design-lab=true] .hero-editorial .hero-space-name{
+    font-size:clamp(10px,2.8vw,13px);
+    line-height:1.35;
+    text-decoration-thickness:1px;
+    text-underline-offset:5px;
+  }
+  /* Next chapter begins as soon as the photo finishes, not after an
+     additional white "breathing" panel. */
+  body[data-design-lab=true] .venues-editorial{
+    margin-top:0;
+    padding-top:36px;
+  }
+  body[data-design-lab=true] .venues-editorial-intro{
+    margin-top:0;
+  }
+  /* Primary booking button must look actionable, never disabled. */
+  body[data-design-lab=true] .mobile-cta{
+    position:fixed;
+    inset:auto 0 0;
+    z-index:45;
+    border-top:1px solid rgba(74,95,57,.15);
+    background:rgba(255,255,255,.97);
+  }
+  body[data-design-lab=true] .mobile-cta .button{
+    background:#DCE9D1;
+    border:1px solid #92A586;
+    color:#20321A;
+    border-radius:7px;
+    font-weight:650;
+    letter-spacing:.01em;
+    min-height:52px;
+    box-shadow:0 4px 14px rgba(24,41,17,.18),inset 0 1px 0 rgba(255,255,255,.48);
+    transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+  }
+  body[data-design-lab=true] .mobile-cta .button:hover,
+  body[data-design-lab=true] .mobile-cta .button:focus-visible{
+    background:#C7DCBA;
+    border-color:#6F8D60;
+    color:#1B2B15;
+    box-shadow:0 5px 16px rgba(24,41,17,.22);
+  }
+  body[data-design-lab=true] .mobile-cta .button:active{
+    background:#BED5AF;
+    transform:translateY(1px);
+  }
+  body[data-design-lab=true] .mobile-cta .button:focus-visible{
+    outline:2px solid #527942;
+    outline-offset:2px;
+  }
+}
+@media(max-width:600px) and (max-height:620px){
+  /* Small landscape/short-height phones: protect the tagline and links. */
+  body[data-design-lab=true] .hero-editorial .hero-copy{
+    padding-top:calc(var(--header) + 9px);
+    padding-bottom:calc(var(--nova-hero-nav-height) + 12px);
+  }
+  body[data-design-lab=true] .hero-editorial h1{
+    margin-top:clamp(15px,3.5svh,26px);
+  }
+  body[data-design-lab=true] .hero-editorial .hero-tagline{
+    font-size:clamp(15px,4.1vw,19px);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-design-lab=true] .hero-editorial .hero-space-link,
+  body[data-design-lab=true] .hero-editorial .hero-space-name,
+  body[data-design-lab=true] .mobile-cta .button{
+    transition:none!important;
+    transform:none!important;
+  }
+}
+
+
+/* Intro polish: the navigation rail fades in PLACE. No 16px downward
+   translate can temporarily expose a photograph tail beneath the rail. */
+@media(prefers-reduced-motion:no-preference){
+  html.lab-hero-ready body[data-design-lab=true] .hero-editorial .hero-spaces{
+    animation:novaHeroNavFade .8s ease .45s both;
+  }
+}
+html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-spaces{
+  transform:none;
+}
+@keyframes novaHeroNavFade{
+  from{opacity:0;transform:none}
+  to{opacity:1;transform:none}
+}
+
+
+/* ━━━ NOVA RESTORED DARK CTA / CLEAN LIGHT CONTROLS · 2026-10-27 ━━━
+   Match the original dark-olive mobile booking CTA. Other controls on
+   light surfaces return to white/transparent backgrounds, dark type and
+   restrained borders. The three hero venue names have NO underlines.
+   Leave all cover-to-dock sizing, links, and dark-surface buttons intact. */
+
+/* Never underline the three venue names; the entire rail remains clickable. */
+body[data-design-lab=true] .hero-editorial .hero-space-link,
+body[data-design-lab=true] .hero-editorial .hero-space-link:hover,
+body[data-design-lab=true] .hero-editorial .hero-space-link:focus-visible,
+body[data-design-lab=true] .hero-editorial .hero-space-name,
+body[data-design-lab=true] .hero-editorial .hero-space-link:hover .hero-space-name,
+body[data-design-lab=true] .hero-editorial .hero-space-link:focus-visible .hero-space-name{
+  text-decoration:none;
+  text-decoration-line:none;
+}
+
+/* White-background editorial controls, including default secondary buttons.
+   Keep clear hit areas and keyboard focus without colored fills. */
+body[data-design-lab=true] .venue-card-editorial:not(.venue-card-editorial-east) .venue-discover,
+body[data-design-lab=true] .story-editorial .story-menu-link,
+body[data-design-lab=true] .home-events-bottom .events-all-link,
+body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts,
+body[data-design-lab=true] .button.secondary,
+body[data-design-lab=true] .modal .button.secondary{
+  background:#FFFFFF;
+  color:#293725;
+  border-color:#C9D1C3;
+  box-shadow:none;
+}
+body[data-design-lab=true] .venue-card-editorial:not(.venue-card-editorial-east):hover .venue-discover,
+body[data-design-lab=true] .venue-card-editorial:not(.venue-card-editorial-east):focus-visible .venue-discover,
+body[data-design-lab=true] .story-editorial .story-menu-link:hover,
+body[data-design-lab=true] .story-editorial .story-menu-link:focus-visible,
+body[data-design-lab=true] .home-events-bottom .events-all-link:hover,
+body[data-design-lab=true] .home-events-bottom .events-all-link:focus-visible,
+body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts:hover,
+body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts:focus-visible,
+body[data-design-lab=true] .button.secondary:hover,
+body[data-design-lab=true] .button.secondary:focus-visible,
+body[data-design-lab=true] .modal .button.secondary:hover,
+body[data-design-lab=true] .modal .button.secondary:focus-visible{
+  background:#FFFFFF;
+  color:#20301A;
+  border-color:#697D5E;
+  box-shadow:none;
+}
+
+/* Return mobile booking action to its original brand color, not pale sage. */
+@media(max-width:600px){
+  body[data-design-lab=true] .mobile-cta .button{
+    background:#384929;
+    border:1px solid #384929;
+    color:#F5F7F1;
+    font-weight:600;
+    box-shadow:0 3px 12px rgba(20,34,15,.14);
+  }
+  body[data-design-lab=true] .mobile-cta .button:hover,
+  body[data-design-lab=true] .mobile-cta .button:focus-visible{
+    background:#29391F;
+    border-color:#29391F;
+    color:#FFFFFF;
+    box-shadow:0 4px 13px rgba(20,34,15,.18);
+  }
+  body[data-design-lab=true] .mobile-cta .button:active{
+    background:#23321B;
+    border-color:#23321B;
+    color:#FFFFFF;
+  }
+}
+
+
+/* ── NOVA MOBILE VENUE OVERLAY PARITY · 2026-10-27 ──────────────
+   Zybitskaya and Pobediteley use the same full-photo + text overlay
+   composition as Vostok below 601px. Desktop art direction untouched. */
+@media(max-width:600px){
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ){
+    position:relative;
+    display:block;
+    isolation:isolate;
+    width:100%;
+    height:425px;
+    min-height:0;
+    margin:0 0 22px;
+    padding:0;
+    overflow:hidden;
+    color:#fff;
+    background:var(--deep);
+  }
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ) .venue-img{
+    position:absolute;
+    inset:0;
+    display:block;
+    width:100%;
+    height:100%;
+    aspect-ratio:auto;
+    margin:0;
+    overflow:hidden;
+    z-index:0;
+  }
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ) .venue-img img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center center;
+    filter:brightness(.73) saturate(.88);
+  }
+  /* Persistent, subtle bottom gradient keeps editorial white type readable
+     over photography without blank panels or visible "cards" behind words. */
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  )::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:linear-gradient(180deg,
+      transparent 34%,
+      rgba(8,15,8,.12) 51%,
+      rgba(8,15,8,.76) 100%);
+    pointer-events:none;
+  }
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ) .venue-foot{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:flex-end;
+    width:100%;
+    height:100%;
+    min-height:0;
+    max-width:none;
+    margin:0;
+    padding:25px 22px;
+    border:0;
+    color:#fff;
+    background:transparent;
+  }
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ) .venue-serial{
+    display:block;
+    color:rgba(255,255,255,.94);
+    font-size:10px;
+    line-height:1.4;
+    margin:0 0 15px;
+  }
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ) .venue-name-line{
+    display:block;
+    width:100%;
+    min-width:0;
+    margin:0;
+  }
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ) .venue-title{
+    color:#fff;
+    font-size:clamp(31px,8.4vw,42px);
+    line-height:1.13;
+    letter-spacing:.002em;
+    font-weight:400;
+    overflow-wrap:normal;
+    margin:0;
+  }
+  /* This is the only long name; size to available text width at 320px. */
+  body[data-design-lab=true] .venue-card-editorial-pob .venue-title{
+    font-size:clamp(25px,7.25vw,36px);
+    letter-spacing:0;
+  }
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ) .venue-description{
+    color:rgba(255,255,255,.93);
+    font-size:13px;
+    line-height:1.6;
+    margin:10px 0 0;
+    max-width:100%;
+  }
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ) .venue-discover{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:fit-content;
+    max-width:100%;
+    min-height:44px;
+    margin:18px 0 0;
+    padding:11px 17px;
+    border:1px solid rgba(237,245,230,.62);
+    border-radius:var(--ui-control-radius,7px);
+    background:rgba(223,232,215,.11);
+    color:#F3F6EF;
+    box-shadow:none;
+    font:500 13px/1.4 Manrope,sans-serif;
+    transition:background-color .2s ease,border-color .2s ease;
+  }
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ):is(:hover,:focus-visible) .venue-discover{
+    background:rgba(223,232,215,.22);
+    border-color:rgba(237,245,230,.92);
+    color:#fff;
+    opacity:1;
+  }
+}
+@media(max-width:600px) and (max-height:600px){
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ){
+    height:390px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-design-lab=true] .venue-card-editorial:is(
+    .venue-card-editorial-zyb,
+    .venue-card-editorial-pob
+  ) .venue-discover{
+    transition:none!important;
+  }
+}
+
+

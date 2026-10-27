@@ -38,3 +38,6 @@ Preserve \`public/app.js\` SPA links, all routes, dynamic content keys, modal ha
 ## External skill
 
 Adapted in \`.agents/skills/nova-hallmark/SKILL.md\`; original source pinned in \`hallmark-source.json\`. It is a development review workflow, **not a frontend library** or a package that visitors download. For the complete upstream Hallmark toolchain, developers can separately opt in to the documented official install command; it is not run during production builds.
+
+## CSS source files
+The editable ordered NOVA style modules are in `styles/design-lab/`; the actual `public/design-lab.css` is compiled without runtime `@import` by `npm run css:design-lab`. See `docs/NOVA-CSS-CONSOLIDATION.md` for the cascade-order contract and visual baseline. Do not manually append one-off patches to the generated file.

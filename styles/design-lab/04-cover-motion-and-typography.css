@@ -1,0 +1,319 @@
+/* FULL-VIEWPORT COVER AND REFINED REVEAL (experiment only)
+   All other compact section proportions remain unchanged. */
+html.lab-js #seo-fallback{display:none!important}
+html.lab-js body[data-design-lab=true] #app>.loading{display:none!important}
+html.lab-js body[data-design-lab=true] #app:not(:has(main)){min-height:100svh;background:var(--deep)}
+body[data-design-lab=true] .site-header-editorial{
+ position:fixed;inset:0 0 auto;z-index:60;
+ background:rgba(26,39,18,.08);border-bottom:1px solid rgba(255,255,255,.2);
+ transition:background .35s ease;
+}
+body[data-design-lab=true].lab-hero-scrolled .site-header-editorial,
+body[data-design-lab=true]:has(.drawer.is-open) .site-header-editorial{
+ background:rgba(28,42,19,.97);
+}
+body[data-design-lab=true] .hero-editorial{
+ position:relative;isolation:isolate;overflow:hidden;background:var(--deep);
+ height:100vh;height:100svh;min-height:100vh;min-height:100svh;max-height:none;
+}
+body[data-design-lab=true] .hero-editorial .hero-photo,
+body[data-design-lab=true] .hero-editorial .hero-photo img{
+ position:absolute;inset:0;width:100%;height:100%;
+}
+body[data-design-lab=true] .hero-editorial .hero-photo img{
+ display:block;object-fit:cover;object-position:57% 54%;
+ transform:scale(1);filter:brightness(.72) saturate(.9);
+}
+body[data-design-lab=true] .hero-editorial .hero-overlay{
+ background:linear-gradient(180deg,rgba(8,14,8,.26) 0%,rgba(8,14,8,.10) 40%,rgba(8,14,8,.49) 100%);
+}
+body[data-design-lab=true] .hero-editorial .hero-copy{
+ height:100%;padding:calc(var(--header) + clamp(18px,3.5vh,43px)) var(--gutter) 107px;
+}
+body[data-design-lab=true] .hero-editorial h1{
+ font:300 clamp(151px,22vw,392px)/1.02 Manrope,Arial,sans-serif;
+ letter-spacing:-.084em;white-space:nowrap;
+ margin:clamp(30px,6vh,86px) 0 0 -.05em;animation:none!important;color:white;
+}
+body[data-design-lab=true] .hero-title-mask{
+ display:block;overflow:hidden;line-height:1.1;padding-bottom:.045em;margin-bottom:-.045em;
+}
+body[data-design-lab=true] .hero-title-word{
+ display:block;line-height:1.1;opacity:1;transform:translate3d(0,0,0);
+}
+body[data-design-lab=true] .hero-editorial .hero-copy>.eyebrow,
+body[data-design-lab=true] .hero-editorial .hero-tagline{animation:none!important}
+body[data-design-lab=true] .hero-editorial .hero-tagline{font-size:clamp(20px,2vw,29px)}
+body[data-design-lab=true] .hero-spaces{bottom:0;min-height:75px;z-index:4}
+body[data-design-lab=true] .hero-space-link{gap:10px;padding:14px 22px}
+body[data-design-lab=true] .hero-space-link:first-child{padding-left:0}
+body[data-design-lab=true] .lab-detail-other-link{grid-template-columns:minmax(0,1fr) 25px}
+body[data-design-lab=true] .lab-detail-other-link>b{justify-self:end}
+html.lab-hero-preparing body[data-design-lab=true] .hero-title-word{
+ opacity:0;transform:translate3d(0,108%,0);
+}
+html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-copy>.eyebrow,
+html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-tagline,
+html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-editorial-book,
+html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-spaces{
+ opacity:0;transform:translate3d(0,16px,0);
+}
+html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-photo img{
+ transform:scale(1.03);
+}
+@media(prefers-reduced-motion:no-preference){
+ html.lab-hero-ready body[data-design-lab=true] .hero-title-word{
+  animation:novaHeroWord 1.03s cubic-bezier(.22,1,.36,1) both;
+ }
+ html.lab-hero-ready body[data-design-lab=true] .hero-editorial .hero-copy>.eyebrow{
+  animation:novaHeroText .72s cubic-bezier(.22,1,.36,1) .06s both;
+ }
+ html.lab-hero-ready body[data-design-lab=true] .hero-editorial .hero-tagline{
+  animation:novaHeroText .83s cubic-bezier(.22,1,.36,1) .28s both;
+ }
+ html.lab-hero-ready body[data-design-lab=true] .hero-editorial .hero-editorial-book{
+  animation:novaHeroText .78s cubic-bezier(.22,1,.36,1) .42s both;
+ }
+ html.lab-hero-ready body[data-design-lab=true] .hero-editorial .hero-spaces{
+  animation:novaHeroText .86s cubic-bezier(.22,1,.36,1) .48s both;
+ }
+ html.lab-hero-ready body[data-design-lab=true] .hero-editorial .hero-photo img{
+  animation:novaHeroPhoto 1.8s cubic-bezier(.22,1,.36,1) both;
+ }
+}
+@keyframes novaHeroWord{
+ from{opacity:0;transform:translate3d(0,108%,0)}
+ to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes novaHeroText{
+ from{opacity:0;transform:translate3d(0,16px,0)}
+ to{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes novaHeroPhoto{
+ from{transform:scale(1.03)}to{transform:scale(1)}
+}
+@media(max-width:600px){
+ body[data-design-lab=true] .hero-editorial{
+  height:100vh;height:100svh;min-height:100vh;min-height:100svh;max-height:none;
+ }
+ body[data-design-lab=true] .hero-editorial .hero-photo img{object-position:60% center}
+ body[data-design-lab=true] .hero-editorial .hero-copy{
+  padding:calc(var(--header) + 18px) 22px calc(155px + env(safe-area-inset-bottom));
+ }
+ body[data-design-lab=true] .hero-editorial h1{
+  font-size:26.7vw;line-height:1;
+  margin:clamp(28px,5.5vh,66px) 0 0 -.05em;letter-spacing:-.08em;
+ }
+ body[data-design-lab=true] .hero-title-mask,
+ body[data-design-lab=true] .hero-title-word{line-height:1.08}
+ body[data-design-lab=true] .hero-editorial .hero-tagline{
+  font-size:clamp(17px,4.4vw,21px);max-width:19ch;
+ }
+ body[data-design-lab=true] .hero-editorial-book{display:none}
+ body[data-design-lab=true] .hero-spaces{
+  bottom:calc(76px + env(safe-area-inset-bottom));
+  min-height:76px;padding:0 11px;
+ }
+ body[data-design-lab=true] .hero-space-link{
+  flex-direction:column;align-items:flex-start;justify-content:center;
+  gap:4px;padding:9px 8px;
+ }
+ body[data-design-lab=true] .hero-space-link:first-child{padding-left:8px}
+ body[data-design-lab=true] .hero-space-name{font-size:clamp(10px,2.75vw,12px)}
+ body[data-design-lab=true] .hero-space-arr{display:none}
+ body[data-design-lab=true] .lab-detail-other-link{
+  grid-template-columns:minmax(0,1fr) 21px;
+ }
+}
+@media(max-width:370px){
+ body[data-design-lab=true] .hero-editorial h1{font-size:25.9vw}
+ body[data-design-lab=true] .lab-detail-other-link{grid-template-columns:minmax(0,1fr) 18px}
+}
+@media(prefers-reduced-motion:reduce){
+ body[data-design-lab=true] .hero-editorial *{animation:none!important;transition:none!important}
+ html.lab-hero-preparing body[data-design-lab=true] .hero-editorial *{
+  opacity:1!important;transform:none!important;
+ }
+}
+
+/* Reserve the cover's dark visual canvas while SSR fallback is hydrated. */
+html.lab-js body[data-design-lab=true] #app:has(> #seo-fallback){min-height:100svh;background:var(--deep)}
+
+
+/* Hero title ink safety.
+   Negative tracking (-.084em) reduces the NOVA line's measured advance.
+   The A overhangs that width and was cut by the reveal mask at its right edge.
+   The mask is expanded without changing letter spacing, positioning or animation. */
+body[data-design-lab=true] .hero-title-mask{
+  padding-inline-end:.16em;
+  margin-inline-end:-.16em;
+  padding-bottom:.075em;
+  margin-bottom:-.075em;
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+   NOVA TYPE / Editorial typography and simplified affordances
+   Lab-only. 2026-10-26.
+   ════════════════════════════════════════════════════════════════ */
+
+/* Manrope works better with mostly neutral spacing in Cyrillic.
+   Previous negative tracking (-.04em to -.08em) crowded long names. */
+body[data-design-lab=true]{
+  letter-spacing:.002em;
+}
+body[data-design-lab=true] .hero-editorial h1{
+  letter-spacing:-.06em;
+}
+body[data-design-lab=true] .brand{
+  letter-spacing:-.025em;
+}
+body[data-design-lab=true] :is(
+  .venue-card-editorial .venue-title,
+  .lab-detail-intro h1,
+  .lab-detail-other-link strong
+){
+  letter-spacing:.006em;
+  word-break:normal;
+  overflow-wrap:normal;
+  hyphens:none;
+}
+body[data-design-lab=true] :is(
+  .venues-editorial .venues-heading,
+  .story-editorial h2,
+  .home-events-top .section-link h2,
+  .book-strip-editorial .book-welcome,
+  .events-intro h1,
+  .lab-detail-story-copy h2,
+  .lab-detail-next h2
+){
+  letter-spacing:-.012em;
+  line-height:1.12;
+  text-wrap:balance;
+  word-break:normal;
+  hyphens:none;
+}
+body[data-design-lab=true] :is(
+  .home-events-gallery .event-info h3,
+  .events-list .event-card .event-info h3,
+  .events-section h2
+){
+  letter-spacing:-.005em;
+  line-height:1.23;
+  text-wrap:balance;
+}
+body[data-design-lab=true] :is(
+  .venues-editorial-lead,
+  .venue-description,
+  .story-editorial .story-copy p,
+  .home-events-lead,
+  .lab-detail-desc,
+  .lab-detail-story-copy>p,
+  .event-info>p,
+  .book-cta,
+  .site-footer p
+){
+  letter-spacing:.005em;
+  line-height:1.65;
+  overflow-wrap:normal;
+}
+body[data-design-lab=true] .hero-editorial .hero-tagline{
+  letter-spacing:0;
+  line-height:1.4;
+}
+
+/* One meaningful signal per interaction.
+   Cards link in their entirety. Keep the quiet CTA underline, remove
+   decorative title arrows. Events headline is a clear text link. */
+body[data-design-lab=true] .venue-name-line{
+  display:block;
+}
+body[data-design-lab=true] .venue-discover{
+  display:inline-block;
+  letter-spacing:.015em;
+  padding-bottom:8px;
+  border-bottom:1px solid currentColor;
+  transition:opacity .22s ease,border-color .22s ease;
+}
+body[data-design-lab=true] .venue-card-editorial:hover .venue-discover,
+body[data-design-lab=true] .venue-card-editorial:focus-visible .venue-discover{
+  opacity:.7;
+}
+body[data-design-lab=true] .hero-space-link{
+  gap:0;
+  transition:background-color .25s ease;
+}
+body[data-design-lab=true] .hero-space-link:hover{
+  background:rgba(255,255,255,.09);
+}
+body[data-design-lab=true] .hero-editorial-book{
+  gap:0;
+  letter-spacing:.01em;
+}
+body[data-design-lab=true] .home-events-top .section-link{
+  display:inline-block;
+  width:fit-content;
+  max-width:100%;
+  text-decoration:none;
+}
+body[data-design-lab=true] .home-events-top .section-link h2{
+  display:inline;
+  border-bottom:1px solid transparent;
+  transition:border-color .25s ease;
+}
+body[data-design-lab=true] .home-events-top .section-link:hover h2,
+body[data-design-lab=true] .home-events-top .section-link:focus-visible h2{
+  border-bottom-color:currentColor;
+}
+body[data-design-lab=true] :is(.story-menu-link,.events-all-link,.lab-detail-contacts){
+  gap:0;
+  text-decoration:none;
+  border-bottom:1px solid currentColor;
+}
+body[data-design-lab=true] .lab-detail-actions button{
+  gap:0;
+  justify-content:flex-start;
+}
+body[data-design-lab=true] .lab-detail-other-link{
+  display:block;
+  padding:clamp(19px,2.1vw,32px) 0;
+  border-bottom:1px solid var(--line);
+  min-width:0;
+  transition:color .25s ease;
+}
+body[data-design-lab=true] .lab-detail-other-link strong{
+  display:block;
+  font-weight:400;
+}
+body[data-design-lab=true] .lab-detail-other-link:hover{
+  color:var(--olive);
+}
+
+/* Rebalance the longest Cyrillic location within narrow layouts. */
+body[data-design-lab=true] .venue-card-editorial-pob .venue-title{
+  font-size:clamp(33px,3.7vw,60px);
+}
+@media(max-width:900px) and (min-width:601px){
+  body[data-design-lab=true] .venue-card-editorial-pob .venue-title{
+    font-size:clamp(29px,3.45vw,42px);
+  }
+}
+@media(max-width:600px){
+  body[data-design-lab=true] .hero-editorial h1{
+    letter-spacing:-.055em;
+  }
+  body[data-design-lab=true] .venue-card-editorial-pob .venue-title{
+    font-size:clamp(30px,8.3vw,42px);
+  }
+  body[data-design-lab=true] .lab-detail-intro h1{
+    letter-spacing:0;
+  }
+  body[data-design-lab=true] .venue-card-editorial .venue-title{
+    line-height:1.17;
+  }
+  body[data-design-lab=true] .home-events-top .section-link h2{
+    line-height:1.12;
+  }
+}
+
+
