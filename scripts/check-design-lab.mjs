@@ -207,3 +207,9 @@ assert.match(mobileHeroCSS,/text-decoration-color:rgba\(231,241,220,.58\)/);
 assert.match(mobileHeroJS,/ResizeObserver/);
 assert.match(mobileHeroJS,/--nova-mobile-dock-height/);
 assert.match(mobileHeroJS,/new MutationObserver\(attach\)/);
+
+
+// The mobile venue rail must never slide below the cover while loading.
+const railCSS=readFileSync('public/design-lab.css','utf8');
+assert.match(railCSS,/novaHeroNavFade/);
+assert.match(railCSS,/from\{opacity:0;transform:none\}/);
