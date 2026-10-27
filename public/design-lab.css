@@ -2111,3 +2111,75 @@ html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-spaces{
   from{opacity:0;transform:none}
   to{opacity:1;transform:none}
 }
+
+
+/* ━━━ NOVA RESTORED DARK CTA / CLEAN LIGHT CONTROLS · 2026-10-27 ━━━
+   Match the original dark-olive mobile booking CTA. Other controls on
+   light surfaces return to white/transparent backgrounds, dark type and
+   restrained borders. The three hero venue names have NO underlines.
+   Leave all cover-to-dock sizing, links, and dark-surface buttons intact. */
+
+/* Never underline the three venue names; the entire rail remains clickable. */
+body[data-design-lab=true] .hero-editorial .hero-space-link,
+body[data-design-lab=true] .hero-editorial .hero-space-link:hover,
+body[data-design-lab=true] .hero-editorial .hero-space-link:focus-visible,
+body[data-design-lab=true] .hero-editorial .hero-space-name,
+body[data-design-lab=true] .hero-editorial .hero-space-link:hover .hero-space-name,
+body[data-design-lab=true] .hero-editorial .hero-space-link:focus-visible .hero-space-name{
+  text-decoration:none;
+  text-decoration-line:none;
+}
+
+/* White-background editorial controls, including default secondary buttons.
+   Keep clear hit areas and keyboard focus without colored fills. */
+body[data-design-lab=true] .venue-card-editorial:not(.venue-card-editorial-east) .venue-discover,
+body[data-design-lab=true] .story-editorial .story-menu-link,
+body[data-design-lab=true] .home-events-bottom .events-all-link,
+body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts,
+body[data-design-lab=true] .button.secondary,
+body[data-design-lab=true] .modal .button.secondary{
+  background:#FFFFFF;
+  color:#293725;
+  border-color:#C9D1C3;
+  box-shadow:none;
+}
+body[data-design-lab=true] .venue-card-editorial:not(.venue-card-editorial-east):hover .venue-discover,
+body[data-design-lab=true] .venue-card-editorial:not(.venue-card-editorial-east):focus-visible .venue-discover,
+body[data-design-lab=true] .story-editorial .story-menu-link:hover,
+body[data-design-lab=true] .story-editorial .story-menu-link:focus-visible,
+body[data-design-lab=true] .home-events-bottom .events-all-link:hover,
+body[data-design-lab=true] .home-events-bottom .events-all-link:focus-visible,
+body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts:hover,
+body[data-design-lab=true] .lab-detail-story-copy .lab-detail-contacts:focus-visible,
+body[data-design-lab=true] .button.secondary:hover,
+body[data-design-lab=true] .button.secondary:focus-visible,
+body[data-design-lab=true] .modal .button.secondary:hover,
+body[data-design-lab=true] .modal .button.secondary:focus-visible{
+  background:#FFFFFF;
+  color:#20301A;
+  border-color:#697D5E;
+  box-shadow:none;
+}
+
+/* Return mobile booking action to its original brand color, not pale sage. */
+@media(max-width:600px){
+  body[data-design-lab=true] .mobile-cta .button{
+    background:#384929;
+    border:1px solid #384929;
+    color:#F5F7F1;
+    font-weight:600;
+    box-shadow:0 3px 12px rgba(20,34,15,.14);
+  }
+  body[data-design-lab=true] .mobile-cta .button:hover,
+  body[data-design-lab=true] .mobile-cta .button:focus-visible{
+    background:#29391F;
+    border-color:#29391F;
+    color:#FFFFFF;
+    box-shadow:0 4px 13px rgba(20,34,15,.18);
+  }
+  body[data-design-lab=true] .mobile-cta .button:active{
+    background:#23321B;
+    border-color:#23321B;
+    color:#FFFFFF;
+  }
+}

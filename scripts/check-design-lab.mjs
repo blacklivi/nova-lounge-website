@@ -202,7 +202,7 @@ const mobileHeroJS=readFileSync('public/design-lab-ui.js','utf8');
 assert.match(mobileHeroCSS,/NOVA MOBILE DOCK \/ VIEWPORT CONTRACT/);
 assert.match(mobileHeroCSS,/height:calc\(100svh - var\(--nova-mobile-dock-height/);
 assert.match(mobileHeroCSS,/\.hero-editorial \.hero-spaces\{\s*bottom:0/);
-assert.match(mobileHeroCSS,/\.mobile-cta \.button\{\s*background:#DCE9D1/);
+assert.match(mobileHeroCSS,/NOVA RESTORED DARK CTA \/ CLEAN LIGHT CONTROLS/);
 assert.match(mobileHeroCSS,/text-decoration-color:rgba\(231,241,220,.58\)/);
 assert.match(mobileHeroJS,/ResizeObserver/);
 assert.match(mobileHeroJS,/--nova-mobile-dock-height/);
@@ -213,3 +213,18 @@ assert.match(mobileHeroJS,/new MutationObserver\(attach\)/);
 const railCSS=readFileSync('public/design-lab.css','utf8');
 assert.match(railCSS,/novaHeroNavFade/);
 assert.match(railCSS,/from\{opacity:0;transform:none\}/);
+
+
+// Latest design review: no blueish/sage fill on light-surface actions,
+// no underlines on hero venue names, brand-dark booking dock.
+const finalUI=readFileSync('public/design-lab.css','utf8');
+const finalStage=finalUI.slice(finalUI.lastIndexOf('NOVA RESTORED DARK CTA / CLEAN LIGHT CONTROLS'));
+assert.ok(finalStage.length>700,'Missing final button style override');
+assert.match(finalStage,/\.hero-editorial \.hero-space-name\{[\s\S]*?text-decoration:none/);
+assert.match(finalStage,/\.venue-card-editorial:not\(\.venue-card-editorial-east\) \.venue-discover/);
+assert.match(finalStage,/\.story-editorial \.story-menu-link/);
+assert.match(finalStage,/\.home-events-bottom \.events-all-link/);
+assert.match(finalStage,/\.lab-detail-story-copy \.lab-detail-contacts/);
+assert.match(finalStage,/background:#FFFFFF/);
+assert.match(finalStage,/\.mobile-cta \.button\{\s*background:#384929/);
+assert.match(finalStage,/\.mobile-cta \.button:hover,[\s\S]*?background:#29391F/);
