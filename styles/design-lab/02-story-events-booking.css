@@ -219,7 +219,7 @@ body[data-design-lab=true] .book-strip-editorial .book-welcome{
   margin:auto 0;white-space:normal;
 }
 body[data-design-lab=true] .book-strip-editorial .book-cta{
-  display:flex;justify-content:space-between;align-items:center;gap:20px;
+  display:flex;justify-content:space-between;gap:20px;
   padding:0 0 15px;width:min(400px,100%);border-bottom:1px solid #ffffffb3;
   font:500 clamp(16px,1.4vw,22px)/1.4 Manrope,sans-serif;
   color:#fff;
@@ -315,7 +315,7 @@ body[data-design-lab=true] .book-editorial-signature{align-self:flex-end}
   margin-top:60px;justify-content:flex-start;
  }
  body[data-design-lab=true] .book-strip-editorial{
-  display:flex;flex-direction:column;min-height:0;
+  display:flex;flex-direction:column;
  }
  body[data-design-lab=true] .book-strip-editorial .book-image{
   display:block;order:1;width:100%;height:280px;min-height:280px;

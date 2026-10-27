@@ -46,3 +46,9 @@ Cloudflare Browser Rendering returned HTTP 429 during this source-only migration
 ## Rollback
 
 The unmodified snapshot is at \`nova-design-lab-pre-css-consolidation-20261027\`. Neither \`main\` nor \`nova-lounge-demo\` may be changed.
+
+## First safe duplicate pass
+
+After the first byte-for-byte consolidation was successfully deployed and the new parity gate passed, a narrowly scoped pass removed **19 exact duplicate declarations** (336 source bytes). No selectors, media queries, fallback pairs or rule order were removed. Every removed declaration had the **same selector, same media condition, same property and identical value** later in the ordered CSS; rules with a single declaration, complex strings, and unsupported constructs were left alone. This is intentionally conservative: the older overlapping design stages need browser visual parity testing before wholesale removal.
+
+The current compiled file is generated from the same six modules and verified by the CI `--check` gate.

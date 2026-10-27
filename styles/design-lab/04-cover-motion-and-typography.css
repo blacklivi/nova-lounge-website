@@ -94,7 +94,7 @@ html.lab-hero-preparing body[data-design-lab=true] .hero-editorial .hero-photo i
 }
 @media(max-width:600px){
  body[data-design-lab=true] .hero-editorial{
-  height:100vh;height:100svh;min-height:100vh;min-height:100svh;max-height:none;
+  height:100vh;height:100svh;min-height:100vh;min-height:100svh;
  }
  body[data-design-lab=true] .hero-editorial .hero-photo img{object-position:60% center}
  body[data-design-lab=true] .hero-editorial .hero-copy{
