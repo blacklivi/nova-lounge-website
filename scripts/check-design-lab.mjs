@@ -253,7 +253,7 @@ const artCSS=readFileSync('public/design-lab.css','utf8');
 const artData=JSON.parse(readFileSync('public/content-defaults.json','utf8'));
 assert.match(artCSS,/NOVA Hallmark art-direction/);
 assert.match(artCSS,/grid-template-areas:"title title" "photo copy"/);
-assert.match(artApp,/const venueMoods=\{/);
+assert.match(artApp,/const venueMood = id =>/);
 assert.match(artApp,/const spaceHeadings=\{/);
 assert.ok(!artApp.includes('NOVA JOURNAL'),'Pseudo-journal label must be removed');
 assert.ok(!artApp.includes('NOVA RESERVATIONS'),'Pseudo booking label must be removed');
