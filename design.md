@@ -47,3 +47,6 @@ The editable ordered NOVA style modules are in `styles/design-lab/`; the actual 
 
 ## Useful venue details (2026-10-27)
 The lab shows the existing CMS-configured address, opening hours and safe map URL below each venue photo, with booking and menu controls unchanged. No made-up opening hours; source keys `address_`, `hours_`, `map_`. Implementation: `styles/design-lab/08-venue-utility.css`. Refer to `docs/NOVA-VENUE-UTILITY-20261027.md`.
+
+## Photo-light foundation — October 2026
+The experimental NOVA site defaults to photography-free editorial design until venue images are approved. Dark olive full-screen cover, ruled destination selector, text-led kitchen and event schedule, compact booking CTA, and photography-free venue detail pages. All earlier photo templates are retained and gated by explicit `*_photo_ready` switches. The layout does not show synthetic restaurant imagery. See `docs/NOVA-PHOTO-LIGHT-FOUNDATION.md`.

@@ -54,3 +54,6 @@ The unmodified snapshot is at \`nova-design-lab-pre-css-consolidation-20261027\`
 After the first byte-for-byte consolidation was successfully deployed and the new parity gate passed, a narrowly scoped pass removed **19 exact duplicate declarations** (336 source bytes). No selectors, media queries, fallback pairs or rule order were removed. Every removed declaration had the **same selector, same media condition, same property and identical value** later in the ordered CSS; rules with a single declaration, complex strings, and unsupported constructs were left alone. This is intentionally conservative: the older overlapping design stages need browser visual parity testing before wholesale removal.
 
 The initial consolidation used six modules. The current art-direction iteration uses eight modules, compiled in order and verified by the CI `--check` gate.
+
+## Current modules
+The original 6-module split now has 3 additional ordered layers: `07-art-direction.css`, `08-venue-utility.css`, and `09-photo-light-foundation.css`. The compiled `public/design-lab.css` remains ONE file and the `--check` gate enforces exact parity. The source modules in number order are canonical.

@@ -45,9 +45,11 @@ Use their ideas for a structured design audit, realistic copy, optical alignment
 - First Hallmark-inspired safe polish: responsive text wrapping, focus visibility, clipping rather than hiding overflow, throttled sticky-header update. See audit. Never replace the approved olive/white brand or the three mobile photo overlays with generic Hallmark theme presets.
 
 ## CSS authoring (after 2026-10-27 consolidation)
-- Source of truth: `styles/design-lab/01-*.css` through `08-*.css`, in order. See `docs/NOVA-CSS-CONSOLIDATION.md`.
+- Source of truth: `styles/design-lab/01-*.css` through `09-*.css`, in order. See `docs/NOVA-CSS-CONSOLIDATION.md`.
 - `public/design-lab.css` is generated for a **single browser request**, not directly edited. Run `npm run css:design-lab` and commit the generated file after edits.
 - `npm run check:design-lab` begins with the `--check` parity gate; do not delete it to bypass a stale compiled file.
 - Consolidation first preserves exact browser CSS bytes; only remove old overlapping declarations with layout/render regression evidence. Keep the backup branch `nova-design-lab-pre-css-consolidation-20261027`.
 
 - Hallmark's *actual* pinned static `sloplint` is now vendored under `tools/hallmark/` and invoked with `npm run audit:hallmark` in the lab's build. It reports findings without enforcing sitewide generic restyles. For evidence, counts and design critique: `docs/HALLMARK-AUDIT-EXECUTED-20261027.md`. No official `--render` or subagent review has been claimed.
+
+- Photo-light mode is now the experiment default. All photos require a separately approved media value and corresponding `*_photo_ready` flag. Never show sample venue photos as if authentic. Preserve original gallery and hero layout when flags become true. See `docs/NOVA-PHOTO-LIGHT-FOUNDATION.md`.

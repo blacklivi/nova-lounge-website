@@ -46,7 +46,16 @@
     "phone_east": "+375 44 791-33-33",
     "hours_east": "Пн–чт, вс: 12:00–02:00\nПт–сб: 12:00–04:00",
     "instagram_east": "https://www.instagram.com/myata.lounge.minsk/",
-    "map_east": "https://yandex.ru/maps/org/136614972290"
+    "map_east": "https://yandex.ru/maps/org/136614972290",
+    "hero_photo_ready": "false",
+    "story_photo_ready": "false",
+    "booking_photo_ready": "false",
+    "venue_zyb_photo_ready": "false",
+    "gallery_zyb_photo_ready": "false",
+    "venue_pob_photo_ready": "false",
+    "gallery_pob_photo_ready": "false",
+    "venue_east_photo_ready": "false",
+    "gallery_east_photo_ready": "false"
   },
   "content_en": {
     "venue_zyb_subtitle": "Parties and DJ sets",
@@ -95,6 +104,15 @@
     "phone_east": "+375 44 791-33-33",
     "hours_east": "Mon–Thu, Sun: 12 PM–2 AM\nFri–Sat: 12 PM–4 AM",
     "instagram_east": "https://www.instagram.com/myata.lounge.minsk/",
-    "map_east": "https://yandex.ru/maps/org/136614972290"
+    "map_east": "https://yandex.ru/maps/org/136614972290",
+    "hero_photo_ready": "false",
+    "story_photo_ready": "false",
+    "booking_photo_ready": "false",
+    "venue_zyb_photo_ready": "false",
+    "gallery_zyb_photo_ready": "false",
+    "venue_pob_photo_ready": "false",
+    "gallery_pob_photo_ready": "false",
+    "venue_east_photo_ready": "false",
+    "gallery_east_photo_ready": "false"
   }
 }
