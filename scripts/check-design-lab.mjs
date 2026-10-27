@@ -173,3 +173,24 @@ assert.ok(!pages.includes('↗'),'Redundant visible diagonal arrow in editorial 
 assert.match(editorialApp,/const t = \(ru,en\) => typography\(/);
 assert.match(readFileSync('public/design-lab.css','utf8'),/NOVA TYPE \/ Editorial typography/);
 assert.match(readFileSync('public/design-lab.css','utf8'),/letter-spacing:\.006em/);
+
+
+// Regression: readable address on dark olive and visible action controls on
+// home, events, venue details, booking, drawer and mobile.
+const uiCSS=readFileSync('public/design-lab.css','utf8');
+assert.match(uiCSS,/NOVA INTERACTION CONTRAST SYSTEM/);
+for(const rule of [
+  '.lab-detail-action-strip .lab-detail-address p',
+  '.lab-detail-action-strip .lab-detail-actions button:first-child',
+  '.lab-detail-action-strip .lab-detail-actions button:last-child',
+  '.story-editorial .story-menu-link',
+  '.home-events-bottom .events-all-link',
+  '.lab-detail-story-copy .lab-detail-contacts',
+  '.venue-card-editorial .venue-discover',
+  '.hero-editorial .hero-editorial-book',
+  '.mobile-cta .button',
+  '.book-strip-editorial .book-cta'
+]) assert.ok(uiCSS.includes(rule),'Missing interaction treatment: '+rule);
+for(const token of ['--ui-sage:#DFE8D7','--ui-sage-text:#E8EEE2',
+'min-height:52px','min-height:56px',':focus-visible','prefers-reduced-motion:reduce'])
+  assert.ok(uiCSS.includes(token),'Missing contrast or usability token: '+token);
