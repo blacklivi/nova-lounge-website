@@ -39,3 +39,6 @@ The above source counts and targeted defects are verified against the GitHub bra
 ## Rollback
 
 \`nova-design-lab-pre-hallmark-20261027\` preserves the baseline. The main branch and existing demonstration Worker must remain untouched.
+
+## Follow-up: original sloplint really executed
+For the upstream-run results and the concrete design strategy, see [`HALLMARK-AUDIT-EXECUTED-20261027.md`](HALLMARK-AUDIT-EXECUTED-20261027.md). Previous manual source analysis was not a Hallmark official run.

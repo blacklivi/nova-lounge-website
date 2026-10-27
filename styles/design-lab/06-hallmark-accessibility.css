@@ -56,3 +56,26 @@ body[data-design-lab=true] :is(
     scroll-behavior:auto;
   }
 }
+
+
+/* Hallmark audit correction 2026-10-27 · practical accessibility only.
+   Keep user-approved white surfaces and dark olive buttons. */
+@media(max-width:600px){
+  body[data-design-lab=true] .mobile-cta .button{
+    /* The keyboard ring must appear instantly; do not animate its shadow. */
+    transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .18s ease;
+  }
+}
+body[data-design-lab=true] .nova-cal-nav:disabled{
+  opacity:1;
+  background:#E9ECE7;
+  color:#707D68;
+  border-color:#C5CEC0;
+  cursor:not-allowed;
+}
+body[data-design-lab=true] .nova-cal-day:disabled{
+  opacity:1;
+  background:#EFF1EC;
+  color:#778273;
+  cursor:not-allowed;
+}

@@ -49,3 +49,5 @@ Use their ideas for a structured design audit, realistic copy, optical alignment
 - `public/design-lab.css` is generated for a **single browser request**, not directly edited. Run `npm run css:design-lab` and commit the generated file after edits.
 - `npm run check:design-lab` begins with the `--check` parity gate; do not delete it to bypass a stale compiled file.
 - Consolidation first preserves exact browser CSS bytes; only remove old overlapping declarations with layout/render regression evidence. Keep the backup branch `nova-design-lab-pre-css-consolidation-20261027`.
+
+- Hallmark's *actual* pinned static `sloplint` is now vendored under `tools/hallmark/` and invoked with `npm run audit:hallmark` in the lab's build. It reports findings without enforcing sitewide generic restyles. For evidence, counts and design critique: `docs/HALLMARK-AUDIT-EXECUTED-20261027.md`. No official `--render` or subagent review has been claimed.
