@@ -44,3 +44,6 @@ The editable ordered NOVA style modules are in `styles/design-lab/`; the actual 
 
 ## Hallmark art-direction iteration
 2026-10-27: experimental NOVA home and inner pages get distinct, grounded venue labels, shorter editorial chapters and fewer purely decorative slogans. Keep first screen, 425px mobile venue photo cards, booking dock, colours and Manrope intact. See docs/NOVA-HALLMARK-ART-DIRECTION-20261027.md and checkpoint nova-design-lab-pre-art-direction-20261027.
+
+## Useful venue details (2026-10-27)
+The lab shows the existing CMS-configured address, opening hours and safe map URL below each venue photo, with booking and menu controls unchanged. No made-up opening hours; source keys `address_`, `hours_`, `map_`. Implementation: `styles/design-lab/08-venue-utility.css`. Refer to `docs/NOVA-VENUE-UTILITY-20261027.md`.

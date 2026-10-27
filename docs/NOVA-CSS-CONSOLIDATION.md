@@ -16,6 +16,8 @@ The experimental CSS had grown to **100,156 bytes / 2,421 lines** after successi
 4. \`04-cover-motion-and-typography.css\` — cover height, reveal, title and Cyrillic tracking
 5. \`05-interactions-and-mobile.css\` — contrasts, actions, booking dock, three mobile photo overlays
 6. \`06-hallmark-accessibility.css\` — Hallmark-inspired small craft refinements
+7. `07-art-direction.css` — distinct venue voice and calmer section hierarchy
+8. `08-venue-utility.css` — configured address/hours and map links on venue pages
 
 **Build** one normal static CSS file (not multiple runtime imports):
 \`npm run css:design-lab\`.
@@ -51,4 +53,4 @@ The unmodified snapshot is at \`nova-design-lab-pre-css-consolidation-20261027\`
 
 After the first byte-for-byte consolidation was successfully deployed and the new parity gate passed, a narrowly scoped pass removed **19 exact duplicate declarations** (336 source bytes). No selectors, media queries, fallback pairs or rule order were removed. Every removed declaration had the **same selector, same media condition, same property and identical value** later in the ordered CSS; rules with a single declaration, complex strings, and unsupported constructs were left alone. This is intentionally conservative: the older overlapping design stages need browser visual parity testing before wholesale removal.
 
-The current compiled file is generated from the same six modules and verified by the CI `--check` gate.
+The initial consolidation used six modules. The current art-direction iteration uses eight modules, compiled in order and verified by the CI `--check` gate.
