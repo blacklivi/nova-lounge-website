@@ -15,3 +15,5 @@ Changes:
 Files: public/app.js, public/content-defaults.json, styles/design-lab/07-art-direction.css, generated public/design-lab.css, CSS assembler and regression tests. Roll back through the checkpoint branch. No main or production Worker changes.
 
 Manual acceptance: iPhone widths 320/390/430, desktop 1440; no horizontal scroll, visible card labels and actions inside all three images, no header/booking overlap; three different detail headings in RU and EN, retained menu/reservation/contacts handlers.
+## Desktop story composition refinement
+The kitchen section no longer repeats the events page's full-width title-above-image macrostructure. At 1001px and wider, heading and description form a left editorial column and the photograph spans the right column. The block height is driven by the photograph rather than an oversized title plus image stacked. Between 601 and 1000px a straightforward header/photo-copy layout is retained, while mobile keeps the previously approved title-photo-copy reading order.

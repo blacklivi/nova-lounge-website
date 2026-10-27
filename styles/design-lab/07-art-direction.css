@@ -15,10 +15,11 @@ body[data-design-lab=true] .venue-card-editorial-east .venue-serial{color:#E8EEE
 
 /* The story section is driven by its content/photo, not fake magazine labels. */
 body[data-design-lab=true] .story-editorial{
- grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
- grid-template-areas:"title title" "photo copy";
- column-gap:clamp(32px,5.5vw,110px);row-gap:clamp(30px,4vw,60px);
- padding-top:clamp(65px,7vw,115px);padding-bottom:clamp(70px,8vw,125px);
+ grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);
+ grid-template-areas:"title photo" "copy photo";
+ column-gap:clamp(40px,6vw,105px);row-gap:clamp(16px,2.2vw,30px);
+ align-items:start;
+ padding-top:clamp(65px,7vw,110px);padding-bottom:clamp(68px,7vw,110px);
 }
 body[data-design-lab=true] .story-editorial-heading{gap:clamp(12px,1.8vw,24px)}
 body[data-design-lab=true] .story-editorial-heading .eyebrow{
@@ -147,4 +148,13 @@ body[data-design-lab=true] .events-intro h1{margin-top:0;letter-spacing:-.045em}
 @media(prefers-reduced-motion:reduce){
  body[data-design-lab=true] .story-editorial,
  body[data-design-lab=true] .book-strip-editorial{scroll-behavior:auto}
+}
+
+/* Tablet retains a straightforward photo + copy row for comfortable measure. */
+@media(min-width:601px) and (max-width:1000px){
+ body[data-design-lab=true] .story-editorial{
+  grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  grid-template-areas:"title title" "photo copy";
+  row-gap:32px;
+ }
 }
