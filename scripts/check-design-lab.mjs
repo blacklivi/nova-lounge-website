@@ -229,3 +229,18 @@ assert.match(finalStage,/\.lab-detail-story-copy \.lab-detail-contacts/);
 assert.match(finalStage,/background:#FFFFFF/);
 assert.match(finalStage,/\.mobile-cta \.button\{\s*background:#384929/);
 assert.match(finalStage,/\.mobile-cta \.button:hover,[\s\S]*?background:#29391F/);
+
+
+// Both mobile photo cards now match Vostok's overlay hierarchy.
+const overlayCSS=readFileSync('public/design-lab.css','utf8');
+const parity=overlayCSS.slice(overlayCSS.lastIndexOf('NOVA MOBILE VENUE OVERLAY PARITY'));
+assert.ok(parity.length>1000,'Missing mobile venue overlay implementation');
+assert.match(parity,/@media\(max-width:600px\)/);
+assert.match(parity,/\.venue-card-editorial-zyb/);
+assert.match(parity,/\.venue-card-editorial-pob/);
+assert.match(parity,/position:absolute/);
+assert.match(parity,/justify-content:flex-end/);
+assert.match(parity,/filter:brightness\(\.73\)/);
+assert.match(parity,/pointer-events:none/);
+assert.match(parity,/min-height:44px/);
+assert.match(parity,/prefers-reduced-motion:reduce/);
