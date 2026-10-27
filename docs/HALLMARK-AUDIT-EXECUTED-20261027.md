@@ -75,3 +75,11 @@ The existing demo caveats are better than invented claims, but should not domina
 
 ## Rollback & safety
 Restore branch `nova-design-lab-pre-official-hallmark-audit-20261027` to return before the original linter was added. Main is unchanged and the lab Worker only has an `ASSETS` binding.
+
+## Post-fix comparison (source-level, not a design score)
+
+The first static audit of commit `3afe16f3` produced **305 FAIL / 317 REFLEX / 17 WARN**. Re-running the **same** upstream linter against the published technical-fix commit `c596f9d7` produced **309 FAIL / 317 REFLEX / 19 WARN**.
+
+The higher raw count **does not establish a worse UI**: gate 10a (transition of `top`) dropped from 1 to 0 after fixing the burger animation, but gate 48 (hard-coded colour declarations) rose from 208 to 213 because the new calendar disabled-state styles added five more literal colours. WARN 40 rose by two. Hallmark parses historical declarations even when later rules override them, so accessibility fixes can add new static findings. A separate token consolidation and render-based validation, not blindly chasing counts, is required before treating sloplint numbers as progress.
+
+The booking button, hero dimensions, photos and every venue route remain unchanged by the technical-fix pass.
