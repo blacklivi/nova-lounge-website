@@ -157,3 +157,45 @@ main.route-enter{animation:novaRouteEnter .3s ease-out both}
  .hero-intro .hero-letter,.hero-intro .hero-photo,.hero-intro .hero-tagline{opacity:1!important;clip-path:none!important;transform:none!important}
  button:active:not(:disabled){transform:none!important}
 }
+
+
+/* NOVA spaces scroll reveal: heading then three cards, with no layout shift. */
+.venues-motion .venues-heading{
+ opacity:1;
+ transform:none;
+ transition:opacity .78s cubic-bezier(.22,1,.36,1),transform .86s cubic-bezier(.22,1,.36,1);
+}
+.venues-motion:not(.venues-heading-entered) .venues-heading{
+ opacity:0;
+ transform:translate3d(0,12px,0);
+}
+@media(min-width:601px){
+ .venues-motion .venue-card{
+  opacity:1;
+  transform:none;
+  transition:opacity .92s cubic-bezier(.22,1,.36,1),transform 1s cubic-bezier(.22,1,.36,1);
+  transition-delay:var(--venue-stagger,0ms);
+ }
+ .venues-motion:not(.venues-cards-entered) .venue-card{
+  opacity:0;
+  transform:translate3d(0,18px,0);
+ }
+}
+@media(max-width:600px){
+ .venues-mobile-motion .venue-card{
+  opacity:0;
+  transform:translate3d(0,14px,0);
+  transition:opacity .82s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1);
+ }
+ .venues-mobile-motion .venue-card.venue-card-entered{
+  opacity:1;
+  transform:none;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .venues-motion .venues-heading,.venues-motion .venue-card{
+  opacity:1!important;
+  transform:none!important;
+  transition:none!important;
+ }
+}
