@@ -326,3 +326,23 @@ main.route-enter{animation:novaRouteEnter .3s ease-out both}
 @media(prefers-reduced-motion:reduce){
  .hof-page *{animation:none!important;transition:none!important}
 }
+
+
+/* HOF: illustrative, clearly labelled event editorial layouts. */
+.hof-demo-notice{padding:25px 0 15px;font-size:10px!important;letter-spacing:.14em;color:#a6b4a2!important}
+.hof-concept-posters{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,3vw,50px)}
+.hof-concept-card{min-width:0}
+.hof-concept-photo{position:relative;aspect-ratio:1.16;overflow:hidden;background:#20291f}
+.hof-concept-photo>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.56) saturate(.75)}
+.hof-concept-photo:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.34),transparent 68%)}
+.hof-poster-type{position:absolute;z-index:1;inset:0;padding:clamp(19px,3vw,55px);display:flex;flex-direction:column;justify-content:space-between;color:#f2f3ec}
+.hof-poster-type>span{font-size:10px;letter-spacing:.15em}
+.hof-poster-type>strong{font-size:clamp(40px,6vw,145px);font-weight:400;letter-spacing:-.08em;line-height:.91}
+.hof-poster-caption{display:block;padding-top:16px;font-size:10px;color:#b5c3b0;letter-spacing:.1em}
+.hof-future-note{max-width:39em;font-size:13px!important;color:#9cad97!important;margin-top:38px}
+@media(max-width:600px){
+ .hof-concept-posters{grid-template-columns:1fr;gap:35px}
+ .hof-concept-photo{aspect-ratio:1.22}
+ .hof-poster-type{padding:22px}
+ .hof-poster-type>strong{font-size:clamp(68px,14vw,110px)}
+}
