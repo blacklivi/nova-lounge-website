@@ -1,8 +1,13 @@
 {
-  "name":"nova-lounge-website",
-  "version":"1.0.0",
-  "private":true,
-  "type":"module",
-  "scripts":{"deploy":"wrangler deploy","check":"node --check src/index.js && node --check public/app.js && node --check public/admin.js && node --check public/cms.js && node --check public/events.js"},
-  "devDependencies":{"wrangler":"^4.102.0"}
+  "name": "nova-lounge-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "check": "node --check src/index.js && node --check public/core.js && node --check public/app.js && node --check public/admin.js && node --check public/cms.js && node --check public/events.js && node scripts/check-hof-typography.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.102.0"
+  }
 }

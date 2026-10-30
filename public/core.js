@@ -3,10 +3,16 @@ export function escapeHTML(value = '') {
   return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 export function typography(value, language = 'ru') {
-  const s = String(value ?? '').replace(/\u00a0/g, ' ');
-  if (language !== 'ru') return s;
-  // Bind one short word to its neighbour, without creating unbreakable chains.
-  return s.replace(/(^|[\s(«])((?:[вксуаои]|на|по|за|из|от|до|об|не|но|со|во|ко|под|при)) +(?=[А-Яа-яЁёA-Za-z0-9])/giu, '$1$2\u00a0');
+  // Start from normal spaces so a CMS edit cannot accumulate stale NBSP runs.
+  let result = String(value ?? '').replace(/\u00a0/g, ' ');
+  // Keep short conjunctions and prepositions attached to their following words.
+  // Two passes also handle short adjacent words ("и в зале" => "и\u00a0в\u00a0зале").
+  const ru = /(^|[\s(«])((?:[вксуаои]|на|по|за|из|от|до|об|не|но|со|во|ко|под|при|для|без)) +(?=[А-Яа-яЁёA-Za-z0-9])/giu;
+  const en = /(^|[\s(“(])((?:a|an|the|of|in|on|at|to|by|for|and|or)) +(?=[A-Za-z0-9])/giu;
+  const rule = language === 'ru' ? ru : language === 'en' ? en : null;
+  if (!rule) return result;
+  for (let i = 0; i < 2; i++) result = result.replace(rule, '$1$2\u00a0');
+  return result;
 }
 export function cleanPhone(value) {
   return String(value).replace(/[^\d+()\s-]/g, '').replace(/(?!^)\+/g, '').slice(0, 30);
