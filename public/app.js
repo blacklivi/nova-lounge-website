@@ -80,16 +80,30 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let heroIntroPending = !isEvents && location.pathname === '/' && !reducedMotion.matches;
 let motionObserver = null;
 const revealedSections = new Set();
+
+// Align to the painted V glyph, not to its letter-spacing-shortened DOM box.
+// In Manrope 300, those centers differ by about 18px at 2048px viewport width.
 function alignHeroPhoto() {
- const hero=app.querySelector('.hero'),letter=hero?.querySelector('.hero-letter-v');
- if(!hero||!letter||matchMedia('(max-width:600px)').matches) {
-  hero?.style.removeProperty('--hero-photo-start');return;
+ const hero=app.querySelector('.hero');
+ const letter=hero?.querySelector('.hero-letter-v');
+ if(!hero||!letter||matchMedia('(max-width:600px)').matches){
+  hero?.style.removeProperty('--hero-photo-start');
+  return;
  }
  const heroBox=hero.getBoundingClientRect(),vBox=letter.getBoundingClientRect();
- if(heroBox.width && vBox.width) {
-  const mid=(vBox.left+vBox.width/2-heroBox.left)/heroBox.width*100;
-  hero.style.setProperty('--hero-photo-start',mid.toFixed(3)+'%');
+ if(!heroBox.width||!vBox.width)return;
+ let centre=vBox.left+vBox.width/2;
+ const style=getComputedStyle(letter);
+ const ctx=document.createElement('canvas').getContext('2d');
+ if(ctx){
+  ctx.font=style.fontWeight+' '+style.fontSize+' '+style.fontFamily;
+  const metrics=ctx.measureText('V');
+  if(Number.isFinite(metrics.actualBoundingBoxRight) && Number.isFinite(metrics.actualBoundingBoxLeft)){
+   centre=vBox.left+(metrics.actualBoundingBoxRight-metrics.actualBoundingBoxLeft)/2;
+  }
  }
+ const percent=(centre-heroBox.left)/heroBox.width*100;
+ if(percent>20&&percent<75)hero.style.setProperty('--hero-photo-start',percent.toFixed(4)+'%');
 }
 let alignmentFrame=0;
 window.addEventListener('resize',()=>{
@@ -97,28 +111,76 @@ window.addEventListener('resize',()=>{
  alignmentFrame=requestAnimationFrame(alignHeroPhoto);
 },{passive:true});
 document.fonts?.ready.then(alignHeroPhoto);
+
+// Animate small content groups, not whole full-width sections and large images.
 function attachMotion() {
  motionObserver?.disconnect();
  const hero=app.querySelector('.hero');
- if(hero && heroIntroPending)hero.classList.add('hero-intro');
+ if(hero&&heroIntroPending)hero.classList.add('hero-intro');
  alignHeroPhoto();
  if(reducedMotion.matches || !('IntersectionObserver' in window))return;
  motionObserver=new IntersectionObserver(entries=>{
-  for(const entry of entries) {
+  for(const entry of entries){
    if(!entry.isIntersecting)continue;
-   entry.target.classList.add('is-visible');
-   revealedSections.add(entry.target.dataset.motionKey);
-   motionObserver?.unobserve(entry.target);
+   const el=entry.target;
+   el.classList.add('is-visible');
+   revealedSections.add(el.dataset.motionKey);
+   motionObserver.unobserve(el);
   }
- },{threshold:0.06,rootMargin:'0px 0px -24px 0px'});
- app.querySelectorAll('.venues,.story,.home-events,.book-strip,.footer-locations,.detail-grid,.detail-bottom,.events-intro,.events-section').forEach((el,index)=>{
+ },{threshold:0.08,rootMargin:'0px 0px -28px 0px'});
+ const targets=app.querySelectorAll(
+  '.venues-heading,.venue-card,.story-copy,.story-photo,.home-events .section-link,'+
+  '.home-events .event-card,.book-welcome,.book-cta,.footer-location,'+
+  '.detail-copy,.detail-image,.detail-bottom>div,.events-intro,.events-section h2,.events-list .event-card'
+ );
+ targets.forEach((el,index)=>{
   const key=location.pathname+'|'+index;
   el.dataset.motionKey=key;
+  const top=el.getBoundingClientRect().top;
+  // Never cover existing content when a page is rerendered or a link lands deep.
+  if(revealedSections.has(key)||top<innerHeight*.82){
+   revealedSections.add(key);
+   return;
+  }
   el.classList.add('nova-reveal');
-  if(revealedSections.has(key) || el.getBoundingClientRect().top<innerHeight*0.75) {
-   el.classList.add('is-visible');revealedSections.add(key);
-  } else motionObserver.observe(el);
+  if(el.classList.contains('venue-card'))el.style.setProperty('--reveal-delay',((index%3)*55)+'ms');
+  motionObserver.observe(el);
  });
+}
+
+// Apply late CMS updates in place. A second full render reset scroll position,
+// recreated the hero and made animated sections flash during reading.
+function patchLateContent(){
+ app.querySelectorAll('[data-content]').forEach(el=>{
+  const updated=value(el.dataset.content);
+  if(updated)el.textContent=typography(updated,language);
+ });
+ app.querySelectorAll('img[data-image]').forEach(el=>{
+  const url=media(el.dataset.image);
+  if(!url)return;
+  const next=url+'?v=visual-2';
+  if(el.getAttribute('src')===next)return;
+  const loader=new Image();
+  loader.onload=()=>{if(el.isConnected)el.src=next;};
+  loader.src=next;
+ });
+ if(isEvents){
+  const current=app.querySelector('.events-page');
+  if(current){
+   const template=document.createElement('template');
+   template.innerHTML=eventsPage();
+   current.replaceWith(template.content.firstElementChild);
+   attachMotion();
+  }
+ }else if(!selected){
+  const oldList=app.querySelector('.home-events > div');
+  if(oldList){
+   const template=document.createElement('template');
+   template.innerHTML=home();
+   const nextList=template.content.querySelector('.home-events > div');
+   if(nextList)oldList.replaceChildren(...nextList.childNodes);
+  }
+ }
 }
 
 function render(){
@@ -158,11 +220,12 @@ function scrollToPosition(y,instant=false){
   window.scrollTo({top:end,behavior:'auto'});
   updateTop();return;
  }
- const duration=Math.min(560,280+distance*.075);
+ // Zero velocity at both ends avoids abrupt starts and stops on anchor links.
+ const duration=Math.min(980,Math.max(390,300+Math.sqrt(distance)*9));
  const beginning=performance.now();
  const tick=now=>{
   const progress=Math.min(1,(now-beginning)/duration);
-  const eased=1-Math.pow(1-progress,3);
+  const eased=progress<.5?4*progress*progress*progress:1-Math.pow(-2*progress+2,3)/2;
   window.scrollTo({top:start+delta*eased,behavior:'auto'});
   if(progress<1)scrollFrame=requestAnimationFrame(tick);
   else{scrollFrame=0;updateTop();}
@@ -286,7 +349,6 @@ function navigate(id){
  document.querySelector('main')?.classList.add('route-enter');
  window.scrollTo({top:0,behavior:'instant'});
  if(place){
-  document.querySelector('main')?.classList.add('route-enter');
   document.querySelector('main')?.focus({preventScroll:true});
  }else if(id){
   scrollToSection(id);
@@ -352,19 +414,14 @@ render();
 scrollToHash(true);
 const heroImage=app.querySelector('.hero-photo img');
 const imageDecoded=heroImage?.decode ? heroImage.decode().catch(()=>{}) : Promise.resolve();
-await Promise.race([Promise.allSettled([document.fonts?.ready||Promise.resolve(),imageDecoded]),pause(1600)]);
+// One stable first paint; never move the image or title after they appear.
+await Promise.race([Promise.allSettled([document.fonts?.ready||Promise.resolve(),imageDecoded]),pause(1200)]);
 alignHeroPhoto();
 app.classList.add('nova-ready');
 requestAnimationFrame(()=>{app.querySelector('.hero-intro')?.classList.add('hero-play');});
 heroIntroPending=false;
-if(!cmsSettled) {
+if(!cmsSettled){
  await cms;
- // Do not replace hero DOM during the sequential title animation.
- if(!reducedMotion.matches && heroImage)await pause(1350);
- if(!modalKind&&!drawerOpen) {
-  const focused=document.activeElement,focusLanguage=focused?.dataset?.language;
-  render();
-  if(focusLanguage)document.querySelector('[data-language="'+focusLanguage+'"]')?.focus({preventScroll:true});
- }
+ patchLateContent();
 }
 if(contentFailed)console.warn('NOVA content unavailable; bundled defaults are displayed.');
