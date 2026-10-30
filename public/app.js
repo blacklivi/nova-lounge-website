@@ -80,6 +80,50 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let heroIntroPending = !isEvents && location.pathname === '/' && !reducedMotion.matches;
 let motionObserver = null;
 const revealedSections = new Set();
+let venuesRevealObserver = null;
+let venuesHeadingRevealed = false;
+let venuesCardsRevealed = false;
+
+// This section is a single visual sequence. Trigger cards at the viewport
+// boundary, before hiding large portions of a card that are already in view.
+function setupVenuesReveal(){
+ venuesRevealObserver?.disconnect();
+ const section=app.querySelector('.venues');
+ if(!section || reducedMotion.matches || !('IntersectionObserver' in window))return;
+ const heading=section.querySelector('.venues-heading');
+ const cards=[...section.querySelectorAll('.venue-card')];
+ if(!heading || !cards.length)return;
+ const first=cards[0];
+ // Never flash hidden content during page restoration or language switches.
+ if(scrollY>20 || heading.getBoundingClientRect().top < innerHeight){
+  venuesHeadingRevealed=true;
+ }
+ if(scrollY>20 || first.getBoundingClientRect().top < innerHeight-24){
+  venuesCardsRevealed=true;
+ }
+ section.classList.add('venues-motion');
+ cards.forEach((card,i)=>card.style.setProperty('--venue-stagger',i*115+'ms'));
+ if(venuesHeadingRevealed)section.classList.add('venues-heading-entered');
+ if(venuesCardsRevealed)section.classList.add('venues-cards-entered');
+ if(venuesHeadingRevealed && venuesCardsRevealed)return;
+ venuesRevealObserver=new IntersectionObserver(entries=>{
+  for(const entry of entries){
+   if(!entry.isIntersecting)continue;
+   if(entry.target===heading){
+    venuesHeadingRevealed=true;
+    section.classList.add('venues-heading-entered');
+   }
+   if(entry.target===first){
+    venuesCardsRevealed=true;
+    section.classList.add('venues-cards-entered');
+   }
+   venuesRevealObserver?.unobserve(entry.target);
+  }
+ },{threshold:0,rootMargin:'0px'});
+ if(!venuesHeadingRevealed)venuesRevealObserver.observe(heading);
+ if(!venuesCardsRevealed)venuesRevealObserver.observe(first);
+}
+
 
 // Align to the painted V glyph, not to its letter-spacing-shortened DOM box.
 // In Manrope 300, those centers differ by about 18px at 2048px viewport width.
@@ -115,6 +159,7 @@ document.fonts?.ready.then(alignHeroPhoto);
 // Animate small content groups, not whole full-width sections and large images.
 function attachMotion() {
  motionObserver?.disconnect();
+ setupVenuesReveal();
  const hero=app.querySelector('.hero');
  if(hero&&heroIntroPending)hero.classList.add('hero-intro');
  alignHeroPhoto();
@@ -129,7 +174,7 @@ function attachMotion() {
   }
  },{threshold:0.08,rootMargin:'0px 0px -28px 0px'});
  const targets=app.querySelectorAll(
-  '.venues-heading,.venue-card,.story-copy,.story-photo,.home-events .section-link,'+
+  '.story-copy,.story-photo,.home-events .section-link,'+
   '.home-events .event-card,.book-welcome,.book-cta,.footer-location,'+
   '.detail-copy,.detail-image,.detail-bottom>div,.events-intro,.events-section h2,.events-list .event-card'
  );
@@ -143,7 +188,6 @@ function attachMotion() {
    return;
   }
   el.classList.add('nova-reveal');
-  if(el.classList.contains('venue-card'))el.style.setProperty('--reveal-delay',((index%3)*55)+'ms');
   motionObserver.observe(el);
  });
 }
