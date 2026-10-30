@@ -33,4 +33,11 @@ assert.match(css,/\.venues>\.venue-card\{display:flex;flex-direction:column;alig
 assert.match(css,/\.venues>\.venue-card \.venue-foot\{flex:1;display:flex;flex-direction:column\}/,
   'Venue footers must share bottom border position');
 
+// Homepage mobile full-bleed cover: never expose a blank band above the sticky booking dock.
+assert.match(css,/height:calc\(100svh - var\(--header\)\)/,'NOVA mobile cover must span viewport below header');
+assert.match(css,/\.hero-copy\{[\s\S]*?padding-bottom:calc\(69px \+ env\(safe-area-inset-bottom,0px\)/,
+  'Home tagline must reserve the fixed mobile booking-dock height');
+assert.match(css,/\.hero\{[\s\S]*?min-height:0;[\s\S]*?max-height:none;/,
+  'Remove legacy hero min/max clamps that created a blank stripe on tall phones');
+
 console.log('NOVA HOF typography checks passed (Hallmark-adapted subset, not official full audit).');
