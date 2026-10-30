@@ -283,6 +283,7 @@ function navigate(id){
  if(!place&&!selected){scrollToSection(id);return;}
  cancelGuidedScroll();
  render();
+ document.querySelector('main')?.classList.add('route-enter');
  window.scrollTo({top:0,behavior:'instant'});
  if(place){
   document.querySelector('main')?.classList.add('route-enter');
@@ -293,7 +294,7 @@ function navigate(id){
 }
 document.addEventListener('click',e=>{
  const b=e.target.closest('button,a');if(!b)return;
- if(b.matches('[data-language]')){const next=b.dataset.language;if(next===language)return;const open=drawerOpen,kind=modalKind,id=modalVenue;language=next;try{localStorage.setItem('nova-language',language)}catch{}drawerOpen=false;document.body.classList.remove('lock');render();if(open)setDrawer(true);if(kind&&kind!=='review')openModal(kind,id);document.querySelector(`[data-language="${next}"]`)?.focus();return;}
+ if(b.matches('[data-language]')){const next=b.dataset.language;if(next===language)return;const open=drawerOpen,kind=modalKind,id=modalVenue;language=next;try{localStorage.setItem('nova-language',language)}catch{}drawerOpen=false;document.body.classList.remove('lock');render();document.querySelector('main')?.classList.add('route-enter');if(open)setDrawer(true);if(kind&&kind!=='review')openModal(kind,id);document.querySelector(`[data-language="${next}"]`)?.focus();return;}
  if(b.matches('[data-drawer]')){setDrawer(!drawerOpen);return;}
  if(b.matches('[data-modal]')){openModal(b.dataset.modal,b.dataset.venue||selected);return;}
  if(b.matches('[data-close]')){closeModal();return;}
@@ -325,6 +326,7 @@ window.addEventListener('popstate',()=>{
   return;
  }
  render();
+ document.querySelector('main')?.classList.add('route-enter');
  if(location.hash)scrollToHash(true);
  else window.scrollTo({top:0,behavior:'auto'});
 });
