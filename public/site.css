@@ -109,14 +109,14 @@ html.nova-js #app{transition:opacity .34s ease}
 }
 .hero-title{display:inline-flex;align-items:baseline;white-space:nowrap}
 .hero-letter{display:inline-block;position:relative;transform:none}
-.hero-intro .hero-letter{opacity:0;clip-path:inset(-8% 102% -8% -4%)}
+.hero-intro .hero-letter{opacity:0;clip-path:inset(-10% 116% -10% -16%)}
 .hero-intro.hero-play .hero-letter{
  animation:novaLetterWipe .49s cubic-bezier(.33,1,.68,1) both;
  animation-delay:calc(100ms + var(--letter-order)*145ms)
 }
 @keyframes novaLetterWipe{
- from{opacity:0;clip-path:inset(-8% 102% -8% -4%)}
- to{opacity:1;clip-path:inset(-8% -4% -8% -4%)}
+ from{opacity:0;clip-path:inset(-10% 116% -10% -16%)}
+ to{opacity:1;clip-path:inset(-10% -16% -10% -16%)}
 }
 /* The photograph remains in its final position from the first visible frame. */
 .hero-photo,.hero-intro .hero-photo,.hero-intro.hero-play .hero-photo{
