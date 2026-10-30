@@ -83,9 +83,10 @@ const revealedSections = new Set();
 let venuesRevealObserver = null;
 let venuesHeadingRevealed = false;
 let venuesCardsRevealed = false;
+const venuesMobileRevealed = new Set();
 
-// This section is a single visual sequence. Trigger cards at the viewport
-// boundary, before hiding large portions of a card that are already in view.
+// Reveal desktop cards together with a subtle left-to-right stagger.
+// On mobile each stacked card appears only when it enters the viewport.
 function setupVenuesReveal(){
  venuesRevealObserver?.disconnect();
  const section=app.querySelector('.venues');
@@ -93,37 +94,48 @@ function setupVenuesReveal(){
  const heading=section.querySelector('.venues-heading');
  const cards=[...section.querySelectorAll('.venue-card')];
  if(!heading || !cards.length)return;
+ const mobile=matchMedia('(max-width:600px)').matches;
  const first=cards[0];
- // Never flash hidden content during page restoration or language switches.
- if(scrollY>20 || heading.getBoundingClientRect().top < innerHeight){
-  venuesHeadingRevealed=true;
- }
- if(scrollY>20 || first.getBoundingClientRect().top < innerHeight-24){
-  venuesCardsRevealed=true;
- }
  section.classList.add('venues-motion');
- cards.forEach((card,i)=>card.style.setProperty('--venue-stagger',i*115+'ms'));
+ section.classList.toggle('venues-mobile-motion',mobile);
+ cards.forEach((card,i)=>card.style.setProperty('--venue-stagger',mobile?'0ms':i*115+'ms'));
+ // Already-visible content is shown immediately, including after history restoration.
+ if(scrollY>20 || heading.getBoundingClientRect().top < innerHeight)venuesHeadingRevealed=true;
  if(venuesHeadingRevealed)section.classList.add('venues-heading-entered');
- if(venuesCardsRevealed)section.classList.add('venues-cards-entered');
- if(venuesHeadingRevealed && venuesCardsRevealed)return;
+ if(mobile){
+  cards.forEach(card=>{
+   if(venuesMobileRevealed.has(card.dataset.place) ||
+      (scrollY>20 && card.getBoundingClientRect().top<innerHeight-12)){
+    card.classList.add('venue-card-entered');
+    venuesMobileRevealed.add(card.dataset.place);
+   }
+  });
+ }else{
+  if(scrollY>20 || first.getBoundingClientRect().top < innerHeight-24)venuesCardsRevealed=true;
+  if(venuesCardsRevealed)section.classList.add('venues-cards-entered');
+ }
+ if(venuesHeadingRevealed && (mobile?cards.every(c=>c.classList.contains('venue-card-entered')):venuesCardsRevealed))return;
  venuesRevealObserver=new IntersectionObserver(entries=>{
   for(const entry of entries){
    if(!entry.isIntersecting)continue;
-   if(entry.target===heading){
+   const el=entry.target;
+   if(el===heading){
     venuesHeadingRevealed=true;
     section.classList.add('venues-heading-entered');
-   }
-   if(entry.target===first){
+   }else if(mobile && el.matches('.venue-card')){
+    venuesMobileRevealed.add(el.dataset.place);
+    el.classList.add('venue-card-entered');
+   }else if(el===first){
     venuesCardsRevealed=true;
     section.classList.add('venues-cards-entered');
    }
-   venuesRevealObserver?.unobserve(entry.target);
+   venuesRevealObserver?.unobserve(el);
   }
  },{threshold:0,rootMargin:'0px'});
  if(!venuesHeadingRevealed)venuesRevealObserver.observe(heading);
- if(!venuesCardsRevealed)venuesRevealObserver.observe(first);
+ if(mobile)cards.filter(card=>!card.classList.contains('venue-card-entered')).forEach(card=>venuesRevealObserver.observe(card));
+ else if(!venuesCardsRevealed)venuesRevealObserver.observe(first);
 }
-
 
 // Align to the painted V glyph, not to its letter-spacing-shortened DOM box.
 // In Manrope 300, those centers differ by about 18px at 2048px viewport width.
