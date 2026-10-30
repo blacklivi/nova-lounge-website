@@ -80,6 +80,62 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let heroIntroPending = !isEvents && location.pathname === '/' && !reducedMotion.matches;
 let motionObserver = null;
 const revealedSections = new Set();
+let venuesRevealObserver = null;
+let venuesHeadingRevealed = false;
+let venuesCardsRevealed = false;
+const venuesMobileRevealed = new Set();
+
+// Reveal desktop cards together with a subtle left-to-right stagger.
+// On mobile each stacked card appears only when it enters the viewport.
+function setupVenuesReveal(){
+ venuesRevealObserver?.disconnect();
+ const section=app.querySelector('.venues');
+ if(!section || reducedMotion.matches || !('IntersectionObserver' in window))return;
+ const heading=section.querySelector('.venues-heading');
+ const cards=[...section.querySelectorAll('.venue-card')];
+ if(!heading || !cards.length)return;
+ const mobile=matchMedia('(max-width:600px)').matches;
+ const first=cards[0];
+ section.classList.add('venues-motion');
+ section.classList.toggle('venues-mobile-motion',mobile);
+ cards.forEach((card,i)=>card.style.setProperty('--venue-stagger',mobile?'0ms':i*115+'ms'));
+ // Already-visible content is shown immediately, including after history restoration.
+ if(scrollY>20 || heading.getBoundingClientRect().top < innerHeight)venuesHeadingRevealed=true;
+ if(venuesHeadingRevealed)section.classList.add('venues-heading-entered');
+ if(mobile){
+  cards.forEach(card=>{
+   if(venuesMobileRevealed.has(card.dataset.place) ||
+      (scrollY>20 && card.getBoundingClientRect().top<innerHeight-12)){
+    card.classList.add('venue-card-entered');
+    venuesMobileRevealed.add(card.dataset.place);
+   }
+  });
+ }else{
+  if(scrollY>20 || first.getBoundingClientRect().top < innerHeight-24)venuesCardsRevealed=true;
+  if(venuesCardsRevealed)section.classList.add('venues-cards-entered');
+ }
+ if(venuesHeadingRevealed && (mobile?cards.every(c=>c.classList.contains('venue-card-entered')):venuesCardsRevealed))return;
+ venuesRevealObserver=new IntersectionObserver(entries=>{
+  for(const entry of entries){
+   if(!entry.isIntersecting)continue;
+   const el=entry.target;
+   if(el===heading){
+    venuesHeadingRevealed=true;
+    section.classList.add('venues-heading-entered');
+   }else if(mobile && el.matches('.venue-card')){
+    venuesMobileRevealed.add(el.dataset.place);
+    el.classList.add('venue-card-entered');
+   }else if(el===first){
+    venuesCardsRevealed=true;
+    section.classList.add('venues-cards-entered');
+   }
+   venuesRevealObserver?.unobserve(el);
+  }
+ },{threshold:0,rootMargin:'0px'});
+ if(!venuesHeadingRevealed)venuesRevealObserver.observe(heading);
+ if(mobile)cards.filter(card=>!card.classList.contains('venue-card-entered')).forEach(card=>venuesRevealObserver.observe(card));
+ else if(!venuesCardsRevealed)venuesRevealObserver.observe(first);
+}
 
 // Align to the painted V glyph, not to its letter-spacing-shortened DOM box.
 // In Manrope 300, those centers differ by about 18px at 2048px viewport width.
@@ -115,6 +171,7 @@ document.fonts?.ready.then(alignHeroPhoto);
 // Animate small content groups, not whole full-width sections and large images.
 function attachMotion() {
  motionObserver?.disconnect();
+ setupVenuesReveal();
  const hero=app.querySelector('.hero');
  if(hero&&heroIntroPending)hero.classList.add('hero-intro');
  alignHeroPhoto();
@@ -129,7 +186,7 @@ function attachMotion() {
   }
  },{threshold:0.08,rootMargin:'0px 0px -28px 0px'});
  const targets=app.querySelectorAll(
-  '.venues-heading,.venue-card,.story-copy,.story-photo,.home-events .section-link,'+
+  '.story-copy,.story-photo,.home-events .section-link,'+
   '.home-events .event-card,.book-welcome,.book-cta,.footer-location,'+
   '.detail-copy,.detail-image,.detail-bottom>div,.events-intro,.events-section h2,.events-list .event-card'
  );
@@ -143,7 +200,6 @@ function attachMotion() {
    return;
   }
   el.classList.add('nova-reveal');
-  if(el.classList.contains('venue-card'))el.style.setProperty('--reveal-delay',((index%3)*55)+'ms');
   motionObserver.observe(el);
  });
 }
