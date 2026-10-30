@@ -81,6 +81,7 @@ let heroIntroPending = !isEvents && location.pathname === '/' && !reducedMotion.
 let motionObserver = null;
 const revealedSections = new Set();
 let venuesRevealObserver = null;
+let venuesRevealScrollHandler = null;
 let venuesHeadingRevealed = false;
 let venuesCardsRevealed = false;
 const venuesMobileRevealed = new Set();
@@ -89,6 +90,7 @@ const venuesMobileRevealed = new Set();
 // On mobile each stacked card appears only when it enters the viewport.
 function setupVenuesReveal(){
  venuesRevealObserver?.disconnect();
+ if(venuesRevealScrollHandler){window.removeEventListener('scroll',venuesRevealScrollHandler);venuesRevealScrollHandler=null;}
  const section=app.querySelector('.venues');
  if(!section || reducedMotion.matches || !('IntersectionObserver' in window))return;
  const heading=section.querySelector('.venues-heading');
@@ -133,8 +135,25 @@ function setupVenuesReveal(){
   }
  },{threshold:0,rootMargin:'0px'});
  if(!venuesHeadingRevealed)venuesRevealObserver.observe(heading);
- if(mobile)cards.filter(card=>!card.classList.contains('venue-card-entered')).forEach(card=>venuesRevealObserver.observe(card));
- else if(!venuesCardsRevealed)venuesRevealObserver.observe(first);
+ // At page load the first card can peek only 2-10px into the viewport.
+ // Defer its observer until actual scrolling to avoid finishing the fade early.
+ const observeFirst=()=>{
+  if(scrollY<8 && first.getBoundingClientRect().top>innerHeight-120){
+   venuesRevealScrollHandler=()=>{
+    if(scrollY<8)return;
+    window.removeEventListener('scroll',venuesRevealScrollHandler);
+    venuesRevealScrollHandler=null;
+    venuesRevealObserver?.observe(first);
+   };
+   window.addEventListener('scroll',venuesRevealScrollHandler,{passive:true});
+  }else venuesRevealObserver.observe(first);
+ };
+ if(mobile){
+  cards.filter(card=>!card.classList.contains('venue-card-entered')).forEach(card=>{
+   if(card===first)observeFirst();
+   else venuesRevealObserver.observe(card);
+  });
+ }else if(!venuesCardsRevealed)observeFirst();
 }
 
 // Align to the painted V glyph, not to its letter-spacing-shortened DOM box.
