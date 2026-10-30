@@ -99,3 +99,45 @@ main.route-enter{animation:novaRouteEnter .23s cubic-bezier(.2,.7,.2,1) both}
 .nova-cal-day[aria-selected=true]{background:var(--olive);color:#fff}
 .nova-cal-day:disabled{opacity:.25;cursor:default;background:transparent;outline:none}
 @media (hover:none),(pointer:coarse){.nova-calendar,.nova-select{display:none!important}}
+
+
+/* Unified NOVA motion system. */
+html.nova-js #app{transition:opacity .52s cubic-bezier(.22,1,.36,1)}
+@media(min-width:601px){.hero{grid-template-columns:var(--hero-photo-start,50%) minmax(0,1fr)}}
+.hero-title{display:inline-flex;align-items:baseline;white-space:nowrap}
+.hero-letter{display:inline-block;position:relative;transform-origin:center bottom}
+.hero-intro .hero-letter{opacity:0;transform:translate3d(0,.17em,0)}
+.hero-intro.hero-play .hero-letter{animation:novaLetterReveal .72s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--letter-order)*155ms)}
+@keyframes novaLetterReveal{from{opacity:0;transform:translate3d(0,.17em,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+.hero-intro .hero-photo{opacity:0;transform:scale(1.025)}
+.hero-intro.hero-play .hero-photo{animation:novaPhotoReveal 1.05s cubic-bezier(.22,1,.36,1) both}
+@keyframes novaPhotoReveal{from{opacity:0;transform:scale(1.025)}to{opacity:1;transform:scale(1)}}
+.hero-intro .hero-tagline,.hero-intro .hero-copy>.eyebrow{opacity:0;transform:translateY(14px)}
+.hero-intro.hero-play .hero-copy>.eyebrow{animation:novaTextReveal .62s .14s both}
+.hero-intro.hero-play .hero-tagline{animation:novaTextReveal .68s .7s both}
+@keyframes novaTextReveal{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.nova-reveal{opacity:0;transform:translate3d(0,24px,0);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1)}
+.nova-reveal.is-visible{opacity:1;transform:translate3d(0,0,0)}
+button,a,.venue-foot,.venue-description{transition-timing-function:cubic-bezier(.22,1,.36,1)}
+.button,.text-link,.close,.language button,.nova-select-trigger,.nova-cal-nav,.nova-select-option,.nova-cal-day,.footer-social-icon,.to-top,.detail-back{
+ transition:color .32s ease,border-color .32s ease,background-color .32s ease,opacity .32s ease,transform .32s cubic-bezier(.22,1,.36,1)
+}
+@media(hover:hover){
+ .button:hover,.footer-social-icon:hover,.to-top:hover{transform:translateY(-2px)}
+ .text-link:hover,.detail-back:hover{color:var(--olive)}
+ .venue-card:hover .venue-foot{border-bottom-color:var(--olive)}
+ .venue-card:hover .venue-description{color:var(--ink)}
+ .main-nav a{position:relative;text-decoration:none!important}
+ .main-nav a:after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .38s cubic-bezier(.22,1,.36,1)}
+ .main-nav a:hover:after,.main-nav a[aria-current="page"]:after{transform:scaleX(1)}
+ .footer-location h3 a,.footer-phone,.footer-social-text{transition:color .3s ease}
+ .footer-location h3 a:hover,.footer-phone:hover,.footer-social-text:hover{color:var(--olive)}
+}
+button:active:not(:disabled){transform:scale(.985)}
+main.route-enter{animation:novaRouteEnter .48s cubic-bezier(.22,1,.36,1) both}
+@media(prefers-reduced-motion:reduce){
+ html.nova-js #app{transition:none!important}
+ .nova-reveal{opacity:1!important;transform:none!important;transition:none!important}
+ .hero-intro .hero-letter,.hero-intro .hero-photo,.hero-intro .hero-tagline,.hero-intro .hero-copy>.eyebrow{opacity:1!important;transform:none!important}
+ button:active:not(:disabled){transform:none!important}
+}

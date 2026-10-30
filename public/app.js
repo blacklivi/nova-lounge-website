@@ -72,9 +72,55 @@ function eventCard(e,home=false){
  const pic=poster?e.demo?`<div class="event-media"><img src="${esc(poster)}" alt="${text(title)}" loading="lazy" width="600" height="800"><span class="demo-poster-label">${t('ПРИМЕР АФИШИ','SAMPLE POSTER')}</span></div>`:`<img src="${esc(poster)}" alt="${text(title)}" loading="lazy" width="600" height="800">`:'';
  return `<${home?'a':'article'} ${home?`href="/events#event-${esc(e.id)}"`: `id="event-${esc(e.id)}"`} class="event-card ${poster?'':'no-image'} ${e.demo?'is-demo':''}">${pic}<div class="event-info">${e.demo?`<span class="event-demo-tag">${t('ДЕМО · НЕ РЕАЛЬНОЕ СОБЫТИЕ','DEMO · NOT A REAL EVENT')}</span>`:''}<time datetime="${esc(e.starts_at)}:00+03:00">${text(when)} · ${t('Минск','Minsk')}</time><h3>${text(title)}</h3>${!home&&desc?`<p>${text(desc)}</p>`:''}<div class="event-location">NOVA / ${name(e.venue)}</div></div></${home?'a':'article'}>`;
 }
-function home(){const next=splitEvents(displayEvents()).upcoming[0];return `<section class="hero" id="top"><div class="hero-copy"><span class="eyebrow" data-content="hero_kicker">${content('hero_kicker')}</span><h1>NOVA</h1><p class="hero-tagline" data-content="hero_tagline">${content('hero_tagline')}</p></div><div class="hero-photo">${image('hero_image',t('Интерьер и коктейль — концептуальное изображение','Interior and cocktail — concept image'),true)}<div class="photo-side">${t('Еда<br>Люди<br>Музыка<br>Атмосфера','Food<br>People<br>Music<br>Atmosphere')}</div></div></section><section class="venues" id="venues" aria-labelledby="venues-heading"><h2 class="venues-heading" id="venues-heading">${t('ВЫБРАТЬ ЗАВЕДЕНИЕ','EXPLORE OUR SPACES')}</h2>${ids.map(id=>`<a class="venue-card" href="${venueURL(id)}" data-place="${id}"><div class="venue-img">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id))}</div><div class="venue-foot"><h3 class="venue-title">${name(id)}</h3><p class="venue-description" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</p></div></a>`).join('')}</section><section class="story" id="about"><div class="story-copy"><span class="eyebrow muted" data-content="story_kicker">${content('story_kicker')}</span><h2 data-content="story_title">${content('story_title')}</h2><p data-content="story_description">${content('story_description')}</p><button class="text-link" data-modal="menu">${t('Посмотреть меню','View the menu')}</button></div><figure class="story-photo">${image('story_image',t('Подача блюда — демонстрационное изображение','Food presentation — concept image'))}<figcaption class="image-note" data-content="media_note">${content('media_note')}</figcaption></figure></section><section class="home-events"><a class="section-link" href="/events"><h2>${t('События','Events')}</h2>${arrow}</a><div>${next?eventCard(next,true)+(next.demo?`<p class="demo-note">${t('Пример оформления. Мероприятие не проводится.','Design preview only. This event is not scheduled.')}</p>`:''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):t('Афиша пока пуста.','No events yet.')}</p>`}</div></section><section class="book-strip" id="booking"><div class="book-image">${image('booking_image',t('Детали интерьера — концепция','Interior details — concept image'))}</div><button class="book-main" type="button" data-modal="booking"><span class="book-welcome">${t('Мы с нетерпением ждём встречи с вами.','We look forward to seeing you.')}</span><span class="book-cta"><span data-content="booking_title">${content('booking_title')}</span><svg class="book-cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></span></button></section>`;}
+function home(){const next=splitEvents(displayEvents()).upcoming[0];return `<section class="hero" id="top"><div class="hero-copy"><span class="eyebrow" data-content="hero_kicker">${content('hero_kicker')}</span><h1 class="hero-title" aria-label="NOVA"><span class="hero-letter hero-letter-n" style="--letter-order:0" aria-hidden="true">N</span><span class="hero-letter hero-letter-o" style="--letter-order:1" aria-hidden="true">O</span><span class="hero-letter hero-letter-v" style="--letter-order:2" aria-hidden="true">V</span><span class="hero-letter hero-letter-a" style="--letter-order:3" aria-hidden="true">A</span></h1><p class="hero-tagline" data-content="hero_tagline">${content('hero_tagline')}</p></div><div class="hero-photo">${image('hero_image',t('Интерьер и коктейль — концептуальное изображение','Interior and cocktail — concept image'),true)}<div class="photo-side">${t('Еда<br>Люди<br>Музыка<br>Атмосфера','Food<br>People<br>Music<br>Atmosphere')}</div></div></section><section class="venues" id="venues" aria-labelledby="venues-heading"><h2 class="venues-heading" id="venues-heading">${t('ВЫБРАТЬ ЗАВЕДЕНИЕ','EXPLORE OUR SPACES')}</h2>${ids.map(id=>`<a class="venue-card" href="${venueURL(id)}" data-place="${id}"><div class="venue-img">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id))}</div><div class="venue-foot"><h3 class="venue-title">${name(id)}</h3><p class="venue-description" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</p></div></a>`).join('')}</section><section class="story" id="about"><div class="story-copy"><span class="eyebrow muted" data-content="story_kicker">${content('story_kicker')}</span><h2 data-content="story_title">${content('story_title')}</h2><p data-content="story_description">${content('story_description')}</p><button class="text-link" data-modal="menu">${t('Посмотреть меню','View the menu')}</button></div><figure class="story-photo">${image('story_image',t('Подача блюда — демонстрационное изображение','Food presentation — concept image'))}<figcaption class="image-note" data-content="media_note">${content('media_note')}</figcaption></figure></section><section class="home-events"><a class="section-link" href="/events"><h2>${t('События','Events')}</h2>${arrow}</a><div>${next?eventCard(next,true)+(next.demo?`<p class="demo-note">${t('Пример оформления. Мероприятие не проводится.','Design preview only. This event is not scheduled.')}</p>`:''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):t('Афиша пока пуста.','No events yet.')}</p>`}</div></section><section class="book-strip" id="booking"><div class="book-image">${image('booking_image',t('Детали интерьера — концепция','Interior details — concept image'))}</div><button class="book-main" type="button" data-modal="booking"><span class="book-welcome">${t('Мы с нетерпением ждём встречи с вами.','We look forward to seeing you.')}</span><span class="book-cta"><span data-content="booking_title">${content('booking_title')}</span><svg class="book-cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></span></button></section>`;}
 function detail(id){return `<article class="detail"><a href="#venues" data-home="venues" class="detail-back">${arrow}${t('Все пространства NOVA','All NOVA spaces')}</a><div class="detail-grid"><div class="detail-copy"><span class="eyebrow muted">NOVA / MINSK</span><h1>${name(id)}</h1><div class="subtitle" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</div><p data-content="venue_${id}_desc">${content('venue_'+id+'_desc',t('Описание готовится.','Details coming soon.'))}</p><div class="detail-actions"><button class="button" data-modal="booking" data-venue="${id}">${bookingLabel()}</button><button class="button secondary" data-modal="menu-location" data-venue="${id}">${t('Посмотреть меню','View the menu')}</button></div></div><div class="detail-image">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id),true)}</div></div><div class="detail-bottom"><div><span class="eyebrow muted">${t('Атмосфера NOVA','NOVA atmosphere')}</span><h2>${t('В своём ритме.','Your kind of evening.')}</h2><p data-content="venue_${id}_second">${content('venue_'+id+'_second')}</p><p class="features" data-content="venue_${id}_features">${content('venue_'+id+'_features')}</p><button class="text-link" data-modal="contacts" data-venue="${id}">${t('Контакты и расположение','Contacts and directions')}</button></div><div><div class="detail-gallery">${[1,2].map(i=>image(`gallery_${id}_${i}_image`,t('Демонстрационное изображение','Concept image'))).join('')}</div><p class="image-note">${content('media_note')}</p></div></div></article>`;}
 function eventsPage(){const visible=displayEvents(),demo=visible.some(e=>e.demo);const {upcoming,past}=splitEvents(visible);return `<div class="events-page"><section class="events-intro"><span class="eyebrow muted">NOVA / MINSK</span><h1>${t('События','Events')}</h1><p>${t('Встречи, музыка и вечера, которые хочется повторить.','Music, good company and nights worth remembering.')}</p>${demo?`<p class="events-demo-notice" role="note">${t('ДЕМОНСТРАЦИОННАЯ АФИША — названия, даты и события вымышлены. Когда появится предстоящее опубликованное мероприятие, примеры автоматически исчезнут.','SAMPLE EVENT LINEUP — all titles, dates and events are fictional. Examples automatically disappear when an upcoming real event is published.')}</p>`:''}</section>${[[upcoming,t('Ближайшие','Coming up'),'future'],[past,t('Архив','Archive'),'archive']].map(([list,title,id])=>`<section class="events-section ${id}"><h2>${title}</h2><div class="events-list" id="${id}">${list.length?list.map(e=>eventCard(e)).join(''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):id==='future'?t('Сейчас нет анонсированных мероприятий.','No upcoming events announced yet.'):t('Архив мероприятий пока пуст.','No past events yet.')}</p>`}</div></section>`).join('')}</div>`;}
+
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let heroIntroPending = !isEvents && location.pathname === '/' && !reducedMotion.matches;
+let motionObserver = null;
+const revealedSections = new Set();
+function alignHeroPhoto() {
+ const hero=app.querySelector('.hero'),letter=hero?.querySelector('.hero-letter-v');
+ if(!hero||!letter||matchMedia('(max-width:600px)').matches) {
+  hero?.style.removeProperty('--hero-photo-start');return;
+ }
+ const heroBox=hero.getBoundingClientRect(),vBox=letter.getBoundingClientRect();
+ if(heroBox.width && vBox.width) {
+  const mid=(vBox.left+vBox.width/2-heroBox.left)/heroBox.width*100;
+  hero.style.setProperty('--hero-photo-start',mid.toFixed(3)+'%');
+ }
+}
+let alignmentFrame=0;
+window.addEventListener('resize',()=>{
+ cancelAnimationFrame(alignmentFrame);
+ alignmentFrame=requestAnimationFrame(alignHeroPhoto);
+},{passive:true});
+document.fonts?.ready.then(alignHeroPhoto);
+function attachMotion() {
+ motionObserver?.disconnect();
+ const hero=app.querySelector('.hero');
+ if(hero && heroIntroPending)hero.classList.add('hero-intro');
+ alignHeroPhoto();
+ if(reducedMotion.matches || !('IntersectionObserver' in window))return;
+ motionObserver=new IntersectionObserver(entries=>{
+  for(const entry of entries) {
+   if(!entry.isIntersecting)continue;
+   entry.target.classList.add('is-visible');
+   revealedSections.add(entry.target.dataset.motionKey);
+   motionObserver?.unobserve(entry.target);
+  }
+ },{threshold:0.06,rootMargin:'0px 0px -24px 0px'});
+ app.querySelectorAll('.venues,.story,.home-events,.book-strip,.footer-locations,.detail-grid,.detail-bottom,.events-intro,.events-section').forEach((el,index)=>{
+  const key=location.pathname+'|'+index;
+  el.dataset.motionKey=key;
+  el.classList.add('nova-reveal');
+  if(revealedSections.has(key) || el.getBoundingClientRect().top<innerHeight*0.75) {
+   el.classList.add('is-visible');revealedSections.add(key);
+  } else motionObserver.observe(el);
+ });
+}
+
 function render(){
  document.documentElement.lang=language;
  selected=!isEvents?(paths[location.pathname.split('/')[2]]||(ids.includes(location.hash.slice(1))?location.hash.slice(1):null)):null;
@@ -97,6 +143,7 @@ const canonical=document.querySelector('link[rel="canonical"]');if(canonical)can
  app.querySelector('dialog').addEventListener('close',()=>{document.querySelector('dialog')?.classList.remove('is-visible');});
  app.querySelector('dialog').addEventListener('click',e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
  updateTop();
+ attachMotion();
 }
 // Coordinated, bounded-duration anchor scrolling. Native smooth scroll can take
 // much longer for deep links and doesn't reliably account for the sticky header.
@@ -236,6 +283,7 @@ function navigate(id){
  if(!place&&!selected){scrollToSection(id);return;}
  cancelGuidedScroll();
  render();
+ document.querySelector('main')?.classList.add('route-enter');
  window.scrollTo({top:0,behavior:'instant'});
  if(place){
   document.querySelector('main')?.classList.add('route-enter');
@@ -246,7 +294,7 @@ function navigate(id){
 }
 document.addEventListener('click',e=>{
  const b=e.target.closest('button,a');if(!b)return;
- if(b.matches('[data-language]')){const next=b.dataset.language;if(next===language)return;const open=drawerOpen,kind=modalKind,id=modalVenue;language=next;try{localStorage.setItem('nova-language',language)}catch{}drawerOpen=false;document.body.classList.remove('lock');render();if(open)setDrawer(true);if(kind&&kind!=='review')openModal(kind,id);document.querySelector(`[data-language="${next}"]`)?.focus();return;}
+ if(b.matches('[data-language]')){const next=b.dataset.language;if(next===language)return;const open=drawerOpen,kind=modalKind,id=modalVenue;language=next;try{localStorage.setItem('nova-language',language)}catch{}drawerOpen=false;document.body.classList.remove('lock');render();document.querySelector('main')?.classList.add('route-enter');if(open)setDrawer(true);if(kind&&kind!=='review')openModal(kind,id);document.querySelector(`[data-language="${next}"]`)?.focus();return;}
  if(b.matches('[data-drawer]')){setDrawer(!drawerOpen);return;}
  if(b.matches('[data-modal]')){openModal(b.dataset.modal,b.dataset.venue||selected);return;}
  if(b.matches('[data-close]')){closeModal();return;}
@@ -278,15 +326,45 @@ window.addEventListener('popstate',()=>{
   return;
  }
  render();
+ document.querySelector('main')?.classList.add('route-enter');
  if(location.hash)scrollToHash(true);
  else window.scrollTo({top:0,behavior:'auto'});
 });
 matchMedia('(min-width:901px)').addEventListener('change',e=>{if(e.matches&&drawerOpen)setDrawer(false);});
+
 async function getJSON(url){const r=await fetch(url);if(!r.ok)throw Error(url+': '+r.status);return r.json();}
-try { defaults=await getJSON('/content-defaults.json'); } catch { app.innerHTML='<p class="loading">NOVA — '+t('Не удалось загрузить страницу. Обновите её.','Could not load the page. Please reload.')+'</p>';throw Error('Defaults unavailable'); }
-// Draw immediately with bundled defaults; the CMS remains authoritative when it loads.
-render();scrollToHash(true);
-await Promise.allSettled([getJSON('/api/content').then(data=>{source=data;}).catch(()=>{contentFailed=true;}),getJSON('/api/events').then(data=>{events=Array.isArray(data.events)?data.events:[];eventsLoaded=true;}).catch(()=>{eventsFailed=true;})]);
-// Avoid resetting a form, focus or navigation if a slow API finishes after interaction.
-if(!modalKind&&!drawerOpen){const focused=document.activeElement;const focusLanguage=focused?.dataset?.language;render();if(focusLanguage)document.querySelector(`[data-language="${focusLanguage}"]`)?.focus();scrollToHash(true);}
+const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+try {
+ defaults=await getJSON('/content-defaults.json');
+} catch {
+ document.documentElement.classList.remove('nova-js');
+ app.innerHTML='<p class="loading">NOVA — '+t('Не удалось загрузить страницу. Обновите её.','Could not load the page. Please reload.')+'</p>';
+ throw Error('Defaults unavailable');
+}
+// Resolve CMS before the visible first paint, with an upper bound for stalled APIs.
+let cmsSettled=false;
+const cms=Promise.allSettled([
+ getJSON('/api/content').then(data=>{source=data;}).catch(()=>{contentFailed=true;}),
+ getJSON('/api/events').then(data=>{events=Array.isArray(data.events)?data.events:[];eventsLoaded=true;}).catch(()=>{eventsFailed=true;})
+]).then(()=>{cmsSettled=true;});
+await Promise.race([cms,pause(700)]);
+render();
+scrollToHash(true);
+const heroImage=app.querySelector('.hero-photo img');
+const imageDecoded=heroImage?.decode ? heroImage.decode().catch(()=>{}) : Promise.resolve();
+await Promise.race([Promise.allSettled([document.fonts?.ready||Promise.resolve(),imageDecoded]),pause(1600)]);
+alignHeroPhoto();
+app.classList.add('nova-ready');
+requestAnimationFrame(()=>{app.querySelector('.hero-intro')?.classList.add('hero-play');});
+heroIntroPending=false;
+if(!cmsSettled) {
+ await cms;
+ // Do not replace hero DOM during the sequential title animation.
+ if(!reducedMotion.matches && heroImage)await pause(1350);
+ if(!modalKind&&!drawerOpen) {
+  const focused=document.activeElement,focusLanguage=focused?.dataset?.language;
+  render();
+  if(focusLanguage)document.querySelector('[data-language="'+focusLanguage+'"]')?.focus({preventScroll:true});
+ }
+}
 if(contentFailed)console.warn('NOVA content unavailable; bundled defaults are displayed.');
