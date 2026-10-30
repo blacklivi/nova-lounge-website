@@ -113,7 +113,8 @@ function setupVenuesReveal(){
    }
   });
  }else{
-  if(scrollY>20 || first.getBoundingClientRect().top < innerHeight-24)venuesCardsRevealed=true;
+  // On first visit the font can reflow the cards while loading: do not auto-reveal at scrollY=0.
+  if(scrollY>20 || (innerHeight>1150 && first.getBoundingClientRect().top < innerHeight-180))venuesCardsRevealed=true;
   if(venuesCardsRevealed)section.classList.add('venues-cards-entered');
  }
  if(venuesHeadingRevealed && (mobile?cards.every(c=>c.classList.contains('venue-card-entered')):venuesCardsRevealed))return;
@@ -138,7 +139,7 @@ function setupVenuesReveal(){
  // At page load the first card can peek only 2-10px into the viewport.
  // Defer its observer until actual scrolling to avoid finishing the fade early.
  const observeFirst=()=>{
-  if(scrollY<8 && first.getBoundingClientRect().top>innerHeight-120){
+  if(scrollY<8){
    venuesRevealScrollHandler=()=>{
     if(scrollY<8)return;
     window.removeEventListener('scroll',venuesRevealScrollHandler);
