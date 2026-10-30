@@ -17,7 +17,8 @@ let keyboardModalInteraction = false;
 document.addEventListener('pointerdown',()=>{keyboardModalInteraction=false;},{capture:true});
 document.addEventListener('touchstart',()=>{keyboardModalInteraction=false;},{capture:true,passive:true});
 document.addEventListener('keydown',e=>{if(['Tab','Enter',' ','Escape'].includes(e.key))keyboardModalInteraction=true;},{capture:true});
-const t = (ru,en) => language === 'en' ? en : ru;
+// Apply the same line-break protection to fixed UI copy and CMS copy.
+const t = (ru,en) => typography(language === 'en' ? en : ru, language);
 const text = value => esc(typography(value,language));
 const name = id => names[language][id] || 'NOVA';
 const brandName = id => id === 'zyb' ? 'HOF by NOVA' : 'NOVA / '+name(id);
@@ -81,8 +82,8 @@ function hofLineup(){
  if(upcoming.length)return `<div class="hof-event-list">${upcoming.map(e=>eventCard(e,true)).join('')}</div>`;
  return `<p class="hof-demo-notice">${t('ДЕМОНСТРАЦИЯ ОФОРМЛЕНИЯ · НЕ АНОНС МЕРОПРИЯТИЙ','DESIGN EXAMPLES · NOT REAL EVENT ANNOUNCEMENTS')}</p>
  <div class="hof-concept-posters">
-  <div class="hof-concept-card"><div class="hof-concept-photo">${image('venue_zyb_image',t('Концепт афиши HOF','Sample HOF poster'))}<div class="hof-poster-type"><span>HOF / 001</span><strong>AFTER<br>DARK</strong><span>HOUSE OF FLOW</span></div></div><span class="hof-poster-caption">${t('ПРИМЕР ОФОРМЛЕНИЯ · БЕЗ ДАТЫ','SAMPLE DESIGN · NO DATE')}</span></div>
-  <div class="hof-concept-card"><div class="hof-concept-photo">${image('gallery_zyb_1_image',t('Концепт афиши HOF','Sample HOF poster'))}<div class="hof-poster-type"><span>HOF / 002</span><strong>FRIDAY<br>FLOW</strong><span>BY NOVA / MINSK</span></div></div><span class="hof-poster-caption">${t('ПРИМЕР ОФОРМЛЕНИЯ · БЕЗ ДАТЫ','SAMPLE DESIGN · NO DATE')}</span></div>
+  <div class="hof-concept-card"><div class="hof-concept-photo">${image('venue_zyb_image',t('Концепт афиши HOF','Sample HOF poster'))}<div class="hof-poster-type"><span>HOUSE OF FLOW</span><strong>AFTER DARK</strong><span>HOF BY NOVA</span></div></div><span class="hof-poster-caption">${t('ПРИМЕР ОФОРМЛЕНИЯ · БЕЗ ДАТЫ','SAMPLE DESIGN · NO DATE')}</span></div>
+  <div class="hof-concept-card"><div class="hof-concept-photo">${image('gallery_zyb_1_image',t('Концепт афиши HOF','Sample HOF poster'))}<div class="hof-poster-type"><span>HOUSE OF FLOW</span><strong>FRIDAY FLOW</strong><span>HOF BY NOVA</span></div></div><span class="hof-poster-caption">${t('ПРИМЕР ОФОРМЛЕНИЯ · БЕЗ ДАТЫ','SAMPLE DESIGN · NO DATE')}</span></div>
  </div>
  <p class="hof-future-note">${t('Реальная афиша HOF появится здесь после публикации мероприятий.','Real HOF events will appear here when published.')}</p>`;
 }
@@ -101,14 +102,14 @@ function hofDetail(){
    </div>
   </section>
   <section class="hof-lineup" id="hof-lineup" aria-labelledby="hof-lineup-title">
-   <div class="hof-section-heading"><div><span class="hof-overline">HOF / AFTER DARK</span><h2 id="hof-lineup-title">${t('События','Events')}</h2></div><span class="hof-side-mark">HOUSE OF FLOW<br>BY NOVA</span></div>
+   <div class="hof-section-heading"><div><span class="hof-overline">HOF / AFTER DARK</span><h2 id="hof-lineup-title">${t('События','Events')}</h2></div><span class="hof-side-mark">${t('ЗЫБИЦКАЯ, 2','2 ZYBITSKAYA ST.')}</span></div>
    <div id="hof-lineup-content">${hofLineup()}</div>
   </section>
   <section class="hof-about" id="hof-about">
    <div class="hof-about-media">${image('gallery_zyb_1_image',t('Атмосфера HOF','HOF atmosphere'))}</div>
    <div class="hof-about-copy">
-    <span class="hof-overline">THE CONCEPT / 001</span>
-    <h2>${t('Свой ритм.\nСвои люди.','Your rhythm.\nYour people.')}</h2>
+    <span class="hof-overline">${t('О пространстве','About the space')}</span>
+    <h2>${text(t('Свой ритм. Свои люди.','Your rhythm. Your people.'))}</h2>
     <p data-content="venue_zyb_desc">${content('venue_zyb_desc')}</p>
     <div class="hof-detail-small" data-content="venue_zyb_features">${content('venue_zyb_features')}</div>
     <button class="hof-inline-link" type="button" data-modal="menu-location" data-venue="zyb">${t('Кухня и бар','Food & bar')} ${arrow}</button>
@@ -116,7 +117,7 @@ function hofDetail(){
   </section>
   <section class="hof-bottom">
    <span class="hof-overline">HOF BY NOVA / MINSK</span>
-   <h2>${t('Увидимся\nна Зыбицкой.','See you\non Zybitskaya.')}</h2>
+   <h2>${text(t('Увидимся на Зыбицкой.','See you on Zybitskaya.'))}</h2>
    <p>${content('address_zyb')}</p>
    <div class="hof-bottom-actions"><button class="hof-outline" type="button" data-modal="booking" data-venue="zyb">${bookingLabel()} ${arrow}</button><button class="hof-text-button" type="button" data-modal="contacts" data-venue="zyb">${t('Контакты и расположение','Contacts & directions')} ${arrow}</button></div>
   </section>
