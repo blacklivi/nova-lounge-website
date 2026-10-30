@@ -1,7 +1,7 @@
 // Server-rendered public SEO landing pages. The interactive UI is enhanced by /app.js.
 // Demo Workers URLs remain noindex until NOVA is connected to its official domain.
 const VENUES={
- zybitskaya:{id:'zyb',name:'Зыбицкая',nameEN:'Zybitskaya',street:'ул. Зыбицкая, 2',phone:'+375 25 722-33-33',map:'https://yandex.ru/maps/org/80044003602',image:'/media/clean-e333e88f87b3e9.jpg',title:'NOVA Зыбицкая — лаунж-кафе и DJ-вечеринки в Минске',description:'NOVA Зыбицкая, 2: кухня, ланчи, вечеринки и DJ-сеты в центре Минска. Телефон +375 25 722-33-33.',opening:[{days:['Monday','Tuesday','Wednesday','Thursday','Sunday'],closes:'02:00'},{days:['Friday','Saturday'],closes:'05:00'}]},
+ zybitskaya:{id:'zyb',name:'HOF by NOVA',nameEN:'HOF by NOVA',street:'ул. Зыбицкая, 2',phone:'+375 25 722-33-33',map:'https://yandex.ru/maps/org/80044003602',image:'/media/clean-e333e88f87b3e9.jpg',title:'HOF by NOVA — House of Flow, музыка и события на Зыбицкой',description:'HOF by NOVA (House of Flow): музыка, DJ-сеты, события, кухня и бар на Зыбицкой, 2, Минск.',opening:[{days:['Monday','Tuesday','Wednesday','Thursday','Sunday'],closes:'02:00'},{days:['Friday','Saturday'],closes:'05:00'}]},
  pobediteley:{id:'pob',name:'Победителей',nameEN:'Pobediteley',street:'просп. Победителей, 89, корп. 3, 2-й этаж',phone:'+375 25 644-33-33',map:'https://yandex.ru/maps/org/myata_lounge/1498688403',image:'/media/clean-04578c785a8dd9.jpg',title:'NOVA Победителей — лаунж-кафе на проспекте Победителей, 89/3',description:'NOVA Победителей, 89/3: кухня, встречи с друзьями, настольные игры и вечерняя музыка. Телефон +375 25 644-33-33.',opening:[{days:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],closes:'02:00'}]},
  vostok:{id:'east',name:'Восток',nameEN:'Vostok',street:'ул. Франциска Скорины, 2',phone:'+375 44 791-33-33',map:'https://yandex.ru/maps/org/136614972290',image:'/media/clean-5cb8311007919b.jpg',title:'NOVA Восток — лаунж-кафе на Франциска Скорины, 2',description:'NOVA Восток, ул. Франциска Скорины, 2: кухня, ланчи, кальяны и встречи в Минске. Телефон +375 44 791-33-33.',opening:[{days:['Monday','Tuesday','Wednesday','Thursday','Sunday'],closes:'02:00'},{days:['Friday','Saturday'],closes:'04:00'}]}
 };
@@ -13,7 +13,7 @@ function structuredBusiness(v,origin,override,defaults){
  return {
  '@context':'https://schema.org','@type':'CafeOrCoffeeShop',
  '@id':origin+'/spaces/'+Object.keys(VENUES).find(k=>VENUES[k]===v)+'#business',
- name:'NOVA — '+v.name,url:origin+'/spaces/'+Object.keys(VENUES).find(k=>VENUES[k]===v),
+ name:id==='zyb'?'HOF by NOVA':'NOVA — '+v.name,url:origin+'/spaces/'+Object.keys(VENUES).find(k=>VENUES[k]===v),
  description:property('venue_'+id+'_desc')||v.description,
  telephone:property('phone_'+id)||v.phone,
  address:{'@type':'PostalAddress',streetAddress:(property('address_'+id)||v.street).replace(/^Минск,?\s*/i,''),addressLocality:'Минск',addressCountry:'BY'},
@@ -38,10 +38,10 @@ function fallback(route,v,origin,over,def){
   const n=htmlEscape(v.name),desc=htmlEscape(val('venue_'+v.id+'_desc')||v.description);
   const address=htmlEscape(val('address_'+v.id)||v.street),phone=htmlEscape(val('phone_'+v.id)||v.phone);
   const map=htmlEscape(val('map_'+v.id)||v.map);
-  return '<main id="seo-fallback"><h1>NOVA — '+n+'</h1><p>'+desc+'</p><address>'+address+', Минск</address><p><a href="tel:'+phone.replace(/[^\d+]/g,'')+'">'+phone+'</a></p><p><a href="'+map+'">Открыть карточку заведения на карте</a></p><nav><a href="/">Все пространства NOVA</a></nav></main>';
+  return '<main id="seo-fallback"><h1>'+(v.id==='zyb'?'':'NOVA — ')+n+'</h1><p>'+desc+'</p><address>'+address+', Минск</address><p><a href="tel:'+phone.replace(/[^\d+]/g,'')+'">'+phone+'</a></p><p><a href="'+map+'">Открыть карточку заведения на карте</a></p><nav><a href="/">Все пространства NOVA</a></nav></main>';
  }
  if(route==='/events')return '<main id="seo-fallback"><h1>События NOVA в Минске</h1><p>Афиша вечеринок и DJ-сетов NOVA.</p><a href="/">Все пространства</a></main>';
- return '<main id="seo-fallback"><h1>NOVA — три лаунж-кафе в Минске</h1><p>Зыбицкая, Победителей и Восток: кухня, встречи, вечеринки и ланчи.</p><ul>'+Object.entries(VENUES).map(([slug,item])=>'<li><a href="/spaces/'+slug+'">NOVA '+htmlEscape(item.name)+' — '+htmlEscape(item.street)+'</a></li>').join('')+'</ul></main>';
+ return '<main id="seo-fallback"><h1>NOVA — три лаунж-кафе в Минске</h1><p>Зыбицкая, Победителей и Восток: кухня, встречи, вечеринки и ланчи.</p><ul>'+Object.entries(VENUES).map(([slug,item])=>'<li><a href="/spaces/'+slug+'">'+(item.id==='zyb'?'':'NOVA ')+htmlEscape(item.name)+' — '+htmlEscape(item.street)+'</a></li>').join('')+'</ul></main>';
 }
 export async function publicPage(request,env,route){
  const url=new URL(request.url),v=VENUES[route.split('/')[2]],origin=url.origin;
