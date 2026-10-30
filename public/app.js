@@ -100,7 +100,18 @@ function setupVenuesReveal(){
  const first=cards[0];
  section.classList.add('venues-motion');
  section.classList.toggle('venues-mobile-motion',mobile);
- cards.forEach((card,i)=>card.style.setProperty('--venue-stagger',mobile?'0ms':i*115+'ms'));
+ cards.forEach((card,i)=>{
+  card.style.setProperty('--venue-stagger',mobile?'0ms':i*130+'ms');
+  // A lazy-loaded photograph must not pop in half-way through its card reveal.
+  const image=card.querySelector('.venue-img img');
+  if(!image)return;
+  const showImage=()=>image.classList.add('venue-image-loaded');
+  if(image.complete&&image.naturalWidth>0)showImage();
+  else{
+   image.addEventListener('load',()=>requestAnimationFrame(showImage),{once:true});
+   image.addEventListener('error',showImage,{once:true});
+  }
+ });
  // Already-visible content is shown immediately, including after history restoration.
  if(scrollY>20 || heading.getBoundingClientRect().top < innerHeight)venuesHeadingRevealed=true;
  if(venuesHeadingRevealed)section.classList.add('venues-heading-entered');
