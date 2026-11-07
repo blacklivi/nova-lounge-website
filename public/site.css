@@ -919,3 +919,16 @@ body.hof-active .site-footer .footer-bottom{font-size:14px}
 @media(prefers-reduced-motion:reduce){
  .hof-page .hof-compact-contact .hof-bottom-actions > button{transition:none}
 }
+
+
+/* HÓF panels remain side by side at tablet widths; a single contact column
+   cannot carry two legible adjacent buttons at 601–900px. */
+@media(min-width:601px) and (max-width:900px){
+ .hof-page .hof-compact-contact .hof-bottom-actions{
+  grid-template-columns:minmax(0,1fr);
+  max-width:none;
+ }
+ .hof-page .hof-compact-contact .hof-bottom-actions > button{
+  min-height:52px;
+ }
+}
