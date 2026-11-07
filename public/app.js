@@ -1,6 +1,7 @@
 import {escapeHTML as esc, typography, cleanPhone, validPhone, minskNow, splitEvents, safeURL, localImage, localizedValue} from './core.js';
 import {enhanceBookingSelects} from './booking-selects.js';
 import {enhanceBookingDate} from './booking-date.js';
+import {EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js';
 const app = document.querySelector('#app');
 const isEvents = document.body.dataset.page === 'events';
 const ids = ['zyb','pob','east'];
@@ -10,6 +11,10 @@ const venueURL=id=>'/spaces/'+slugs[id];
 const names = {ru:{zyb:'Зыбицкая',pob:'Победителей',east:'Восток'},en:{zyb:'Zybitskaya',pob:'Pobediteley',east:'Vostok'}};
 let language = 'ru';
 try { language = localStorage.getItem('nova-language') === 'en' ? 'en' : 'ru'; } catch {}
+const editorParams=new URLSearchParams(location.search);
+const isEditorPreview=editorParams.has('cms_preview')&&window.parent!==window;
+if(isEditorPreview && ['ru','en'].includes(editorParams.get('editor_lang')))language=editorParams.get('editor_lang');
+if(isEditorPreview)document.body.classList.add('cms-preview');
 let defaults = {content:{},content_en:{}}, source = {}, events = [], contentFailed = false, eventsFailed = false, eventsLoaded = false;
 let selected = null, lastFocus = null, modalKind = '', modalVenue = '', drawerOpen = false;
 // Keep keyboard focus restoration accessible without leaving a focus ring after touch taps.
@@ -20,25 +25,68 @@ document.addEventListener('keydown',e=>{if(['Tab','Enter',' ','Escape'].includes
 // Apply the same line-break protection to fixed UI copy and CMS copy.
 const t = (ru,en) => typography(language === 'en' ? en : ru, language);
 const text = value => esc(typography(value,language));
-const name = id => names[language][id] || 'NOVA';
+const name = id => text(value('venue_'+id+'_name') || names[language][id] || 'NOVA');
 const brandName = id => id === 'zyb' ? 'HOF by NOVA' : 'NOVA / '+name(id);
 const venueLabel = id => id === 'zyb' ? 'HOF by NOVA · '+name(id) : 'NOVA / '+name(id);
 const value = key => localizedValue(key,language,defaults,source);
+
+const editorValue=key=>{
+ const spec=EDITOR_BY_KEY[key];
+ const stored=value(key);
+ return stored || (language==='en' ? (spec?.en||spec?.ru||'') : (spec?.ru||'')) || '';
+};
+const E=key=>text(editorValue(key));
+function validCmsHref(link){
+ if(typeof link!=='string'||!link||/[\\\u0000-\u001f\u007f]/.test(link))return false;
+ if(/^#[A-Za-z0-9_-]+$/.test(link))return true;
+ if(/^\/(?!\/)[A-Za-z0-9_/#?&.=%+~-]*$/.test(link)&&!/%(?:0[0-9a-f]|1[0-9a-f]|7f)/i.test(link))return true;
+ try{const url=new URL(link);return url.protocol==='https:'&&!url.username&&!url.password&&url.hostname.includes('.')}catch{return false}
+}
+const hrefFor=(key,alternative='/')=>{
+ const val=editorValue(key)||alternative;
+ return validCmsHref(val)?val:alternative;
+};
+const H=(key,alternative='/')=>esc(hrefFor(key,alternative));
+const imageFor=(key,alternative='')=>{
+ const value=editorValue(key)||alternative;
+ return /^\/media\/[A-Za-z0-9_.-]+\.(?:svg|jpg|png|webp)$/.test(value)?esc(value):esc(alternative);
+};
+const editorAttribute=key=>EDITOR_BY_KEY[key]?' data-editor-key="'+key+'"':'';
+const shown=key=>editorValue(key)!=='no';
+const ICON_PATHS={
+ 'arrow-right':'<path d="M3 12h18m-7-7 7 7-7 7"/>',
+ 'arrow-up-right':'<path d="M5 19 19 5M8 5h11v11"/>',
+ 'chevron-right':'<path d="m9 18 6-6-6-6"/>',
+ 'external-link':'<path d="M14 4h6v6m0-6-9 9M20 14v6H4V4h6"/>',
+ 'calendar-days':'<rect x="3" y="5" width="18" height="16" rx="1"/><path d="M7 3v4m10-4v4M3 10h18"/>',
+ 'map-pin':'<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/>',
+ 'phone':'<path d="M6 3h4l2 5-2.5 2.5a17 17 0 0 0 5 5L17 13l4 2v5c-8 3-19-8-17-16z"/>',
+ 'instagram':'<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7h.01"/>',
+ 'music-2':'<path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-3-3c2 0 3 1 3 3Zm12-2a3 3 0 1 1-3-3c2 0 3 1 3 3Z"/>',
+ 'utensils':'<path d="M4 3v7m4-7v7m-4 0h4m-2 0v11m9-18v18m0-18c6 1 6 9 0 9"/>'
+};
+function I(key,fallback='arrow-right'){
+ const id=editorValue(key)||fallback;
+ if(id==='none')return '';
+ const path=ICON_PATHS[ICON_CHOICES.includes(id)?id:fallback]||ICON_PATHS['arrow-right'];
+ return '<svg data-editor-icon="'+key+'" class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+path+'</svg>';
+}
+
 const content = (key, fallback='') => text(value(key) || fallback);
 const media = key => localImage(value(key)) || localImage(defaults.content[key]);
 const arrow = '<svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17m-7-7 7 7-7 7"/></svg>';
-const bookingLabel = () => t('Забронировать стол','Reserve a table');
+const bookingLabel = () => E('global_booking_text');
 const image = (key,alt,priority=false) => `<img data-image="${key}" src="${esc(media(key))}?v=visual-2" alt="${text(alt)}" ${priority?'fetchpriority="high"':'loading="lazy"'} decoding="async" width="900" height="900">`;
 const languages = () => `<div class="language" role="group" aria-label="${t('Язык сайта','Site language')}">${['ru','en'].map(l=>`<button type="button" data-language="${l}" aria-pressed="${l===language}" aria-label="${l==='ru'?'Русский язык':'English language'}">${l.toUpperCase()}</button>`).join('')}</div>`;
-const nav = () => `<a href="/#venues" data-home="venues">${t('Пространства','Spaces')}</a><a href="/events" ${isEvents?'aria-current="page"':''}>${t('События','Events')}</a><a href="/#about" data-home="about">${t('О нас','About')}</a><a href="#contacts">${t('Контакты','Contacts')}</a>`;
-function header(){return `<a class="skip" href="#main">${t('К содержимому','Skip to content')}</a><header class="site-header"><a class="brand" href="/" aria-label="${t('NOVA — на главную','NOVA — home')}">NOVA</a><nav class="main-nav" aria-label="${t('Основная навигация','Main navigation')}">${nav()}</nav><div class="header-side">${languages()}<button type="button" class="button header-book" data-modal="booking">${bookingLabel()}</button><button type="button" class="menu-toggle" data-drawer aria-controls="drawer" aria-expanded="false" aria-label="${t('Открыть меню','Open menu')}"><span></span><span></span></button></div></header>`;}
-const instagramMark='<svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.25" y="3.25" width="17.5" height="17.5" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.6" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>';
-const locationMark='<svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.7"/></svg>';
+const nav = () => `<a href="${H('nav_spaces_url','/#venues')}" ${hrefFor('nav_spaces_url','/#venues')==='/#venues'?'data-home="venues"':''} data-editor-key="nav_spaces_url">${E('nav_spaces_text')}</a><a href="${H('nav_events_url','/events')}" ${isEvents?'aria-current="page"':''} data-editor-key="nav_events_url">${E('nav_events_text')}</a><a href="${H('nav_about_url','/#about')}" ${hrefFor('nav_about_url','/#about')==='/#about'?'data-home="about"':''} data-editor-key="nav_about_url">${E('nav_about_text')}</a><a href="${H('nav_contacts_url','#contacts')}" data-editor-key="nav_contacts_url">${E('nav_contacts_text')}</a>`;
+function header(){return `<a class="skip" href="#main">${t('К содержимому','Skip to content')}</a><header class="site-header"><a class="brand" href="${H('global_logo_url','/')}" data-editor-key="global_logo_url" aria-label="${t('NOVA — на главную','NOVA — home')}">${editorValue('global_logo_image')?'<img data-editor-key="global_logo_image" src="'+imageFor('global_logo_image')+'" alt="NOVA">':'NOVA'}</a><nav class="main-nav" aria-label="${t('Основная навигация','Main navigation')}">${nav()}</nav><div class="header-side">${languages()}<button type="button" class="button header-book" data-modal="booking">${bookingLabel()}</button><button type="button" class="menu-toggle" data-drawer aria-controls="drawer" aria-expanded="false" aria-label="${t('Открыть меню','Open menu')}"><span></span><span></span></button></div></header>`;}
+const instagramMark=()=>I('global_instagram_icon','instagram').replace('class="arrow"','class="footer-icon"');
+const locationMark=()=>I('global_map_icon','map-pin').replace('class="arrow"','class="footer-icon"');
 function contactLinks(id){
  const phone=value('phone_'+id), instagram=id==='zyb'?'':safeURL(value('instagram_'+id)), telegram=safeURL(value('telegram_'+id)), route=safeURL(value('map_'+id));
- return `${phone&&validPhone(phone)?`<a class="footer-phone" href="tel:${esc(phone.replace(/[^+\d]/g,''))}">${text(phone)}</a>`:''}${instagram||telegram||route?`<div class="footer-socials">${instagram?`<a class="footer-social-icon" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="Instagram NOVA ${name(id)}" title="Instagram">${instagramMark}<span class="sr-only">Instagram</span></a>`:''}${telegram?`<a class="footer-social-text" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer">Telegram</a>`:''}${route?`<a class="footer-route footer-social-icon" href="${esc(route)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Показать NOVA на карте','View NOVA on map')} ${name(id)}" title="${t('На карте','View on map')}">${locationMark}</a>`:''}</div>`:''}`;
+ return `${phone&&validPhone(phone)?`<a class="footer-phone" href="tel:${esc(phone.replace(/[^+\d]/g,''))}">${text(phone)}</a>`:''}${instagram||telegram||route?`<div class="footer-socials">${instagram?`<a class="footer-social-icon" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="Instagram NOVA ${name(id)}" title="Instagram">${instagramMark()}<span class="sr-only">Instagram</span></a>`:''}${telegram?`<a class="footer-social-text" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer">Telegram</a>`:''}${route?`<a class="footer-route footer-social-icon" href="${esc(route)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Показать NOVA на карте','View NOVA on map')} ${name(id)}" title="${t('На карте','View on map')}">${locationMark()}</a>`:''}</div>`:''}`;
 }
-function footer(){return `<footer class="site-footer" id="contacts"><div class="footer-top"><div><a class="brand" href="/">NOVA</a><p data-content="footer_tagline">${content('footer_tagline')}</p></div></div><div class="footer-locations">${ids.map(id=>`<div class="footer-location"><h3><a href="${venueURL(id)}" data-place="${id}">${brandName(id)}</a></h3>${value('address_'+id)?`<p class="venue-address">${content('address_'+id)}</p>`:''}${value('hours_'+id)?`<p class="venue-hours">${content('hours_'+id)}</p>`:''}${contactLinks(id)}${!['address_','phone_','instagram_','telegram_','hours_','map_'].some(k=>value(k+id))?`<p class="muted">${t('Контакты уточняются','Contact details coming soon')}</p>`:''}</div>`).join('')}</div><div class="footer-bottom"><span>NOVA · MINSK</span><span>${t('Демонстрационная версия · заявки не отправляются','Demo website · booking requests are not sent')}</span></div></footer>`;}
+function footer(){return `<footer class="site-footer" id="contacts"><div class="footer-top"><div><a class="brand" href="${H('global_logo_url','/')}" data-editor-key="global_logo_url">${E('footer_logo_text')}</a><p data-content="footer_tagline">${content('footer_tagline')}</p></div></div><div class="footer-locations">${ids.map(id=>`<div class="footer-location"><h3><a href="${venueURL(id)}" data-place="${id}">${brandName(id)}</a></h3>${value('address_'+id)?`<p class="venue-address">${content('address_'+id)}</p>`:''}${value('hours_'+id)?`<p class="venue-hours">${content('hours_'+id)}</p>`:''}${contactLinks(id)}${!['address_','phone_','instagram_','telegram_','hours_','map_'].some(k=>value(k+id))?`<p class="muted">${t('Контакты уточняются','Contact details coming soon')}</p>`:''}</div>`).join('')}</div><div class="footer-bottom"><span data-editor-key="footer_left">${E('footer_left')}</span><span data-editor-key="footer_right">${E('footer_right')}</span></div></footer>`;}
 function layers(){return `<aside id="drawer" class="drawer" inert aria-hidden="true" aria-label="${t('Мобильная навигация','Mobile navigation')}"><nav>${nav()}</nav><button type="button" class="button" data-modal="booking">${bookingLabel()}</button><p>MINSK · LOUNGE CAFÉ</p></aside><div class="mobile-cta"><button class="button" data-modal="booking">${bookingLabel()}</button></div><button class="to-top" data-top hidden aria-label="${t('Наверх','Back to top')}">${arrow}</button><dialog class="modal" aria-labelledby="modal-title"><div class="modal-shell"><div class="modal-top"><span class="eyebrow">NOVA / <span id="modal-caption">MINSK</span></span><button class="close" data-close aria-label="${t('Закрыть окно','Close dialog')}">×</button></div><div id="modal-body"></div></div></dialog>`;}
 function demoEvents(){
  // Presentation-only sample events; nothing is written to D1.
@@ -75,13 +123,13 @@ function eventCard(e,home=false){
  const pic=poster?e.demo?`<div class="event-media"><img src="${esc(poster)}" alt="${text(title)}" loading="lazy" width="600" height="800"><span class="demo-poster-label">${t('ПРИМЕР АФИШИ','SAMPLE POSTER')}</span></div>`:`<img src="${esc(poster)}" alt="${text(title)}" loading="lazy" width="600" height="800">`:'';
  return `<${home?'a':'article'} ${home?`href="/events#event-${esc(e.id)}"`: `id="event-${esc(e.id)}"`} class="event-card ${poster?'':'no-image'} ${e.demo?'is-demo':''}">${pic}<div class="event-info">${e.demo?`<span class="event-demo-tag">${t('ДЕМО · НЕ РЕАЛЬНОЕ СОБЫТИЕ','DEMO · NOT A REAL EVENT')}</span>`:''}<time datetime="${esc(e.starts_at)}:00+03:00">${text(when)} · ${t('Минск','Minsk')}</time><h3>${text(title)}</h3>${!home&&desc?`<p>${text(desc)}</p>`:''}<div class="event-location">${brandName(e.venue)}</div></div></${home?'a':'article'}>`;
 }
-function home(){const next=splitEvents(displayEvents()).upcoming[0];return `<section class="hero" id="top"><div class="hero-copy"><span class="eyebrow" data-content="hero_kicker">${content('hero_kicker')}</span><h1 class="hero-title" aria-label="NOVA"><span class="hero-letter hero-letter-n" style="--letter-order:0" aria-hidden="true">N</span><span class="hero-letter hero-letter-o" style="--letter-order:1" aria-hidden="true">O</span><span class="hero-letter hero-letter-v" style="--letter-order:2" aria-hidden="true">V</span><span class="hero-letter hero-letter-a" style="--letter-order:3" aria-hidden="true">A</span></h1><p class="hero-tagline" data-content="hero_tagline">${content('hero_tagline')}</p></div><div class="hero-photo">${image('hero_image',t('Интерьер и коктейль — концептуальное изображение','Interior and cocktail — concept image'),true)}<div class="photo-side">${t('Еда<br>Люди<br>Музыка<br>Атмосфера','Food<br>People<br>Music<br>Atmosphere')}</div></div></section><section class="venues" id="venues" aria-labelledby="venues-heading"><h2 class="venues-heading" id="venues-heading">${t('ВЫБРАТЬ ЗАВЕДЕНИЕ','EXPLORE OUR SPACES')}</h2>${ids.map(id=>`<a class="venue-card ${id==='zyb'?'venue-card-hof':''}" href="${venueURL(id)}" data-place="${id}"><div class="venue-img">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id))}${id==='zyb'?'<span class="venue-hof-image-label">HOF / HOUSE OF FLOW</span>':''}</div><div class="venue-foot"><h3 class="venue-title">${id==='zyb'?'<img class="venue-hof-logo" src="/media/hof-wordmark-black.svg" alt="HÓF" width="519" height="247"><span class="venue-by">by NOVA</span>':name(id)}</h3>${id==='zyb'?'<span class="venue-hof-location">HOUSE OF FLOW · '+t('ЗЫБИЦКАЯ','ZYBITSKAYA')+'</span>':''}<p class="venue-description" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</p></div></a>`).join('')}</section><section class="story" id="about"><div class="story-copy"><span class="eyebrow muted" data-content="story_kicker">${content('story_kicker')}</span><h2 data-content="story_title">${content('story_title')}</h2><p data-content="story_description">${content('story_description')}</p><button class="text-link" data-modal="menu">${t('Посмотреть меню','View the menu')}</button></div><figure class="story-photo">${image('story_image',t('Подача блюда — демонстрационное изображение','Food presentation — concept image'))}<figcaption class="image-note" data-content="media_note">${content('media_note')}</figcaption></figure></section><section class="home-events"><a class="section-link" href="/events"><h2>${t('События','Events')}</h2>${arrow}</a><div>${next?eventCard(next,true)+(next.demo?`<p class="demo-note">${t('Пример оформления. Мероприятие не проводится.','Design preview only. This event is not scheduled.')}</p>`:''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):t('Афиша пока пуста.','No events yet.')}</p>`}</div></section><section class="book-strip" id="booking"><div class="book-image">${image('booking_image',t('Детали интерьера — концепция','Interior details — concept image'))}</div><button class="book-main" type="button" data-modal="booking"><span class="book-welcome">${t('Мы с нетерпением ждём встречи с вами.','We look forward to seeing you.')}</span><span class="book-cta"><span data-content="booking_title">${content('booking_title')}</span><svg class="book-cta-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></span></button></section>`;}
+function home(){const next=splitEvents(displayEvents()).upcoming[0];return `<section class="hero" id="top"><div class="hero-copy"><span class="eyebrow" data-content="hero_kicker">${content('hero_kicker')}</span><h1 class="hero-title" aria-label="NOVA"><span class="hero-letter hero-letter-n" style="--letter-order:0" aria-hidden="true">N</span><span class="hero-letter hero-letter-o" style="--letter-order:1" aria-hidden="true">O</span><span class="hero-letter hero-letter-v" style="--letter-order:2" aria-hidden="true">V</span><span class="hero-letter hero-letter-a" style="--letter-order:3" aria-hidden="true">A</span></h1><p class="hero-tagline" data-content="hero_tagline">${content('hero_tagline')}</p></div><div class="hero-photo">${image('hero_image',t('Интерьер и коктейль — концептуальное изображение','Interior and cocktail — concept image'),true)}<div class="photo-side" data-editor-key="home_photo_side">${E('home_photo_side').replace(/\n/g,'<br>')}</div></div></section><section class="venues" id="venues" aria-labelledby="venues-heading"><h2 class="venues-heading" id="venues-heading" data-editor-key="home_locations_title">${E('home_locations_title')}</h2>${ids.map(id=>`<a class="venue-card ${id==='zyb'?'venue-card-hof':''}" href="${H('home_card_'+id+'_url',venueURL(id))}" ${hrefFor('home_card_'+id+'_url',venueURL(id))===venueURL(id)?'data-place="'+id+'"':''} data-editor-key="home_card_${id}_url"><div class="venue-img">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id))}${id==='zyb'?'<span class="venue-hof-image-label" data-editor-key="home_card_hof_label">'+E('home_card_hof_label')+'</span>':''}</div><div class="venue-foot"><h3 class="venue-title">${id==='zyb'?'<img class="venue-hof-logo" data-editor-key="home_card_hof_logo_image" src="'+imageFor('home_card_hof_logo_image','/media/hof-wordmark-black.svg')+'" alt="HÓF" width="519" height="247"><span class="venue-by" data-editor-key="home_card_hof_by">'+E('home_card_hof_by')+'</span>':name(id)}</h3>${id==='zyb'?'<span class="venue-hof-location" data-editor-key="home_card_hof_location">'+E('home_card_hof_location')+'</span>':''}<p class="venue-description" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</p></div></a>`).join('')}</section><section class="story" id="about" ${shown('home_story_visible')?'':'style="display:none"'}><div class="story-copy"><span class="eyebrow muted" data-content="story_kicker">${content('story_kicker')}</span><h2 data-content="story_title">${content('story_title')}</h2><p data-content="story_description">${content('story_description')}</p><button class="text-link" data-editor-key="home_story_menu_text" data-modal="menu">${E('home_story_menu_text')} ${I('home_story_menu_icon')}</button></div><figure class="story-photo">${image('story_image',t('Подача блюда — демонстрационное изображение','Food presentation — concept image'))}<figcaption class="image-note" data-content="media_note">${content('media_note')}</figcaption></figure></section><section class="home-events" ${shown('home_events_visible')?'':'style="display:none"'}><a class="section-link" href="${H('home_events_url','/events')}" data-editor-key="home_events_url"><h2 data-editor-key="home_events_title">${E('home_events_title')}</h2>${I('home_events_icon')}</a><div>${next?eventCard(next,true)+(next.demo?`<p class="demo-note">${t('Пример оформления. Мероприятие не проводится.','Design preview only. This event is not scheduled.')}</p>`:''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):E('home_events_empty')}</p>`}</div></section><section class="book-strip" id="booking" ${shown('home_booking_visible')?'':'style="display:none"'}><div class="book-image">${image('booking_image',t('Детали интерьера — концепция','Interior details — concept image'))}</div><button class="book-main" type="button" data-modal="booking"><span class="book-welcome" data-editor-key="home_booking_welcome">${E('home_booking_welcome')}</span><span class="book-cta"><span data-content="booking_title">${content('booking_title')}</span>${I('home_booking_icon')}</span></button></section>`;}
 
 
 function hofLineup(){
  const upcoming=splitEvents(events.filter(e=>e.venue==='zyb'&&!e.demo)).upcoming.slice(0,2);
  if(upcoming.length)return `<div class="hof-event-list">${upcoming.map(e=>eventCard(e,true)).join('')}</div>`;
- return `<div class="hof-events-empty"><p>${t('Новые события скоро появятся здесь.','New events will appear here soon.')}</p><a class="hof-event-more" href="/events">${t('Общая афиша NOVA','NOVA events')} ${arrow}</a></div>`;
+ return `<div class="hof-events-empty"><p>${E('hof_events_empty')}</p><a class="hof-event-more" href="${H('hof_events_more_url','/events')}" data-editor-key="hof_events_more_url">${E('hof_events_more_text')} ${arrow}</a></div>`;
 }
 function hofDetail(){
  return `<article class="detail hof-page hof-editorial">
@@ -89,46 +137,46 @@ function hofDetail(){
    <div class="hof-hero-image">${image('venue_zyb_image',t('Музыкальная атмосфера HOF','HOF nightlife atmosphere'),true)}</div>
    <div class="hof-hero-overlay" aria-hidden="true"></div>
    <div class="hof-cover-inner">
-    <div class="hof-cover-top"><span class="hof-top-brand"><span class="hof-top-marker" aria-hidden="true"></span>HOUSE OF FLOW</span><span>${t('МИНСК · ЗЫБИЦКАЯ, 2','MINSK · 2 ZYBITSKAYA ST.')}</span></div>
+    <div class="hof-cover-top"><span class="hof-top-brand"><span class="hof-top-marker" aria-hidden="true"></span><span data-editor-key="hof_top_name">${E('hof_top_name')}</span></span><span data-editor-key="hof_top_location">${E('hof_top_location')}</span></div>
     <div class="hof-cover-brand">
-     <span class="hof-hero-eyebrow">${t('МУЗЫКА / ВЕЧЕРИНКИ','MUSIC / PARTIES')}</span>
-     <h1 id="hof-title"><img class="hof-wordmark" src="/media/hof-wordmark-orange.svg" alt="HÓF" width="519" height="247" fetchpriority="high"></h1>
-     <span class="hof-by-nova">by NOVA</span>
+     <span class="hof-hero-eyebrow" data-editor-key="hof_hero_kicker">${E('hof_hero_kicker')}</span>
+     <h1 id="hof-title"><img class="hof-wordmark" data-editor-key="hof_logo_image" src="${esc(/^\/media\/[A-Za-z0-9_.-]+\.(?:svg|jpg|png|webp)$/.test(editorValue('hof_logo_image'))?editorValue('hof_logo_image'):'/media/hof-wordmark-orange.svg')}" alt="HÓF" width="519" height="247" fetchpriority="high"></h1>
+     <span class="hof-by-nova" data-editor-key="hof_by_nova">${E('hof_by_nova')}</span>
     </div>
     <div class="hof-cover-bottom">
-     <div class="hof-hero-message"><p class="hof-manifesto">${t('Музыка. Люди. Ночи.','Music. People. Nights.')}</p><span>${t('Встречаемся там, где начинается движение.','Where the night finds its rhythm.')}</span></div>
-     <div class="hof-hero-actions"><a class="hof-outline" href="#hof-lineup" data-scroll="hof-lineup">${t('Афиша','Events')} ${arrow}</a><button class="hof-outline hof-primary-cta" type="button" data-modal="booking" data-venue="zyb">${bookingLabel()} ${arrow}</button></div>
+     <div class="hof-hero-message"><p class="hof-manifesto" data-editor-key="hof_slogan">${E('hof_slogan')}</p><span data-editor-key="hof_description_short">${E('hof_description_short')}</span></div>
+     <div class="hof-hero-actions"><a class="hof-outline" href="${H('hof_events_button_url','#hof-lineup')}" ${hrefFor('hof_events_button_url','#hof-lineup')==='#hof-lineup'?'data-scroll="hof-lineup"':''} data-editor-key="hof_events_button_url">${E('hof_events_button_text')} ${I('hof_hero_icon')}</a><button class="hof-outline hof-primary-cta" type="button" data-editor-key="hof_booking_button_text" data-modal="booking" data-venue="zyb">${E('hof_booking_button_text')} ${I('hof_hero_icon')}</button></div>
     </div>
    </div>
   </section>
   <section class="hof-compact-about hof-editorial-about" aria-labelledby="hof-about-heading">
-   <div class="hof-editorial-symbol"><img src="/media/hof-mark-orange.svg" width="95" height="126" alt="" aria-hidden="true" loading="lazy"><span>HOUSE OF FLOW</span></div>
+   <div class="hof-editorial-symbol"><img data-editor-key="hof_about_mark_image" src="${imageFor('hof_about_mark_image','/media/hof-mark-orange.svg')}" width="95" height="126" alt="" aria-hidden="true" loading="lazy"><span>HOUSE OF FLOW</span></div>
    <div class="hof-about-details">
-    <span class="hof-overline">${t('О ПРОСТРАНСТВЕ','THE SPACE')}</span>
-    <h2 id="hof-about-heading">${t('Свой ритм. Свои люди.','Your rhythm. Your people.')}</h2>
-    <p>${t('HÓF — новое направление NOVA на Зыбицкой. Здесь больше музыки, DJ-сетов и вечеринок. Кухня и бар остаются частью вечера.','HÓF is NOVA’s nightlife-led space on Zybitskaya. More music, DJ sets and parties, with food and drinks throughout the night.')}</p>
-    <button class="hof-text-button" type="button" data-modal="menu-location" data-venue="zyb">${t('Кухня и бар','Food & bar')} ${arrow}</button>
+    <span class="hof-overline">${E('hof_about_kicker')}</span>
+    <h2 id="hof-about-heading" data-editor-key="hof_about_title">${E('hof_about_title')}</h2>
+    <p data-editor-key="hof_about_description">${E('hof_about_description')}</p>
+    <button class="hof-text-button" data-editor-key="menu_zyb" type="button" data-modal="menu-location" data-venue="zyb">${E('hof_menu_button_text')} ${I('hof_menu_button_icon')}</button>
    </div>
   </section>
   <div class="hof-editorial-grid">
    <section class="hof-lineup hof-compact-events" id="hof-lineup" aria-labelledby="hof-lineup-title">
-    <div class="hof-section-heading"><span class="hof-overline">HÓF / AFTER DARK</span><h2 id="hof-lineup-title">${t('Афиша','Events')}<span aria-hidden="true" class="hof-heading-period">.</span></h2></div>
+    <div class="hof-section-heading"><span class="hof-overline" data-editor-key="hof_events_kicker">${E('hof_events_kicker')}</span><h2 id="hof-lineup-title" data-editor-key="hof_events_title">${E('hof_events_title')}<span aria-hidden="true" class="hof-heading-period">.</span></h2></div>
     <div id="hof-lineup-content">${hofLineup()}</div>
    </section>
    <section class="hof-bottom hof-compact-contact" aria-label="${t('Контакты и бронирование','Contacts and reservations')}">
-    <div class="hof-contact-top"><span class="hof-overline">${t('ЗЫБИЦКАЯ / МИНСК','ZYBITSKAYA / MINSK')}</span><img src="/media/hof-mark-black.svg" width="56" height="74" alt="" aria-hidden="true" loading="lazy"></div>
-    <h2>${t('Ночь начинается здесь.','The night starts here.')}</h2>
-    <p>${content('address_zyb')}</p>
+    <div class="hof-contact-top"><span class="hof-overline" data-editor-key="hof_contact_kicker">${E('hof_contact_kicker')}</span><img data-editor-key="hof_contact_mark_image" src="${imageFor('hof_contact_mark_image','/media/hof-mark-black.svg')}" width="56" height="74" alt="" aria-hidden="true" loading="lazy"></div>
+    <h2 data-editor-key="hof_contact_title">${E('hof_contact_title')}</h2>
+    <p data-content="address_zyb">${content('address_zyb')}</p>
     <div class="hof-bottom-actions">
-     <button class="hof-outline hof-primary-cta" type="button" data-modal="booking" data-venue="zyb">${bookingLabel()} ${arrow}</button>
-     <button class="hof-text-button" type="button" data-modal="contacts" data-venue="zyb">${t('Контакты','Contacts')} ${arrow}</button>
+     <button class="hof-outline hof-primary-cta" type="button" data-editor-key="hof_book_button_text" data-modal="booking" data-venue="zyb">${E('hof_book_button_text')} ${arrow}</button>
+     <button class="hof-text-button" data-editor-key="hof_contacts_button_text" type="button" data-modal="contacts" data-venue="zyb">${E('hof_contacts_button_text')} ${arrow}</button>
     </div>
    </section>
   </div>
  </article>`;
 }
 
-function detail(id){if(id==='zyb')return hofDetail();return `<article class="detail"><a href="#venues" data-home="venues" class="detail-back">${arrow}${t('Все пространства NOVA','All NOVA spaces')}</a><div class="detail-grid"><div class="detail-copy"><span class="eyebrow muted">NOVA / MINSK</span><h1>${name(id)}</h1><div class="subtitle" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</div><p data-content="venue_${id}_desc">${content('venue_'+id+'_desc',t('Описание готовится.','Details coming soon.'))}</p><div class="detail-actions"><button class="button" data-modal="booking" data-venue="${id}">${bookingLabel()}</button><button class="button secondary" data-modal="menu-location" data-venue="${id}">${t('Посмотреть меню','View the menu')}</button></div></div><div class="detail-image">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id),true)}</div></div><div class="detail-bottom"><div><span class="eyebrow muted">${t('Атмосфера NOVA','NOVA atmosphere')}</span><h2>${t('В своём ритме.','Your kind of evening.')}</h2><p data-content="venue_${id}_second">${content('venue_'+id+'_second')}</p><p class="features" data-content="venue_${id}_features">${content('venue_'+id+'_features')}</p><button class="text-link" data-modal="contacts" data-venue="${id}">${t('Контакты и расположение','Contacts and directions')}</button></div><div><div class="detail-gallery">${[1,2].map(i=>image(`gallery_${id}_${i}_image`,t('Демонстрационное изображение','Concept image'))).join('')}</div><p class="image-note">${content('media_note')}</p></div></div></article>`;}
+function detail(id){if(id==='zyb')return hofDetail();return `<article class="detail"><a href="${H('venue_'+id+'_back_url','/#venues')}" ${hrefFor('venue_'+id+'_back_url','/#venues')==='/#venues'?'data-home="venues"':''} class="detail-back" data-editor-key="venue_${id}_back_url">${arrow}${E('venue_'+id+'_back_text')}</a><div class="detail-grid"><div class="detail-copy"><span class="eyebrow muted" data-editor-key="venue_${id}_kicker">${E('venue_'+id+'_kicker')}</span><h1 data-editor-key="venue_${id}_name">${name(id)}</h1><div class="subtitle" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</div><p data-content="venue_${id}_desc">${content('venue_'+id+'_desc',t('Описание готовится.','Details coming soon.'))}</p><div class="detail-actions"><button class="button" data-editor-key="venue_${id}_booking_text" data-modal="booking" data-venue="${id}">${E('venue_'+id+'_booking_text')}</button><button class="button secondary" data-editor-key="menu_${id}" data-modal="menu-location" data-venue="${id}">${E('venue_'+id+'_menu_text')}</button></div></div><div class="detail-image">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id),true)}</div></div><div class="detail-bottom"><div><span class="eyebrow muted" data-editor-key="venue_${id}_atmosphere_kicker">${E('venue_'+id+'_atmosphere_kicker')}</span><h2 data-editor-key="venue_${id}_atmosphere_title">${E('venue_'+id+'_atmosphere_title')}</h2><p data-content="venue_${id}_second">${content('venue_'+id+'_second')}</p><p class="features" data-content="venue_${id}_features">${content('venue_'+id+'_features')}</p><button class="text-link" data-editor-key="venue_${id}_contacts_text" data-modal="contacts" data-venue="${id}">${E('venue_'+id+'_contacts_text')}</button></div><div><div class="detail-gallery" ${shown('venue_'+id+'_gallery_visible')?'':'style="display:none"'}>${[1,2].map(i=>image(`gallery_${id}_${i}_image`,t('Демонстрационное изображение','Concept image'))).join('')}</div><p class="image-note">${content('media_note')}</p></div></div></article>`;}
 function eventsPage(){const visible=displayEvents(),demo=visible.some(e=>e.demo);const {upcoming,past}=splitEvents(visible);return `<div class="events-page"><section class="events-intro"><span class="eyebrow muted">NOVA / MINSK</span><h1>${t('События','Events')}</h1><p>${t('Встречи, музыка и вечера, которые хочется повторить.','Music, good company and nights worth remembering.')}</p>${demo?`<p class="events-demo-notice" role="note">${t('ДЕМОНСТРАЦИОННАЯ АФИША — названия, даты и события вымышлены. Когда появится предстоящее опубликованное мероприятие, примеры автоматически исчезнут.','SAMPLE EVENT LINEUP — all titles, dates and events are fictional. Examples automatically disappear when an upcoming real event is published.')}</p>`:''}</section>${[[upcoming,t('Ближайшие','Coming up'),'future'],[past,t('Архив','Archive'),'archive']].map(([list,title,id])=>`<section class="events-section ${id}"><h2>${title}</h2><div class="events-list" id="${id}">${list.length?list.map(e=>eventCard(e)).join(''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):id==='future'?t('Сейчас нет анонсированных мероприятий.','No upcoming events announced yet.'):t('Архив мероприятий пока пуст.','No past events yet.')}</p>`}</div></section>`).join('')}</div>`;}
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -293,6 +341,20 @@ function attachMotion() {
 // Apply late CMS updates in place. A second full render reset scroll position,
 // recreated the hero and made animated sections flash during reading.
 function patchLateContent(){
+ app.querySelectorAll('[data-editor-key]').forEach(el=>{
+  const key=el.dataset.editorKey,spec=EDITOR_BY_KEY[key];
+  if(!spec)return;
+  // A late CMS response must not leave the initial fallback text visible.
+  if(['text','textarea'].includes(spec.type)&&!el.children.length&&el.tagName!=='INPUT'){
+   el.textContent=typography(editorValue(key),language);
+  }else if(spec.type==='image'&&el.tagName==='IMG'){
+   const source=imageFor(key);
+   if(source && el.getAttribute('src')!==source)el.src=source;
+  }else if(spec.type==='link'&&el.tagName==='A'){
+   const url=hrefFor(key);
+   if(url && el.getAttribute('href')!==url)el.href=url;
+  }
+ });
  app.querySelectorAll('[data-content]').forEach(el=>{
   const updated=value(el.dataset.content);
   if(updated)el.textContent=typography(updated,language);
@@ -440,7 +502,7 @@ function closeModal(instant=false){
 function contactPanel(id){const address=value('address_'+id),hours=value('hours_'+id),links=contactLinks(id);return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p>${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;}
 function openModal(kind,id=selected){
  if(drawerOpen)setDrawer(false);
- if(kind==='menu-location'){const url=safeURL(value('menu_'+id));if(url){window.open(url,'_blank','noopener,noreferrer');return;}}
+ if(kind==='menu-location'){const url=hrefFor('menu_'+id,'');if(url){window.open(url,'_blank','noopener,noreferrer');return;}}
  const dialog=document.querySelector('dialog');if(!dialog.open)lastFocus=document.activeElement;
  modalKind=kind;modalVenue=id||'';
  document.getElementById('modal-caption').textContent=id?(id==='zyb'?'HOF':name(id)):'MINSK';
@@ -500,6 +562,55 @@ function navigate(id){
  }else if(id){
   scrollToSection(id);
  }
+}
+// Page preview is read-only. Click targets select fields in the authorized parent editor.
+if(isEditorPreview){
+ document.addEventListener('click',e=>{
+  const node=e.target.closest('[data-editor-icon],[data-editor-key],[data-content],[data-image]');
+  e.preventDefault();e.stopImmediatePropagation();
+  const key=node?.dataset.editorIcon||node?.dataset.editorKey||node?.dataset.content||node?.dataset.image||'';
+  window.parent.postMessage({source:'nova-cms-inspector',key},location.origin);
+ },true);
+  // Same-origin draft messages update the preview DOM only; never write to D1 or R2.
+ window.addEventListener('message',event=>{
+  if(event.source!==window.parent||event.origin!==location.origin||event.data?.source!=='nova-cms-draft')return;
+  const {key,value,type}=event.data;
+  if(typeof key!=='string'||!Object.hasOwn(EDITOR_BY_KEY,key)||typeof value!=='string'||value.length>1600)return;
+  if(type==='toggle'){
+   const selector=key==='home_story_visible'?'#about':
+     key==='home_events_visible'?'.home-events':
+     key==='home_booking_visible'?'#booking':
+     /^venue_(pob|east)_gallery_visible$/.test(key)?'.detail-gallery':null;
+   if(selector)document.querySelector(selector)?.style.setProperty('display',value==='no'?'none':'');
+   return;
+  }
+  if(type==='icon'){
+   if(!ICON_CHOICES.includes(value))return;
+   document.querySelectorAll('[data-editor-icon="'+key+'"]').forEach(svg=>{
+    if(value==='none'){svg.style.display='none';return}
+    svg.style.display='';
+    svg.innerHTML=ICON_PATHS[value]||ICON_PATHS['arrow-right'];
+   });
+   return;
+  }
+  const selectors=['[data-editor-key="'+key+'"]','[data-content="'+key+'"]','[data-image="'+key+'"]'];
+  for(const node of document.querySelectorAll(selectors.join(','))){
+   if(type==='image'){
+    if(node.tagName==='IMG'&&(/^\/media\/[A-Za-z0-9_.-]+\.(jpg|png|webp|svg)$/.test(value)||value.startsWith('blob:'+location.origin+'/')))node.src=value;
+   }else if(type==='link'){
+    if(validCmsHref(value)&&node.tagName==='A')node.setAttribute('href',value);
+    else node.title=value;
+   }else if(type==='text'||type==='textarea'){
+    const textNode=[...node.childNodes].find(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim());
+    if(textNode)textNode.textContent=typography(value,language);
+    else if(node.children.length===0)node.textContent=typography(value,language);
+   }
+  }
+ });
+document.addEventListener('mouseover',e=>{
+  document.querySelectorAll('.cms-inspect-highlight').forEach(n=>n.classList.remove('cms-inspect-highlight'));
+  const el=e.target.closest('[data-editor-icon],[data-editor-key],[data-content],[data-image]');el?.classList.add('cms-inspect-highlight');
+ },{passive:true});
 }
 document.addEventListener('click',e=>{
  const b=e.target.closest('button,a');if(!b)return;

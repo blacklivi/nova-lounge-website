@@ -32,10 +32,13 @@ assert.match(mark,/fill="#000000"/,'Correct black brand mark for orange backgrou
 assert.equal((detail.match(/<section /g)||[]).length,4,'Four concise sections including the shared events/contact row');
 for(const name of ['hof-editorial-hero','hof-editorial-about','hof-compact-events','hof-compact-contact'])assert.ok(detail.includes(name),'Required section: '+name);
 assert.doesNotMatch(detail,/hof-about-media|hof-concept-posters|hof-concept-card/,'No long decorative blocks or fake posters');
-assert.match(detail,/src="\/media\/hof-wordmark-orange\.svg"/,'Use new official orange logo on black');
+assert.match(detail,/data-editor-key="hof_logo_image"/,'HOF first-screen logo must be editable');
+assert.match(detail,/hof-wordmark-orange\.svg/,'Default HOF logo remains the official orange asset');
 assert.match(detail,/class="hof-hero-image"/,'Hero must use real CMS venue imagery');
-assert.match(detail,/src="\/media\/hof-mark-black\.svg"/,'Use new brand symbol on orange');
-assert.match(app,/src="\/media\/hof-wordmark-black\.svg"/,'Use black official mark on home card');
+assert.match(detail,/data-editor-key="hof_contact_mark_image"/,'Official HOF contact symbol must be editable');
+assert.match(detail,/hof-mark-black\.svg/,'Default contact symbol remains black');
+assert.match(app,/data-editor-key="home_card_hof_logo_image"/,'Homepage HOF identity must be editable');
+assert.match(app,/hof-wordmark-black\.svg/,'Official black HOF wordmark remains the default');
 assert.match(events,/!e\.demo/,'Do not display fictional event posters');
 assert.match(events,/\.upcoming\.slice\(0,2\)/,'Keep event list compact');
 assert.doesNotMatch(detail,/01 \/ HOUSE OF FLOW|02 \/ AFTER DARK|03 \/ /,'Avoid arbitrary decorative section numbers');

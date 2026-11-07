@@ -499,3 +499,12 @@ body.hof-active .site-footer .footer-bottom{border-top:0;color:#aaa;margin:0;pad
 @media(prefers-reduced-motion:reduce){
  .hof-page .hof-outline,.hof-page .hof-text-button,.hof-page .hof-event-more{transition:none!important}
 }
+
+
+/* Visual content inspector is isolated to authorized editor preview iframe.
+   The public website never gets these highlight outlines. */
+.cms-preview [data-editor-key],
+.cms-preview [data-content],
+.cms-preview [data-image]{cursor:crosshair}
+.cms-preview .cms-inspect-highlight{outline:2px dashed #F04902!important;outline-offset:4px;position:relative}
+.cms-preview a[data-editor-key],.cms-preview button[data-editor-key]{pointer-events:auto}
