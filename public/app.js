@@ -11,6 +11,10 @@ const venueURL=id=>'/spaces/'+slugs[id];
 const names = {ru:{zyb:'Зыбицкая',pob:'Победителей',east:'Восток'},en:{zyb:'Zybitskaya',pob:'Pobediteley',east:'Vostok'}};
 let language = 'ru';
 try { language = localStorage.getItem('nova-language') === 'en' ? 'en' : 'ru'; } catch {}
+const editorParams=new URLSearchParams(location.search);
+const isEditorPreview=editorParams.has('cms_preview')&&window.parent!==window;
+if(isEditorPreview && ['ru','en'].includes(editorParams.get('editor_lang')))language=editorParams.get('editor_lang');
+if(isEditorPreview)document.body.classList.add('cms-preview');
 let defaults = {content:{},content_en:{}}, source = {}, events = [], contentFailed = false, eventsFailed = false, eventsLoaded = false;
 let selected = null, lastFocus = null, modalKind = '', modalVenue = '', drawerOpen = false;
 // Keep keyboard focus restoration accessible without leaving a focus ring after touch taps.
@@ -541,7 +545,7 @@ function navigate(id){
  }
 }
 // Page preview is read-only. Click targets select fields in the authorized parent editor.
-if(new URLSearchParams(location.search).has('cms_preview')&&window.parent!==window){
+if(isEditorPreview){
  document.addEventListener('click',e=>{
   const node=e.target.closest('[data-editor-key],[data-content],[data-image]');
   e.preventDefault();e.stopImmediatePropagation();
