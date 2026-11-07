@@ -91,7 +91,7 @@ function hofDetail(){
    <div class="hof-cover-inner">
     <div class="hof-cover-top"><span class="hof-top-brand"><span class="hof-top-marker" aria-hidden="true"></span>HOUSE OF FLOW</span><span>${t('МИНСК · ЗЫБИЦКАЯ, 2','MINSK · 2 ZYBITSKAYA ST.')}</span></div>
     <div class="hof-cover-brand">
-     <span class="hof-hero-eyebrow">BY NOVA <span aria-hidden="true">/</span> AFTER DARK</span>
+     <span class="hof-hero-eyebrow">${t('МУЗЫКА / ВЕЧЕРИНКИ','MUSIC / PARTIES')}</span>
      <h1 id="hof-title"><img class="hof-wordmark" src="/media/hof-wordmark-orange.svg" alt="HÓF" width="519" height="247" fetchpriority="high"></h1>
      <span class="hof-by-nova">by NOVA</span>
     </div>
@@ -100,10 +100,9 @@ function hofDetail(){
      <div class="hof-hero-actions"><a class="hof-outline" href="#hof-lineup" data-scroll="hof-lineup">${t('Афиша','Events')} ${arrow}</a><button class="hof-outline hof-primary-cta" type="button" data-modal="booking" data-venue="zyb">${bookingLabel()} ${arrow}</button></div>
     </div>
    </div>
-   <span class="hof-photo-credit">${t('ЗЫБИЦКАЯ / МУЗЫКА / НОЧИ','ZYBITSKAYA / MUSIC / NIGHTS')}</span>
   </section>
   <section class="hof-compact-about hof-editorial-about" aria-labelledby="hof-about-heading">
-   <div class="hof-editorial-symbol"><img src="/media/hof-mark-orange.svg" width="95" height="126" alt="" aria-hidden="true" loading="lazy"><span>01 / HOUSE OF FLOW</span></div>
+   <div class="hof-editorial-symbol"><img src="/media/hof-mark-orange.svg" width="95" height="126" alt="" aria-hidden="true" loading="lazy"><span>HOUSE OF FLOW</span></div>
    <div class="hof-about-details">
     <span class="hof-overline">${t('О ПРОСТРАНСТВЕ','THE SPACE')}</span>
     <h2 id="hof-about-heading">${t('Свой ритм. Свои люди.','Your rhythm. Your people.')}</h2>
@@ -113,11 +112,11 @@ function hofDetail(){
   </section>
   <div class="hof-editorial-grid">
    <section class="hof-lineup hof-compact-events" id="hof-lineup" aria-labelledby="hof-lineup-title">
-    <div class="hof-section-heading"><span class="hof-overline">02 / AFTER DARK</span><h2 id="hof-lineup-title">${t('Афиша','Events')}<span aria-hidden="true" class="hof-heading-period">.</span></h2></div>
+    <div class="hof-section-heading"><span class="hof-overline">HÓF / AFTER DARK</span><h2 id="hof-lineup-title">${t('Афиша','Events')}<span aria-hidden="true" class="hof-heading-period">.</span></h2></div>
     <div id="hof-lineup-content">${hofLineup()}</div>
    </section>
    <section class="hof-bottom hof-compact-contact" aria-label="${t('Контакты и бронирование','Contacts and reservations')}">
-    <div class="hof-contact-top"><span class="hof-overline">03 / ${t('ДО ВСТРЕЧИ','SEE YOU THERE')}</span><img src="/media/hof-mark-black.svg" width="56" height="74" alt="" aria-hidden="true" loading="lazy"></div>
+    <div class="hof-contact-top"><span class="hof-overline">${t('ЗЫБИЦКАЯ / МИНСК','ZYBITSKAYA / MINSK')}</span><img src="/media/hof-mark-black.svg" width="56" height="74" alt="" aria-hidden="true" loading="lazy"></div>
     <h2>${t('Ночь начинается здесь.','The night starts here.')}</h2>
     <p>${content('address_zyb')}</p>
     <div class="hof-bottom-actions">
