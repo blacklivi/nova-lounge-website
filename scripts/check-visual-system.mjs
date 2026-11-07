@@ -23,7 +23,7 @@ assert.match(design,/\.modal \ .demo-note|\.modal \.demo-note/,'Demo warning mus
 assert.match(design,/height:calc\(100svh - var\(--header\)\)/,'First-screen HOF hero fills available mobile viewport');
 assert.match(design,/body\.hof-active\.hof-dock-visible \.mobile-cta/,'Mobile booking dock appears only when triggered');
 assert.match(design,/@media\(prefers-reduced-motion:reduce\)/,'Animations respect reduced-motion preference');
-assert.match(app,/dialog\.dataset\.theme=kind==='booking'&&id==='zyb'\?'hof':'nova'/,'Venue theme must not alter booking data');
+assert.match(app,/dialog\.dataset\.theme=\(kind==='booking'\|\|kind==='contacts'\)&&id==='zyb'\?'hof':'nova'/,'Venue theme must not alter booking data');
 assert.match(app,/const visible=Boolean\(hero&&hero\.getBoundingClientRect\(\)\.bottom<=header\+4&&!contactVisible\)/,'Dock must not duplicate hero or contact booking CTA');
 assert.match(app,/dock\.inert=!visible/,'Hidden dock must be removed from keyboard order');
 assert.match(app,/window\.addEventListener\('scroll',updateTop,\{passive:true\}\)/,'Mobile dock updates on scroll');
