@@ -46,7 +46,7 @@ function fallback(route,v,origin,over,def){
  return '<main id="seo-fallback"><h1>NOVA — три лаунж-кафе в Минске</h1><p>Зыбицкая, Победителей и Восток: кухня, встречи, вечеринки и ланчи.</p><ul>'+Object.entries(VENUES).map(([slug,item])=>'<li><a href="/spaces/'+slug+'">'+(item.id==='zyb'?'':'NOVA ')+htmlEscape(item.name)+' — '+htmlEscape(item.street)+'</a></li>').join('')+'</ul></main>';
 }
 export async function publicPage(request,env,route){
- const url=new URL(request.url),v=VENUES[route.split('/')[2]],eventVenue=route.startsWith('/events/')?EVENT_ROUTES[route.split('/')[2]]:null,origin=url.origin;
+ const url=new URL(request.url),v=route.startsWith('/spaces/')?VENUES[route.split('/')[2]]:null,eventVenue=route.startsWith('/events/')?EVENT_ROUTES[route.split('/')[2]]:null,origin=url.origin;
  const asset=route.startsWith('/events')?'/events.html':'/index.html';
  const [page,def,over]=await Promise.all([env.ASSETS.fetch(new Request(new URL(asset,request.url),request)),defaultsFor(env,request.url),overrides(env)]);
  if(!page.ok)return page;
