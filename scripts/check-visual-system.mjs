@@ -33,4 +33,11 @@ assert.match(app,/enhanceBookingDate/,'Existing date component must remain wired
 assert.match(app,/enhanceBookingSelects/,'Existing select component must remain wired');
 assert.match(app,/function reviewBooking\(e\)/,'Booking review flow must not be removed');
 
+assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions\s*\{\s*display:grid;\s*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/,'HOF contact buttons must use equal-width grid tracks');
+assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions > button\s*\{[^}]*height:100%/s,'Both HOF contact buttons must share a common row height');
+assert.match(css,/@media\(max-width:380px\)\s*\{\s*\.hof-page \.hof-compact-contact \.hof-bottom-actions\s*\{\s*grid-template-columns:minmax\(0,1fr\)/,'Narrow phones must stack equal-width buttons');
+assert.match(css,/@media\(min-width:601px\) and \(max-width:900px\)/,'Narrow split panels on tablets must stack contact buttons');
+assert.match(app,/data-editor-key="hof_contacts_button_text".*data-modal="contacts"/,'Contacts button remains wired and editable');
+assert.match(app,/data-editor-key="hof_book_button_text".*data-modal="booking"/,'Booking button remains wired and editable');
+
 console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');

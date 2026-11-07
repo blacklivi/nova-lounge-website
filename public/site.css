@@ -839,3 +839,96 @@ body.hof-active .site-footer .footer-bottom{font-size:14px}
   transition:none!important;
  }
 }
+
+
+/* HÓF contact actions: same button geometry, different visual priority.
+   Both CTAs share one grid row, so labels wrapping never change heights. */
+.hof-page .hof-compact-contact .hof-bottom-actions{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:12px;
+ width:100%;
+ max-width:480px;
+ align-items:stretch;
+ margin-top:18px;
+}
+.hof-page .hof-compact-contact .hof-bottom-actions > button{
+ box-sizing:border-box;
+ display:inline-flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:8px;
+ width:100%;
+ min-width:0;
+ min-height:56px;
+ height:100%;
+ margin:0;
+ padding:12px 14px;
+ border:1px solid #000;
+ border-radius:0;
+ text-align:left;
+ font:500 15px/1.35 Manrope,Arial,sans-serif;
+ white-space:normal;
+ text-decoration:none;
+ transition:background-color .2s ease,border-color .2s ease,color .2s ease;
+}
+.hof-page .hof-compact-contact .hof-bottom-actions > .hof-primary-cta{
+ background:#000!important;
+ color:#fff!important;
+ border-color:#000!important;
+}
+.hof-page .hof-compact-contact .hof-bottom-actions > .hof-text-button{
+ background:transparent;
+ color:#000;
+ border-color:#000;
+ border-bottom:1px solid #000;
+}
+.hof-page .hof-compact-contact .hof-bottom-actions > button .arrow{
+ width:18px;
+ height:18px;
+ flex:0 0 18px;
+}
+@media(hover:hover){
+ .hof-page .hof-compact-contact .hof-bottom-actions > .hof-text-button:hover{
+  background:#000;
+  color:#fff;
+  border-color:#000;
+ }
+}
+@media(max-width:600px){
+ .hof-page .hof-compact-contact .hof-bottom-actions{
+  max-width:none;
+  gap:10px;
+ }
+ .hof-page .hof-compact-contact .hof-bottom-actions > button{
+  min-height:60px;
+  padding:10px 12px;
+  font-size:14px;
+ }
+}
+@media(max-width:380px){
+ .hof-page .hof-compact-contact .hof-bottom-actions{
+  grid-template-columns:minmax(0,1fr);
+ }
+ .hof-page .hof-compact-contact .hof-bottom-actions > button{
+  min-height:52px;
+  padding:12px 16px;
+  font-size:15px;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .hof-page .hof-compact-contact .hof-bottom-actions > button{transition:none}
+}
+
+
+/* HÓF panels remain side by side at tablet widths; a single contact column
+   cannot carry two legible adjacent buttons at 601–900px. */
+@media(min-width:601px) and (max-width:900px){
+ .hof-page .hof-compact-contact .hof-bottom-actions{
+  grid-template-columns:minmax(0,1fr);
+  max-width:none;
+ }
+ .hof-page .hof-compact-contact .hof-bottom-actions > button{
+  min-height:52px;
+ }
+}
