@@ -1,0 +1,36 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+
+const app=readFileSync('public/app.js','utf8');
+const css=readFileSync('public/site.css','utf8');
+const ix=css.indexOf('/* NOVA / HÓF design-system v1');
+assert.ok(ix>=0,'Shared visual system missing');
+const design=css.slice(ix);
+assert.match(design,/--nova-grid-gap/,'Global grid gap must be explicit');
+assert.match(design,/--gutter:clamp\(32px,3\.5vw,64px\)/,'Desktop page rails should be shared');
+assert.match(design,/grid-template-columns:repeat\(12,minmax\(0,1fr\)\)/,'HOF desktop must use site 12-column grid');
+assert.match(design,/grid-template-columns:repeat\(8,minmax\(0,1fr\)\)/,'Tablet grid must exist');
+assert.match(design,/grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/,'Mobile grid must exist');
+assert.match(design,/\.hof-editorial-about \.hof-about-details\{[\s\S]*?grid-column:4 \/ -1/,'HOF editorial copy should align to a grid track');
+assert.match(design,/--nova-button-height:50px/,'Core buttons must share size');
+assert.match(design,/\.hof-page \.hof-outline\{[\s\S]*?font-size:15px/,'HOF outlined actions should be readable');
+assert.match(design,/\.hof-page \.hof-text-button,[\s\S]*?font-size:15px/,'Text actions should share typographic baseline');
+assert.match(design,/\.modal \.field label\{font-size:14px/,'Form labels must be readable');
+assert.match(design,/\.modal \.field input,\.modal \.field select/,'Modal inputs must share base geometry');
+assert.match(design,/\.modal\[data-theme="hof"\]/,'HOF modal has its own colour theme');
+assert.match(design,/\.modal\[data-theme="hof"\] \.form-submit\{/,'HOF submit uses a brand-colour primary action');
+assert.match(design,/\.modal \ .demo-note|\.modal \.demo-note/,'Demo warning must remain readable');
+assert.match(design,/height:calc\(100svh - var\(--header\)\)/,'First-screen HOF hero fills available mobile viewport');
+assert.match(design,/body\.hof-active\.hof-dock-visible \.mobile-cta/,'Mobile booking dock appears only when triggered');
+assert.match(design,/@media\(prefers-reduced-motion:reduce\)/,'Animations respect reduced-motion preference');
+assert.match(app,/dialog\.dataset\.theme=kind==='booking'&&id==='zyb'\?'hof':'nova'/,'Venue theme must not alter booking data');
+assert.match(app,/const visible=Boolean\(hero&&hero\.getBoundingClientRect\(\)\.bottom<=header\+4&&!contactVisible\)/,'Dock must not duplicate hero or contact booking CTA');
+assert.match(app,/dock\.inert=!visible/,'Hidden dock must be removed from keyboard order');
+assert.match(app,/window\.addEventListener\('scroll',updateTop,\{passive:true\}\)/,'Mobile dock updates on scroll');
+assert.match(app,/window\.addEventListener\('resize',updateTop,\{passive:true\}\)/,'Mobile dock responds to device orientation');
+assert.match(app,/data-modal="booking" data-venue="zyb"/,'HOF fixed venue booking ID must be retained');
+assert.match(app,/enhanceBookingDate/,'Existing date component must remain wired');
+assert.match(app,/enhanceBookingSelects/,'Existing select component must remain wired');
+assert.match(app,/function reviewBooking\(e\)/,'Booking review flow must not be removed');
+
+console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');
