@@ -1,4 +1,5 @@
 import {EDITOR_PAGES,EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js';
+import {preparePhoto,uploadPhoto,validatePhoto,formatBytes,IMAGE_ACCEPT} from './image-upload.js';
 
 const $=s=>document.querySelector(s);
 const getPage=()=>EDITOR_PAGES.find(p=>p.id===$('#page-editor-select').value)||EDITOR_PAGES[1];
@@ -135,20 +136,35 @@ function buildField(field){
    box.append(create('small','editor-inherited-note','Пока используется заглавная фотография страницы. Загрузите отдельную фотографию для карточки — заглавная при этом не изменится.'));
   }
   const uploadInput=create('input','editor-upload');
-  uploadInput.type='file';uploadInput.accept='image/jpeg,image/png,image/webp';
-  uploadInput.addEventListener('change',()=>{
+  uploadInput.type='file';uploadInput.accept=IMAGE_ACCEPT;
+  let previewBlobURL='';
+  uploadInput.addEventListener('change',async()=>{
    const file=uploadInput.files?.[0];
    if(!file)return;
-   if(file.size>8*1024*1024||!['image/jpeg','image/png','image/webp'].includes(file.type)){
-    status('Разрешены JPG, PNG, WebP до 8 МБ',true);uploadInput.value='';return;
-   }
+   try{validatePhoto(file)}
+   catch(err){status(err.message,true);uploadInput.value='';return}
+   // Store the raw file; the shared optimizer caches the pending conversion
+   // so an immediate "Publish" click waits for, rather than duplicates, it.
    images.set(field.key,file);
-   preview.src=URL.createObjectURL(file);preview.hidden=false;
-   sendPreview(field,preview.src);
    dirtyMessage();
+   status('Обрабатываем фотографию: WebP, размер под назначение…');
+   try{
+    const optimized=await preparePhoto(file,field.key);
+    if(images.get(field.key)!==file)return;
+    if(previewBlobURL)URL.revokeObjectURL(previewBlobURL);
+    previewBlobURL=URL.createObjectURL(optimized.file);
+    preview.src=previewBlobURL;preview.hidden=false;
+    sendPreview(field,previewBlobURL);
+    status('WebP готов: '+optimized.originalWidth+'×'+optimized.originalHeight+' → '+optimized.width+'×'+optimized.height+
+      ', '+formatBytes(optimized.originalBytes)+' → '+formatBytes(optimized.bytes)+'. Нажмите «Опубликовать изменения».');
+   }catch(err){
+    if(images.get(field.key)===file)images.delete(field.key);
+    uploadInput.value='';
+    status('Не удалось обработать фотографию: '+err.message,true);
+   }
   });
   box.append(uploadInput);
-  box.append(create('small','editor-field-help','Можно загрузить новый файл или указать путь существующего /media/…; для фирменных SVG используется готовый файл.'));
+  box.append(create('small','editor-field-help','JPG, PNG, WebP, AVIF, HEIC → WebP автоматически. Заглавные фото до 2400 px, карточки до 1400 px. Исходники до 80 МБ. Готовые фирменные SVG используются по ссылке.'));
  }
  if(field.type==='link'){
   const note=create('p','editor-link-note','');
@@ -208,12 +224,7 @@ function selectField(key){
  setTimeout(()=>target.classList.remove('editor-selected'),2500);
  status('Выбран элемент: '+field.label);
 }
-async function upload(file){
- const r=await fetch('/api/admin/upload',{method:'POST',credentials:'same-origin',headers:{'X-Nova-Admin':'1','Content-Type':file.type},body:file});
- const data=await r.json().catch(()=>({error:'upload_failed'}));
- if(!r.ok)throw Error(data.error||'upload_failed');
- return data.url;
-}
+async function upload(file,key){return (await uploadPhoto(file,key)).url}
 function editorBusy(state){
  busy=state;
  $('#page-editor-save').disabled=state;
@@ -228,7 +239,8 @@ async function publish(){
  try{
   status('Загружаем фотографии…');
   for(const [key,file] of [...images]){
-   const url=await upload(file);
+   status('Загружаем сжатый WebP: '+key+'…');
+   const url=await upload(file,key);
    drafts.ru.set(key,url);images.delete(key);
   }
   let pending=0;
