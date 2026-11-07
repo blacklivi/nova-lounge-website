@@ -508,3 +508,334 @@ body.hof-active .site-footer .footer-bottom{border-top:0;color:#aaa;margin:0;pad
 .cms-preview [data-image]{cursor:crosshair}
 .cms-preview .cms-inspect-highlight{outline:2px dashed #F04902!important;outline-offset:4px;position:relative}
 .cms-preview a[data-editor-key],.cms-preview button[data-editor-key]{pointer-events:auto}
+
+
+/* NOVA / HÓF design-system v1 — aligned grid, accessible type and button rhythm.
+   Preserve the photographic poster, the HÓF vectors and every CMS field. */
+:root{
+ --gutter:clamp(32px,3.5vw,64px);
+ --nova-grid-gap:clamp(16px,1.65vw,28px);
+ --nova-button-height:50px;
+ --nova-button-padding:20px;
+ --nova-control-size:16px;
+}
+.site-header{padding-inline:var(--gutter)}
+.main-nav a{font-size:clamp(13px,1vw,15px);line-height:1.45}
+.language{font-size:13px}
+.eyebrow{font-size:12px;line-height:1.5;letter-spacing:.095em}
+.button,
+.detail-actions .button,
+.drawer .button,
+.mobile-cta .button,
+.modal .button{
+ min-height:var(--nova-button-height);
+ padding:12px var(--nova-button-padding);
+ font-size:15px;
+ font-weight:500;
+ line-height:1.35;
+ border-radius:0;
+ transition:background-color .2s ease,border-color .2s ease,color .2s ease;
+}
+.header-book{min-height:46px;padding:10px 18px}
+.text-link,.section-link,.detail-back{font-size:15px;line-height:1.5}
+.text-link{display:inline-flex;align-items:center;gap:13px;min-height:44px}
+.text-link .arrow{width:18px;height:18px}
+.venue-description,.footer-location p,.footer-location a{font-size:14px;line-height:1.6}
+.venue-hof-location,.venue-hof-image-label{font-size:12px}
+.venue-foot .venue-description{max-width:35ch}
+.detail-copy .subtitle{font-size:15px}
+.detail-copy p,.detail-bottom p{font-size:16px;line-height:1.65}
+.features{font-size:14px!important}
+.detail-actions{gap:12px}
+.detail-actions .button{font-size:15px;padding-inline:16px}
+.image-note,.event-info p,.footer-bottom{font-size:13px}
+.site-footer .venue-hours{font-size:14px}
+
+/* Poster geometry shares the same outer rails and column rhythm as the site. */
+.hof-page{--hof-inner-gap:var(--nova-grid-gap)}
+.hof-editorial-hero .hof-cover-inner{
+ width:100%;
+ max-width:none;
+ padding-inline:var(--gutter);
+}
+.hof-editorial-about{
+ grid-template-columns:repeat(12,minmax(0,1fr));
+ column-gap:var(--nova-grid-gap);
+ padding-inline:var(--gutter);
+}
+.hof-editorial-about .hof-editorial-symbol{
+ grid-column:1 / span 3;
+ min-width:0;
+ padding-right:var(--nova-grid-gap);
+}
+.hof-editorial-about .hof-about-details{
+ grid-column:4 / -1;
+ min-width:0;
+ column-gap:clamp(24px,3vw,55px);
+}
+.hof-editorial-grid{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.hof-page .hof-compact-events,.hof-page .hof-compact-contact{padding-inline:var(--gutter)}
+.hof-editorial-grid>section{min-width:0}
+.hof-cover-top{font-size:12px;line-height:1.45}
+.hof-top-marker{width:18px;height:7px}
+.hof-page .hof-hero-eyebrow{font-size:12px;letter-spacing:.095em}
+.hof-hero-message>span{font-size:14px;line-height:1.55}
+.hof-page .hof-overline,.hof-editorial-symbol span{font-size:12px;line-height:1.5;letter-spacing:.055em}
+.hof-editorial-about p{font-size:16px;line-height:1.65}
+.hof-events-empty p{font-size:15px;line-height:1.6}
+.hof-compact-contact p{font-size:15px;line-height:1.6}
+.hof-compact-events .event-info time,.hof-compact-events .event-location{font-size:14px}
+body.hof-active .site-footer .footer-bottom{font-size:14px}
+
+/* Three action types: solid primary, outlined secondary, underlined text.
+   Same sizing and predictable icon alignment regardless of venue theme. */
+.hof-page .hof-outline{
+ box-sizing:border-box;
+ min-height:50px;
+ padding:12px 18px;
+ font-size:15px;
+ line-height:1.35;
+ gap:16px;
+ text-align:left;
+ align-items:center;
+ border-radius:0;
+}
+.hof-page .hof-outline .arrow,
+.hof-page .hof-text-button .arrow,
+.hof-page .hof-event-more .arrow{width:18px;height:18px;flex:0 0 18px;stroke-width:1.6}
+.hof-page .hof-text-button,
+.hof-page .hof-event-more{
+ box-sizing:border-box;
+ display:inline-flex;
+ gap:13px;
+ align-items:center;
+ justify-content:space-between;
+ padding:8px 0;
+ min-height:44px;
+ width:max-content;
+ max-width:100%;
+ font-size:15px;
+ line-height:1.4;
+ font-weight:500;
+ border-radius:0;
+}
+.hof-page .hof-editorial-about .hof-text-button{
+ min-height:44px;
+ padding:8px 0;
+ font-size:15px;
+}
+.hof-page .hof-compact-contact .hof-text-button{
+ min-height:44px;
+ padding:8px 0;
+ font-size:15px;
+}
+.hof-page .hof-event-more{
+ min-height:44px;
+ padding:8px 0;
+ font-size:15px;
+ white-space:normal;
+}
+.hof-page .hof-compact-contact .hof-outline,
+.hof-page .hof-compact-contact .hof-primary-cta{
+ min-height:50px;
+ padding-inline:18px;
+ font-size:15px;
+}
+.hof-compact-contact .hof-bottom-actions{align-items:center;gap:20px}
+.hof-events-empty{gap:20px}
+.hof-editorial-about .hof-about-details{row-gap:15px}
+
+/* A reusable booking dialog: same fields and validation, NOVA/HÓF theme tokens. */
+.modal{
+ --booking-accent:var(--olive);
+ --booking-background:#fff;
+ --booking-text:var(--ink);
+ --booking-muted:#5c6158;
+ --booking-border:#b7beb0;
+ --booking-field:#fff;
+ background:var(--booking-background);
+ color:var(--booking-text);
+}
+.modal-shell{padding:30px clamp(22px,3vw,36px) 34px}
+.modal-top{margin-bottom:20px;align-items:center}
+.modal .eyebrow{font-size:12px;color:var(--booking-muted)}
+.modal h2{font-size:clamp(27px,3.6vw,39px);line-height:1.12;margin-bottom:14px}
+.modal .intro{font-size:15px;line-height:1.65;margin-bottom:22px;color:var(--booking-muted)}
+.modal .field label{font-size:14px;line-height:1.45;margin-bottom:8px;color:var(--booking-text)}
+.modal .field input,.modal .field select,.modal .nova-select-trigger{
+ min-height:50px;
+ border-color:var(--booking-border);
+ background:var(--booking-field);
+ color:var(--ink);
+ padding:12px 14px;
+ font-size:16px;
+ line-height:1.35;
+ border-radius:0;
+}
+.modal .nova-select-trigger{padding-right:42px}
+.modal .venue-context{
+ padding:14px 16px;
+ min-height:50px;
+ display:flex;
+ align-items:center;
+ font-size:16px;
+ line-height:1.45;
+ border-color:var(--booking-border);
+}
+.modal .form-fields{gap:18px 16px}
+.modal .form-submit{min-height:52px;margin-top:22px;font-size:16px}
+.modal .demo-note{font-size:14px;line-height:1.55;margin-top:18px}
+.modal .form-error{font-size:14px}
+.modal .contact-list p,.modal .contact-list a{font-size:15px}
+.modal .contact-list h3{font-size:14px}
+.modal .summary{font-size:16px}
+.modal .close{width:46px;height:46px;line-height:1}
+.modal .field input:focus,.modal .field select:focus,.modal .nova-select-trigger:focus-visible{
+ outline-color:var(--booking-accent);
+ border-color:var(--booking-accent);
+}
+.modal[data-theme="hof"]{
+ --booking-accent:#F04902;
+ --booking-background:#131311;
+ --booking-text:#fff;
+ --booking-muted:#d2cec6;
+ --booking-border:#a59c92;
+ --booking-field:#faf8f4;
+ color-scheme:dark;
+}
+.modal[data-theme="hof"] .modal-top{border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:13px}
+.modal[data-theme="hof"] .modal-top .eyebrow{color:#F04902;font-weight:600}
+.modal[data-theme="hof"] .modal .close,.modal[data-theme="hof"] .close{color:#fff}
+.modal[data-theme="hof"] .intro{color:#d2cec6}
+.modal[data-theme="hof"] .field input,.modal[data-theme="hof"] .field select,
+.modal[data-theme="hof"] .nova-select-trigger{color:#181818;color-scheme:light}
+.modal[data-theme="hof"] .venue-context{
+ background:#23221e;
+ border-color:#665d53;
+ color:#fff;
+}
+.modal[data-theme="hof"] .form-submit{
+ background:#F04902;
+ border-color:#F04902;
+ color:#000;
+}
+.modal[data-theme="hof"] .form-submit:hover{background:#fff;border-color:#fff;color:#000}
+.modal[data-theme="hof"] .button.secondary{
+ background:transparent;
+ border-color:#89837b;
+ color:#fff;
+}
+.modal[data-theme="hof"] .button.secondary:hover{background:#27251f}
+.modal[data-theme="hof"] .demo-note{color:#dbd2c9;border-left-color:#F04902}
+.modal[data-theme="hof"] .summary dt{color:#d2cec6}
+.modal[data-theme="hof"] .nova-select-list,
+.modal[data-theme="hof"] .nova-calendar{color:var(--ink);color-scheme:light}
+
+/* Preserve the normal NOVA mobile booking dock. HÓF has a CTA in its hero,
+   so its dock is hidden until scrolling passes the hero; never two together. */
+@media(max-width:1100px){
+ .hof-editorial-about .hof-about-details{grid-template-columns:1fr}
+ .hof-editorial-about .hof-about-details>*{grid-row:auto}
+}
+@media(max-width:900px){
+ :root{--gutter:clamp(24px,3.8vw,34px)}
+ .hof-editorial-about{grid-template-columns:repeat(8,minmax(0,1fr))}
+ .hof-editorial-about .hof-editorial-symbol{grid-column:1 / span 2}
+ .hof-editorial-about .hof-about-details{grid-column:3/-1}
+}
+@media(max-width:760px){
+ .hof-editorial-about{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+ .hof-editorial-about .hof-editorial-symbol{grid-column:1/-1;min-height:0;border-right:0;padding-right:0}
+ .hof-editorial-about .hof-about-details{grid-column:1/-1}
+ .hof-editorial-grid{grid-template-columns:minmax(0,1fr)}
+ .hof-page .hof-compact-events,.hof-page .hof-compact-contact{padding-inline:var(--gutter)}
+}
+@media(max-width:600px){
+ :root{--gutter:clamp(16px,4.8vw,22px);--nova-grid-gap:12px}
+ .site-header{padding-inline:var(--gutter)}
+ .hero-copy>.eyebrow{font-size:12px}
+ .venue-description{font-size:14px;line-height:1.5}
+ .venue-hof-location{font-size:12px}
+ .story p,.detail-copy p,.detail-bottom p{font-size:16px}
+ .detail-actions .button{min-height:50px;padding:10px 12px;font-size:14px;line-height:1.3}
+ .detail-back{font-size:14px}
+ .detail-copy .subtitle{font-size:15px}
+ .site-footer .footer-location p,.site-footer .footer-location a{font-size:14px}
+ .mobile-cta{padding:10px var(--gutter) calc(10px + env(safe-area-inset-bottom))}
+ .mobile-cta .button{min-height:50px;font-size:16px}
+ .hof-page .hof-editorial-hero{
+  height:calc(100svh - var(--header));
+  min-height:0;
+ }
+ .hof-editorial-hero .hof-cover-inner{
+  padding-inline:var(--gutter);
+  padding-top:clamp(15px,2.5svh,24px);
+  padding-bottom:clamp(16px,2.5svh,25px);
+ }
+ .hof-cover-top{font-size:11px;gap:12px}
+ .hof-cover-top>span:last-child{max-width:48%;text-align:right}
+ .hof-hero-eyebrow{font-size:12px!important;margin-bottom:12px!important}
+ .hof-editorial-hero .hof-wordmark{width:min(78vw,360px)}
+ .hof-page .hof-by-nova{font-size:clamp(19px,5vw,24px);margin-top:8px}
+ .hof-manifesto{font-size:clamp(24px,6.1vw,30px)}
+ .hof-hero-message>span{font-size:14px;line-height:1.4}
+ .hof-cover-bottom{gap:14px}
+ .hof-hero-actions{gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .hof-page .hof-hero-actions .hof-outline{
+  min-height:52px;
+  padding:9px 10px;
+  gap:7px;
+  font-size:clamp(14px,3.7vw,16px);
+  line-height:1.25;
+  overflow-wrap:normal;
+ }
+ .hof-page .hof-hero-actions .hof-outline .arrow{width:16px;height:16px;flex-basis:16px}
+ .hof-editorial-about p{font-size:16px;line-height:1.6}
+ .hof-page .hof-overline{font-size:12px}
+ .hof-editorial-symbol span{font-size:12px}
+ .hof-events-empty p{font-size:15px}
+ .hof-page .hof-compact-events .hof-event-more{font-size:15px}
+ .hof-compact-contact p{font-size:15px}
+ .hof-page .hof-compact-contact .hof-outline{font-size:15px}
+ .modal{width:calc(100% - 24px);max-height:calc(100dvh - 24px)}
+ .modal-shell{padding:20px 18px 24px}
+ .modal .intro{font-size:15px}
+ .modal .field label{font-size:14px}
+ .modal .field input,.modal .field select,.modal .nova-select-trigger{font-size:16px;padding:10px 12px}
+ .modal .demo-note{font-size:14px}
+ .modal .form-fields{gap:14px 12px}
+ .modal .form-submit{margin-top:18px}
+ body.hof-active .mobile-cta{
+  visibility:hidden;
+  opacity:0;
+  transform:translate3d(0,110%,0);
+  pointer-events:none;
+  transition:opacity .22s ease,transform .25s cubic-bezier(.22,.8,.3,1),visibility .25s;
+ }
+ body.hof-active.hof-dock-visible .mobile-cta{
+  visibility:visible;
+  opacity:1;
+  transform:translate3d(0,0,0);
+  pointer-events:auto;
+ }
+ body.hof-active.lock .mobile-cta{display:none}
+}
+@media(max-width:600px) and (max-height:690px){
+ .hof-editorial-hero .hof-wordmark{width:min(67vw,300px)}
+ .hof-editorial-hero .hof-cover-inner{gap:7px;padding-top:12px;padding-bottom:12px}
+ .hof-hero-eyebrow{margin-bottom:8px!important}
+ .hof-page .hof-by-nova{font-size:18px;margin-top:5px}
+ .hof-hero-message>span{font-size:13px}
+ .hof-manifesto{font-size:clamp(21px,5.7vw,26px)}
+ .hof-cover-bottom{gap:9px}
+ .hof-page .hof-hero-actions .hof-outline{min-height:48px;padding:7px 9px;font-size:14px}
+}
+@media(max-width:360px){
+ .hof-page .hof-hero-actions .hof-outline{font-size:13.5px;padding-inline:8px}
+ .hof-hero-message>span{font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.hof-active .mobile-cta,.hof-page .hof-outline,.hof-page .hof-text-button,.hof-page .hof-event-more{
+  transition:none!important;
+ }
+}
