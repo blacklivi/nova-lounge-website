@@ -23,7 +23,7 @@ assert.match(design,/\.modal \ .demo-note|\.modal \.demo-note/,'Demo warning mus
 assert.match(design,/height:calc\(100svh - var\(--header\)\)/,'First-screen HOF hero fills available mobile viewport');
 assert.match(design,/body\.hof-active\.hof-dock-visible \.mobile-cta/,'Mobile booking dock appears only when triggered');
 assert.match(design,/@media\(prefers-reduced-motion:reduce\)/,'Animations respect reduced-motion preference');
-assert.match(app,/dialog\.dataset\.theme=kind==='booking'&&id==='zyb'\?'hof':'nova'/,'Venue theme must not alter booking data');
+assert.match(app,/dialog\.dataset\.theme=\(kind==='booking'\|\|kind==='contacts'\)&&id==='zyb'\?'hof':'nova'/,'Venue theme must not alter booking data');
 assert.match(app,/const visible=Boolean\(hero&&hero\.getBoundingClientRect\(\)\.bottom<=header\+4&&!contactVisible\)/,'Dock must not duplicate hero or contact booking CTA');
 assert.match(app,/dock\.inert=!visible/,'Hidden dock must be removed from keyboard order');
 assert.match(app,/window\.addEventListener\('scroll',updateTop,\{passive:true\}\)/,'Mobile dock updates on scroll');
@@ -39,5 +39,13 @@ assert.match(css,/@media\(max-width:380px\)\s*\{\s*\.hof-page \.hof-compact-cont
 assert.match(css,/@media\(min-width:601px\) and \(max-width:900px\)/,'Narrow split panels on tablets must stack contact buttons');
 assert.match(app,/data-editor-key="hof_contacts_button_text".*data-modal="contacts"/,'Contacts button remains wired and editable');
 assert.match(app,/data-editor-key="hof_book_button_text".*data-modal="booking"/,'Booking button remains wired and editable');
+
+assert.match(css,/\.hof-page \.hof-editorial-about \.hof-text-button,\s*\.hof-page \.hof-compact-events \.hof-event-more\s*\{/,'HOF kitchen and events actions must share outline button geometry');
+assert.match(css,/border:1px solid currentColor/,'HOF outline actions must have a full rectangular border');
+assert.match(css,/\.modal\[data-kind="contacts"\]\[data-theme="hof"\]/,'HOF contacts must have a dedicated brand theme');
+assert.match(app,/dialog\.dataset\.kind=kind/,'Modal kind must be available for scoped styles');
+assert.match(app,/\(kind==='booking'\|\|kind==='contacts'\)&&id==='zyb'/,'HOF contacts and booking must use the brand theme');
+assert.match(app,/class="hof-contact-modal-actions"/,'HOF contacts must render a clear action group');
+assert.match(app,/href="tel:\$\{esc\(phone\.replace/,'Contact phone must retain functional tel URL');
 
 console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');
