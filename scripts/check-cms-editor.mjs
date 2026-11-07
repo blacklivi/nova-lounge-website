@@ -52,4 +52,18 @@ assert.match(server,/hof-\(\?:wordmark\|mark\)/,'Brand SVGs must remain availabl
 assert.match(app,/nova-cms-draft/,'Draft live preview must not write D1');
 assert.match(admin,/function sendPreview\(field,value\)/,'Editor must show unsaved draft changes');
 
+// Venue tiles and venue hero photos have separate CMS keys and independent save paths.
+for(const id of ['zyb','pob','east']){
+ const card=EDITOR_BY_KEY['home_card_'+id+'_image'];
+ const hero=EDITOR_BY_KEY['venue_'+id+'_image'];
+ assert.ok(card&&hero,'Card and hero image fields must exist for '+id);
+ assert.equal(card.type,'image');
+ assert.equal(hero.type,'image');
+ assert.ok(card.key!==hero.key,'A location tile cannot share its CMS key with the venue hero');
+}
+assert.match(app,/image\('home_card_'\+id\+'_image'/,'Homepage cards must render their dedicated image key');
+assert.match(app,/false,'venue_'\+id\+'_image'\)/,'Existing homepage pictures must be inherited until explicitly changed');
+assert.match(admin,/function inheritedCardImage\(field\)/,'Editor should preview inherited images instead of blank placeholders');
+assert.match(css,/page-editor-layout/,'Editor layout must remain intact');
+
 console.log('NOVA page CMS registry, link security and editor smoke guards passed');
