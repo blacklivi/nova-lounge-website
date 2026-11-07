@@ -1,6 +1,7 @@
 import {escapeHTML as esc, typography, cleanPhone, validPhone, minskNow, splitEvents, safeURL, localImage, localizedValue} from './core.js';
 import {enhanceBookingSelects} from './booking-selects.js';
 import {enhanceBookingDate} from './booking-date.js';
+import {EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js';
 const app = document.querySelector('#app');
 const isEvents = document.body.dataset.page === 'events';
 const ids = ['zyb','pob','east'];
@@ -20,25 +21,63 @@ document.addEventListener('keydown',e=>{if(['Tab','Enter',' ','Escape'].includes
 // Apply the same line-break protection to fixed UI copy and CMS copy.
 const t = (ru,en) => typography(language === 'en' ? en : ru, language);
 const text = value => esc(typography(value,language));
-const name = id => names[language][id] || 'NOVA';
+const name = id => value('venue_'+id+'_name') || names[language][id] || 'NOVA';
 const brandName = id => id === 'zyb' ? 'HOF by NOVA' : 'NOVA / '+name(id);
 const venueLabel = id => id === 'zyb' ? 'HOF by NOVA · '+name(id) : 'NOVA / '+name(id);
 const value = key => localizedValue(key,language,defaults,source);
+
+const editorValue=key=>{
+ const spec=EDITOR_BY_KEY[key];
+ const stored=value(key);
+ return stored || (language==='en' ? (spec?.en||spec?.ru||'') : (spec?.ru||'')) || '';
+};
+const E=key=>text(editorValue(key));
+function validCmsHref(link){
+ if(typeof link!=='string'||!link||/[\\\u0000-\u001f\u007f]/.test(link))return false;
+ if(/^#[A-Za-z0-9_-]+$/.test(link))return true;
+ if(/^\/(?!\/)[A-Za-z0-9_/#?&.=%+~-]*$/.test(link)&&!/%(?:0[0-9a-f]|1[0-9a-f]|7f)/i.test(link))return true;
+ try{const url=new URL(link);return url.protocol==='https:'&&!url.username&&!url.password&&url.hostname.includes('.')}catch{return false}
+}
+const hrefFor=(key,alternative='/')=>{
+ const val=editorValue(key)||alternative;
+ return validCmsHref(val)?val:alternative;
+};
+const H=(key,alternative='/')=>esc(hrefFor(key,alternative));
+const editorAttribute=key=>EDITOR_BY_KEY[key]?' data-editor-key="'+key+'"':'';
+const ICON_PATHS={
+ 'arrow-right':'<path d="M3 12h18m-7-7 7 7-7 7"/>',
+ 'arrow-up-right':'<path d="M5 19 19 5M8 5h11v11"/>',
+ 'chevron-right':'<path d="m9 18 6-6-6-6"/>',
+ 'external-link':'<path d="M14 4h6v6m0-6-9 9M20 14v6H4V4h6"/>',
+ 'calendar-days':'<rect x="3" y="5" width="18" height="16" rx="1"/><path d="M7 3v4m10-4v4M3 10h18"/>',
+ 'map-pin':'<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/>',
+ 'phone':'<path d="M6 3h4l2 5-2.5 2.5a17 17 0 0 0 5 5L17 13l4 2v5c-8 3-19-8-17-16z"/>',
+ 'instagram':'<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7h.01"/>',
+ 'music-2':'<path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-3-3c2 0 3 1 3 3Zm12-2a3 3 0 1 1-3-3c2 0 3 1 3 3Z"/>',
+ 'utensils':'<path d="M4 3v7m4-7v7m-4 0h4m-2 0v11m9-18v18m0-18c6 1 6 9 0 9"/>'
+};
+function I(key,fallback='arrow-right'){
+ const id=editorValue(key)||fallback;
+ if(id==='none')return '';
+ const path=ICON_PATHS[ICON_CHOICES.includes(id)?id:fallback]||ICON_PATHS['arrow-right'];
+ return '<svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+path+'</svg>';
+}
+
 const content = (key, fallback='') => text(value(key) || fallback);
 const media = key => localImage(value(key)) || localImage(defaults.content[key]);
 const arrow = '<svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17m-7-7 7 7-7 7"/></svg>';
-const bookingLabel = () => t('Забронировать стол','Reserve a table');
+const bookingLabel = () => E('global_booking_text');
 const image = (key,alt,priority=false) => `<img data-image="${key}" src="${esc(media(key))}?v=visual-2" alt="${text(alt)}" ${priority?'fetchpriority="high"':'loading="lazy"'} decoding="async" width="900" height="900">`;
 const languages = () => `<div class="language" role="group" aria-label="${t('Язык сайта','Site language')}">${['ru','en'].map(l=>`<button type="button" data-language="${l}" aria-pressed="${l===language}" aria-label="${l==='ru'?'Русский язык':'English language'}">${l.toUpperCase()}</button>`).join('')}</div>`;
-const nav = () => `<a href="/#venues" data-home="venues">${t('Пространства','Spaces')}</a><a href="/events" ${isEvents?'aria-current="page"':''}>${t('События','Events')}</a><a href="/#about" data-home="about">${t('О нас','About')}</a><a href="#contacts">${t('Контакты','Contacts')}</a>`;
-function header(){return `<a class="skip" href="#main">${t('К содержимому','Skip to content')}</a><header class="site-header"><a class="brand" href="/" aria-label="${t('NOVA — на главную','NOVA — home')}">NOVA</a><nav class="main-nav" aria-label="${t('Основная навигация','Main navigation')}">${nav()}</nav><div class="header-side">${languages()}<button type="button" class="button header-book" data-modal="booking">${bookingLabel()}</button><button type="button" class="menu-toggle" data-drawer aria-controls="drawer" aria-expanded="false" aria-label="${t('Открыть меню','Open menu')}"><span></span><span></span></button></div></header>`;}
+const nav = () => `<a href="${H('nav_spaces_url','/#venues')}" ${hrefFor('nav_spaces_url','/#venues')==='/#venues'?'data-home="venues"':''} data-editor-key="nav_spaces_url">${E('nav_spaces_text')}</a><a href="${H('nav_events_url','/events')}" ${isEvents?'aria-current="page"':''} data-editor-key="nav_events_url">${E('nav_events_text')}</a><a href="${H('nav_about_url','/#about')}" ${hrefFor('nav_about_url','/#about')==='/#about'?'data-home="about"':''} data-editor-key="nav_about_url">${E('nav_about_text')}</a><a href="${H('nav_contacts_url','#contacts')}" data-editor-key="nav_contacts_url">${E('nav_contacts_text')}</a>`;
+function header(){return `<a class="skip" href="#main">${t('К содержимому','Skip to content')}</a><header class="site-header"><a class="brand" href="${H('global_logo_url','/')}" data-editor-key="global_logo_url" aria-label="${t('NOVA — на главную','NOVA — home')}">NOVA</a><nav class="main-nav" aria-label="${t('Основная навигация','Main navigation')}">${nav()}</nav><div class="header-side">${languages()}<button type="button" class="button header-book" data-modal="booking">${bookingLabel()}</button><button type="button" class="menu-toggle" data-drawer aria-controls="drawer" aria-expanded="false" aria-label="${t('Открыть меню','Open menu')}"><span></span><span></span></button></div></header>`;}
 const instagramMark='<svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3.25" y="3.25" width="17.5" height="17.5" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.6" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>';
 const locationMark='<svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.7"/></svg>';
 function contactLinks(id){
  const phone=value('phone_'+id), instagram=id==='zyb'?'':safeURL(value('instagram_'+id)), telegram=safeURL(value('telegram_'+id)), route=safeURL(value('map_'+id));
  return `${phone&&validPhone(phone)?`<a class="footer-phone" href="tel:${esc(phone.replace(/[^+\d]/g,''))}">${text(phone)}</a>`:''}${instagram||telegram||route?`<div class="footer-socials">${instagram?`<a class="footer-social-icon" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="Instagram NOVA ${name(id)}" title="Instagram">${instagramMark}<span class="sr-only">Instagram</span></a>`:''}${telegram?`<a class="footer-social-text" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer">Telegram</a>`:''}${route?`<a class="footer-route footer-social-icon" href="${esc(route)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Показать NOVA на карте','View NOVA on map')} ${name(id)}" title="${t('На карте','View on map')}">${locationMark}</a>`:''}</div>`:''}`;
 }
-function footer(){return `<footer class="site-footer" id="contacts"><div class="footer-top"><div><a class="brand" href="/">NOVA</a><p data-content="footer_tagline">${content('footer_tagline')}</p></div></div><div class="footer-locations">${ids.map(id=>`<div class="footer-location"><h3><a href="${venueURL(id)}" data-place="${id}">${brandName(id)}</a></h3>${value('address_'+id)?`<p class="venue-address">${content('address_'+id)}</p>`:''}${value('hours_'+id)?`<p class="venue-hours">${content('hours_'+id)}</p>`:''}${contactLinks(id)}${!['address_','phone_','instagram_','telegram_','hours_','map_'].some(k=>value(k+id))?`<p class="muted">${t('Контакты уточняются','Contact details coming soon')}</p>`:''}</div>`).join('')}</div><div class="footer-bottom"><span>NOVA · MINSK</span><span>${t('Демонстрационная версия · заявки не отправляются','Demo website · booking requests are not sent')}</span></div></footer>`;}
+function footer(){return `<footer class="site-footer" id="contacts"><div class="footer-top"><div><a class="brand" href="${H('global_logo_url','/')}" data-editor-key="global_logo_url">${E('footer_logo_text')}</a><p data-content="footer_tagline">${content('footer_tagline')}</p></div></div><div class="footer-locations">${ids.map(id=>`<div class="footer-location"><h3><a href="${venueURL(id)}" data-place="${id}">${brandName(id)}</a></h3>${value('address_'+id)?`<p class="venue-address">${content('address_'+id)}</p>`:''}${value('hours_'+id)?`<p class="venue-hours">${content('hours_'+id)}</p>`:''}${contactLinks(id)}${!['address_','phone_','instagram_','telegram_','hours_','map_'].some(k=>value(k+id))?`<p class="muted">${t('Контакты уточняются','Contact details coming soon')}</p>`:''}</div>`).join('')}</div><div class="footer-bottom"><span data-editor-key="footer_left">${E('footer_left')}</span><span data-editor-key="footer_right">${E('footer_right')}</span></div></footer>`;}
 function layers(){return `<aside id="drawer" class="drawer" inert aria-hidden="true" aria-label="${t('Мобильная навигация','Mobile navigation')}"><nav>${nav()}</nav><button type="button" class="button" data-modal="booking">${bookingLabel()}</button><p>MINSK · LOUNGE CAFÉ</p></aside><div class="mobile-cta"><button class="button" data-modal="booking">${bookingLabel()}</button></div><button class="to-top" data-top hidden aria-label="${t('Наверх','Back to top')}">${arrow}</button><dialog class="modal" aria-labelledby="modal-title"><div class="modal-shell"><div class="modal-top"><span class="eyebrow">NOVA / <span id="modal-caption">MINSK</span></span><button class="close" data-close aria-label="${t('Закрыть окно','Close dialog')}">×</button></div><div id="modal-body"></div></div></dialog>`;}
 function demoEvents(){
  // Presentation-only sample events; nothing is written to D1.
@@ -500,6 +539,19 @@ function navigate(id){
  }else if(id){
   scrollToSection(id);
  }
+}
+// Page preview is read-only. Click targets select fields in the authorized parent editor.
+if(new URLSearchParams(location.search).has('cms_preview')&&window.parent!==window){
+ document.addEventListener('click',e=>{
+  const node=e.target.closest('[data-editor-key],[data-content],[data-image]');
+  e.preventDefault();e.stopImmediatePropagation();
+  const key=node?.dataset.editorKey||node?.dataset.content||node?.dataset.image||'';
+  window.parent.postMessage({source:'nova-cms-inspector',key},location.origin);
+ },true);
+ document.addEventListener('mouseover',e=>{
+  document.querySelectorAll('.cms-inspect-highlight').forEach(n=>n.classList.remove('cms-inspect-highlight'));
+  const el=e.target.closest('[data-editor-key],[data-content],[data-image]');el?.classList.add('cms-inspect-highlight');
+ },{passive:true});
 }
 document.addEventListener('click',e=>{
  const b=e.target.closest('button,a');if(!b)return;
