@@ -1288,3 +1288,163 @@ body.hof-active .header-book{
  .hof-page .hof-cover-bottom{gap:7px}
  .hof-page .hof-hero-actions{gap:6px}
 }
+
+
+/* Venue-scoped event calendars — one event source, context-sensitive brand. */
+.venue-events-page{min-height:calc(100svh - var(--header));}
+.venue-events-intro{padding:clamp(30px,5vw,74px) var(--gutter) clamp(35px,5vw,64px);border-bottom:1px solid var(--line)}
+.venue-events-intro-top,.venue-events-headerline,.venue-events-section-head{display:flex;align-items:center;justify-content:space-between;gap:22px}
+.venue-events-intro-top{font-size:12px;letter-spacing:.045em}
+.venue-events-intro-top a,.venue-events-all,.venue-events-link{display:inline-flex;align-items:center;justify-content:space-between;gap:14px;text-decoration:none;font-size:15px;min-height:44px}
+.venue-events-intro-top .arrow,.venue-events-all .arrow,.venue-events-link .arrow{width:18px;height:18px;flex:none}
+.venue-events-nova-mark{display:block;font-size:clamp(52px,10vw,140px);font-weight:400;letter-spacing:-.065em;line-height:1;margin:48px 0}
+.venue-events-intro .venue-events-logo{display:block;width:clamp(220px,34vw,460px);height:auto;max-width:100%;margin:clamp(33px,6vw,78px) 0 clamp(31px,4vw,61px)}
+.venue-events-headerline{align-items:flex-end}
+.venue-events-overline{font-size:12px;letter-spacing:.07em}
+.venue-events-headerline h1{font-size:clamp(57px,11vw,148px);font-weight:400;line-height:1;margin:16px 0 14px;letter-spacing:-.055em}
+.venue-events-period{color:#F04902}
+.venue-events-headerline p{font-size:clamp(16px,1.6vw,20px);max-width:40ch;line-height:1.55;margin:0}
+.venue-events-all{flex:none;padding:0 0 4px;border-bottom:1px solid currentColor}
+.venue-events-section{padding:clamp(26px,4vw,48px) var(--gutter);margin:0;border-bottom:1px solid var(--line)}
+.venue-events-section-head{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:15px}
+.venue-events-section-head h2{font-size:clamp(28px,4vw,52px);font-weight:400;margin:0}
+.venue-events-section-head span{font-size:15px;font-variant-numeric:tabular-nums}
+.venue-events-page .events-list{gap:clamp(15px,2.5vw,40px)}
+.venue-events-page .event-card{border-bottom:1px solid var(--line)}
+.venue-events-page .event-card img{aspect-ratio:3/4}
+.venue-events-page .event-info h3{line-height:1.15;letter-spacing:-.025em}
+.venue-events-page .event-info p{font-size:15px;line-height:1.6}
+.venue-events-page .event-empty{padding:24px 0 36px;line-height:1.55}
+.hof-events-active .site-header{background:#12110f;color:#fff;border-bottom:1px solid #3c3935}
+.hof-events-page{background:#12110f;color:#fff;--line:#39342e}
+.hof-events-page .venue-events-intro{border-bottom:1px solid #39342e}
+.hof-events-page .venue-events-intro-top{color:#d8d4ce}
+.hof-events-page .venue-events-intro-top a,.hof-events-page .venue-events-all{color:#f5f2ed}
+.hof-events-page .venue-events-overline{color:#F04902}
+.hof-events-page .venue-events-headerline h1{color:#fff}
+.hof-events-page .venue-events-headerline p{color:#c5beb5}
+.hof-events-page .venue-events-section-head{border-color:#39342e}
+.hof-events-page .venue-events-section{border-bottom:1px solid #39342e}
+.hof-events-page .event-card{color:#fff;border-color:#39342e}
+.hof-events-page .event-card img{background:#24211f}
+.hof-events-page .event-info h3,.hof-events-page .venue-events-section h2{color:#fff}
+.hof-events-page .event-info time,.hof-events-page .event-info p,.hof-events-page .event-empty{color:#cac3ba}
+.hof-events-page .event-location{color:#F04902}
+.hof-events-page .event-card.no-image{border-top:1px solid #F04902;padding-top:32px}
+.hof-events-page .archive .event-card{opacity:.8}
+.nova-venue-events-page{background:#fff;color:#151a14}
+.nova-venue-events-page .venue-events-overline{color:var(--olive)}
+.nova-venue-events-page .venue-events-period{color:var(--olive)}
+.nova-venue-events-page .venue-events-all{color:var(--ink)}
+.venue-events-page .event-demo-tag,.venue-events-page .demo-poster-label{display:none}
+/* A venue listing link on Pobediteley/Vostok, with in-venue previews. */
+.venue-events-teaser{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(25px,4vw,60px);border-top:1px solid var(--line);padding:clamp(30px,5vw,75px) var(--gutter);background:#f7f8f5}
+.venue-events-teaser h2{font-size:clamp(32px,5vw,72px);font-weight:400;letter-spacing:-.04em;margin:20px 0 15px}
+.venue-events-teaser p{font-size:16px;line-height:1.6;max-width:34ch}
+.venue-events-link{min-height:52px;width:234px;max-width:100%;padding:12px 16px;border:1px solid #27381f;color:#27381f;margin-top:20px;font-size:15px;box-sizing:border-box}
+.venue-events-link:hover{background:#27381f;color:#fff}
+.venue-events-teaser-list{display:grid;align-items:start;gap:12px}
+.venue-events-teaser-list .event-card{display:grid;grid-template-columns:85px minmax(0,1fr);gap:14px;border:1px solid #d9ded5;padding:12px;background:#fff;min-width:0}
+.venue-events-teaser-list .event-card.no-image{grid-template-columns:1fr}
+.venue-events-teaser-list .event-card img{height:110px;width:85px;object-fit:cover}
+.venue-events-teaser-list .event-info h3{font-size:clamp(17px,2vw,24px);margin:7px 0}
+.venue-events-teaser-list .event-info time{font-size:12px}
+.venue-events-teaser-list .event-location{font-size:11px;margin-top:7px}
+/* Horizontal button pairs on every device. Same measured geometry at each breakpoint. */
+body.hof-active{
+ --hof-action-height:56px;
+ --hof-action-width:234px;
+ --hof-action-text:15px;
+ --hof-action-pad:14px;
+}
+.hof-page .hof-hero-actions,
+.hof-page .hof-compact-contact .hof-bottom-actions{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,var(--hof-action-width)));
+ width:max-content;
+ max-width:100%;
+ gap:10px;
+ align-items:stretch;
+}
+.hof-page .hof-hero-actions > .hof-action,
+.hof-page .hof-editorial-about .hof-action,
+.hof-page .hof-compact-events .hof-action,
+.hof-page .hof-compact-contact .hof-bottom-actions > .hof-action{
+ box-sizing:border-box;
+ width:var(--hof-action-width);
+ min-width:0;
+ max-width:100%;
+ height:var(--hof-action-height);
+ min-height:var(--hof-action-height);
+ max-height:var(--hof-action-height);
+ padding:8px var(--hof-action-pad);
+ gap:7px;
+ font-size:var(--hof-action-text);
+ line-height:1.2;
+ display:inline-flex;
+ align-items:center;
+ justify-content:space-between;
+ white-space:normal;
+ overflow-wrap:anywhere;
+ border-radius:0;
+}
+.hof-page .hof-action .arrow{width:18px;height:18px;flex:0 0 18px}
+@media(min-width:601px) and (max-width:1360px){
+ .hof-editorial-grid{grid-template-columns:minmax(0,1fr)}
+ .hof-page .hof-compact-contact .hof-bottom-actions{grid-template-columns:repeat(2,minmax(0,var(--hof-action-width)));width:max-content}
+ .hof-page .hof-cover-bottom{flex-direction:column;align-items:flex-start;gap:20px}
+ .hof-page .hof-hero-actions{grid-template-columns:repeat(2,minmax(0,var(--hof-action-width)))}
+}
+@media(max-width:600px){
+ body.hof-active{
+  --hof-action-width:calc(50vw - var(--gutter) - 4px);
+  --hof-action-height:64px;
+  --hof-action-text:clamp(12px,3.4vw,15px);
+  --hof-action-pad:clamp(8px,2.4vw,13px);
+ }
+ .hof-page .hof-hero-actions,
+ .hof-page .hof-compact-contact .hof-bottom-actions{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  width:100%;
+  max-width:100%;
+  gap:8px;
+ }
+ .hof-page .hof-hero-actions > .hof-action,
+ .hof-page .hof-editorial-about .hof-action,
+ .hof-page .hof-compact-events .hof-action,
+ .hof-page .hof-compact-contact .hof-bottom-actions > .hof-action{
+  width:var(--hof-action-width);
+  max-width:100%;
+  min-height:var(--hof-action-height);
+  height:var(--hof-action-height);
+  max-height:var(--hof-action-height);
+  padding:6px var(--hof-action-pad);
+  font-size:var(--hof-action-text);
+  line-height:1.18;
+  gap:4px;
+ }
+ .hof-page .hof-hero-actions .hof-action .arrow,
+ .hof-page .hof-action .arrow{width:16px;height:16px;flex-basis:16px}
+ body.hof-active .mobile-cta .button{width:var(--hof-action-width);height:var(--hof-action-height);min-height:var(--hof-action-height);max-height:var(--hof-action-height);font-size:var(--hof-action-text)}
+ .hof-page .hof-cover-bottom{gap:clamp(8px,1.5svh,15px)}
+ .hof-page .hof-hero-actions{gap:8px}
+ .hof-page .hof-editorial-hero .hof-cover-inner{padding-bottom:clamp(12px,2.5svh,20px)}
+ .venue-events-intro-top{align-items:flex-start}
+ .venue-events-headerline{align-items:flex-start;flex-direction:column;gap:26px}
+ .venue-events-headerline h1{font-size:clamp(52px,15vw,76px)}
+ .venue-events-intro .venue-events-logo{width:min(70vw,330px);margin:38px 0}
+ .venue-events-page .events-list{grid-template-columns:1fr;gap:16px}
+ .venue-events-page .event-card{grid-template-columns:minmax(0,1fr);gap:16px}
+ .venue-events-page .event-card img{width:100%;max-height:340px;object-fit:cover}
+ .venue-events-teaser{grid-template-columns:1fr;gap:22px}
+ .venue-events-teaser .event-card{grid-template-columns:90px 1fr}
+}
+@media(max-width:600px) and (max-height:690px){
+ .hof-page .hof-editorial-hero .hof-cover-inner{padding-top:9px;padding-bottom:9px;gap:6px}
+ .hof-page .hof-editorial-hero .hof-wordmark{width:min(61vw,235px)}
+ .hof-page .hof-cover-bottom{gap:6px}
+ .hof-page .hof-hero-actions > .hof-action{height:64px;min-height:64px;max-height:64px}
+}
+@media(prefers-reduced-motion:reduce){
+ .hof-page .hof-action,.venue-events-link,.venue-events-all{transition:none!important}
+}
