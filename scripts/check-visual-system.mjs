@@ -48,4 +48,11 @@ assert.match(app,/\(kind==='booking'\|\|kind==='contacts'\)&&id==='zyb'/,'HOF co
 assert.match(app,/class="hof-contact-modal-actions"/,'HOF contacts must render a clear action group');
 assert.match(app,/href="tel:\$\{esc\(phone\.replace/,'Contact phone must retain functional tel URL');
 
+// Both secondary outline actions must use one width/height contract, not content-sized widths.
+const auxiliaryRules=css.slice(css.indexOf('/* HÓF auxiliary actions:'));
+assert.match(auxiliaryRules,/\.hof-page \.hof-editorial-about \.hof-text-button,\s*\.hof-page \.hof-compact-events \.hof-event-more\{\s*box-sizing:border-box;/,'Both HOF auxiliary actions share a selector');
+assert.match(auxiliaryRules,/width:min\(100%,260px\);\s*max-width:100%;\s*min-height:52px;\s*height:52px;/,'Shared width and height must be fixed to 260×52 and adapt to narrow viewports');
+assert.match(auxiliaryRules,/justify-content:space-between/,'Right-side arrows should align in a common column');
+assert.match(auxiliaryRules,/\.hof-page \.hof-compact-events \.hof-event-more\{\s*color:#fff;/,'Dark panel keeps a high-contrast border');
+
 console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');

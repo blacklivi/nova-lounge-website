@@ -942,11 +942,11 @@ body.hof-active .site-footer .footer-bottom{font-size:14px}
  display:inline-flex;
  align-items:center;
  justify-content:space-between;
- width:max-content;
+ width:min(100%,260px);
  max-width:100%;
  min-height:52px;
- height:auto;
- padding:13px 17px;
+ height:52px;
+ padding:12px 17px;
  margin:0;
  gap:24px;
  border:1px solid currentColor;
@@ -988,10 +988,12 @@ body.hof-active .site-footer .footer-bottom{font-size:14px}
 @media(max-width:600px){
  .hof-page .hof-editorial-about .hof-text-button,
  .hof-page .hof-compact-events .hof-event-more{
+  width:min(100%,260px);
+  height:52px;
   min-height:52px;
-  padding:13px 15px;
+  padding:12px 15px;
   font-size:15px;
-  gap:20px;
+  gap:12px;
  }
  .hof-events-empty{align-items:flex-start;flex-wrap:wrap;gap:22px}
 }
