@@ -1448,3 +1448,19 @@ body.hof-active{
 @media(prefers-reduced-motion:reduce){
  .hof-page .hof-action,.venue-events-link,.venue-events-all{transition:none!important}
 }
+
+
+/* Live HÓF event teasers use eventCard's direct image, not only sample .event-media. */
+.hof-event-list .event-card>img{
+ display:block;
+ width:75px;
+ height:90px;
+ flex:0 0 75px;
+ max-height:none;
+ aspect-ratio:5/6;
+ object-fit:cover;
+ background:#24211f;
+}
+@media(max-width:600px){
+ .hof-event-list{grid-template-columns:minmax(0,1fr)}
+}
