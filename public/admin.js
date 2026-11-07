@@ -33,6 +33,13 @@ function initFields(){const box=$('#content-fields');box.replaceChildren();for(c
  });
  field.append(inp);const small=document.createElement('small');small.textContent='JPEG / PNG / WebP / AVIF / HEIC → WebP автоматически · оригинал до 80 МБ';field.append(small)}else{let inp=document.createElement(type==='textarea'?'textarea':'input');inp.id='field-'+key;inp.dataset.field=key;if(type==='textarea')inp.rows=3;else inp.type='text';field.append(inp)}box.append(field)}}
 async function loadContent(){const r=await request('/api/admin/content');currentContent=r.content||{};currentContentEN=r.content_en||{};for(const [k] of keySpecs){const field=$('[data-field="'+k+'"]'),img=$('[data-preview="'+k+'"]');if(field)field.value=currentContent[k]??sourceDefaults[k]??'';if(img){let val=currentContent[k]||sourceDefaults[k];if(val){img.src=val;img.hidden=false}else img.hidden=true}}}
+function notifyEventChanged(){
+ // Notify other open NOVA tabs immediately; no event content or admin data is sent.
+ if(typeof BroadcastChannel==='undefined')return;
+ const channel=new BroadcastChannel('nova-events-changed');
+ channel.postMessage('changed');
+ channel.close();
+}
 const venueEventPaths={zyb:'/events/hof',pob:'/events/pobediteley',east:'/events/vostok'};
 const adminVenueNames={zyb:'HÓF / Зыбицкая',pob:'NOVA / Победителей',east:'NOVA / Восток'};
 function updateVenueEventPreview(){
@@ -95,10 +102,10 @@ $('#event-image').addEventListener('change',async e=>{
   status($('#event-status'),'WebP готов: '+result.width+'×'+result.height+', '+formatBytes(result.originalBytes)+' → '+formatBytes(result.bytes));
  }catch(err){status($('#event-status'),'Ошибка обработки афиши: '+err.message,true);e.target.value=''}
 });
-$('#event-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,btn=f.querySelector('button[type=submit]');btn.disabled=true;status($('#event-status'),'Сохраняем…');try{let image_url=f.elements.image_url.value;const file=$('#event-image').files[0];if(file){status($('#event-status'),'Сжимаем афишу в WebP…');image_url=await upload(file,'event')}const event={title:f.elements.title.value,description:f.elements.description.value,starts_at:f.elements.starts_at.value,venue:f.elements.venue.value,image_url,published:f.elements.published.checked};const id=f.elements.id.value;const saved=await request(id?'/api/admin/events/'+id:'/api/admin/events',id?'PUT':'POST',event);resetEvent();await loadEvents();status($('#event-status'),saved.translation_pending?'Событие сохранено на русском. Английский перевод не удался — повторите сохранение.':'Событие опубликовано на русском и английском.',Boolean(saved.translation_pending))}catch(err){status($('#event-status'),'Ошибка: '+err.message,true)}finally{btn.disabled=false}});
+$('#event-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,btn=f.querySelector('button[type=submit]');btn.disabled=true;status($('#event-status'),'Сохраняем…');try{let image_url=f.elements.image_url.value;const file=$('#event-image').files[0];if(file){status($('#event-status'),'Сжимаем афишу в WebP…');image_url=await upload(file,'event')}const event={title:f.elements.title.value,description:f.elements.description.value,starts_at:f.elements.starts_at.value,venue:f.elements.venue.value,image_url,published:f.elements.published.checked};const id=f.elements.id.value;const saved=await request(id?'/api/admin/events/'+id:'/api/admin/events',id?'PUT':'POST',event);notifyEventChanged();resetEvent();await loadEvents();status($('#event-status'),saved.translation_pending?'Событие сохранено на русском. Английский перевод не удался — повторите сохранение.':'Событие опубликовано на русском и английском.',Boolean(saved.translation_pending))}catch(err){status($('#event-status'),'Ошибка: '+err.message,true)}finally{btn.disabled=false}});
 $('#event-form').elements.venue.addEventListener('change',updateVenueEventPreview);
 $('#events-venue-filter').addEventListener('change',renderEventList);
 updateVenueEventPreview();
 $('#event-reset').addEventListener('click',resetEvent);$('#reload-events').addEventListener('click',loadEvents);
-$('#event-delete').addEventListener('click',async()=>{const id=$('#event-id').value;if(!id||!confirm('Удалить событие без возможности восстановления?'))return;try{await request('/api/admin/events/'+id,'DELETE');resetEvent();await loadEvents();status($('#event-status'),'Событие удалено.')}catch(e){status($('#event-status'),e.message,true)}});
+$('#event-delete').addEventListener('click',async()=>{const id=$('#event-id').value;if(!id||!confirm('Удалить событие без возможности восстановления?'))return;try{await request('/api/admin/events/'+id,'DELETE');notifyEventChanged();resetEvent();await loadEvents();status($('#event-status'),'Событие удалено.')}catch(e){status($('#event-status'),e.message,true)}});
 start();

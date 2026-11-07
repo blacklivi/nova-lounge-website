@@ -213,7 +213,7 @@ function venueEventsPage(id){
   <p>${hof?t('Музыка, вечеринки и встречи в HÓF на Зыбицкой.','Music, nights and events at HÓF on Zybitskaya.'):t('Афиша мероприятий именно этого заведения.','Events at this venue only.')}</p></div>
   <a class="venue-events-all" href="/events">${t('Все события NOVA','All NOVA events')} ${arrow}</a></div>
  </section>
- ${[[upcoming,t('Ближайшие','Coming up'),'future'],[past,t('Архив','Archive'),'archive']].map(([list,title,key])=>`<section class="venue-events-section ${key}"><div class="venue-events-section-head"><h2>${title}</h2><span>${list.length.toString().padStart(2,'0')}</span></div><div class="events-list" id="${key}">${list.length?list.map(e=>eventCard(e)).join(''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):key==='future'?t('В этом заведении пока нет анонсированных событий.','No upcoming events at this venue yet.'):t('Архив мероприятий пока пуст.','No past events yet.')}</p>`}</div></section>`).join('')}
+ ${[[upcoming,t('Ближайшие','Coming up'),'future'],[past,t('Архив','Archive'),'archive']].map(([list,title,key])=>`<section class="venue-events-section ${key}"><div class="venue-events-section-head"><h2>${title}</h2><span>${list.length.toString().padStart(2,'0')}</span></div><div class="events-list" id="${key}">${list.length?list.map(e=>eventCard(e)).join(''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):eventsFailed&&!eventsLoaded?t('Не удалось загрузить афишу. Проверьте соединение и повторите попытку.','Could not load events. Check your connection and try again.'):key==='future'?t('В этом заведении пока нет анонсированных событий.','No upcoming events at this venue yet.'):t('Архив мероприятий пока пуст.','No past events yet.')}</p>`}</div></section>`).join('')}
  </div>`;
 }
 function eventsPage(){if(scopedEventVenue)return venueEventsPage(scopedEventVenue);const visible=displayEvents(),demo=visible.some(e=>e.demo);const {upcoming,past}=splitEvents(visible);return `<div class="events-page"><section class="events-intro"><span class="eyebrow muted">NOVA / MINSK</span><h1>${t('События','Events')}</h1><p>${t('Встречи, музыка и вечера, которые хочется повторить.','Music, good company and nights worth remembering.')}</p>${demo?`<p class="events-demo-notice" role="note">${t('ДЕМОНСТРАЦИОННАЯ АФИША — названия, даты и события вымышлены. Когда появится предстоящее опубликованное мероприятие, примеры автоматически исчезнут.','SAMPLE EVENT LINEUP — all titles, dates and events are fictional. Examples automatically disappear when an upcoming real event is published.')}</p>`:''}</section>${[[upcoming,t('Ближайшие','Coming up'),'future'],[past,t('Архив','Archive'),'archive']].map(([list,title,id])=>`<section class="events-section ${id}"><h2>${title}</h2><div class="events-list" id="${id}">${list.length?list.map(e=>eventCard(e)).join(''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):id==='future'?t('Сейчас нет анонсированных мероприятий.','No upcoming events announced yet.'):t('Архив мероприятий пока пуст.','No past events yet.')}</p>`}</div></section>`).join('')}</div>`;}
@@ -407,10 +407,11 @@ function patchLateContent(){
   loader.onload=()=>{if(el.isConnected)el.src=next;};
   loader.src=next;
  });
- if(selected==='zyb'){
-  const container=app.querySelector('#hof-lineup-content');
-  if(container)container.innerHTML=hofLineup();
- }
+ patchEventSections();
+}
+// When the published events change, update only the event-related fragments.
+// Do not remount the entire site, reopen dialogs or reset scroll position.
+function patchEventSections(){
  if(isEvents){
   const current=app.querySelector('.events-page');
   if(current){
@@ -419,7 +420,23 @@ function patchLateContent(){
    current.replaceWith(template.content.firstElementChild);
    attachMotion();
   }
- }else if(!selected){
+  return;
+ }
+ if(selected==='zyb'){
+  const container=app.querySelector('#hof-lineup-content');
+  if(container)container.innerHTML=hofLineup();
+  return;
+ }
+ if(selected==='pob'||selected==='east'){
+  const current=app.querySelector('.venue-events-teaser');
+  if(current){
+   const template=document.createElement('template');
+   template.innerHTML=venueEventsPreview(selected);
+   current.replaceWith(template.content.firstElementChild);
+  }
+  return;
+ }
+ if(!selected){
   const oldList=app.querySelector('.home-events > div');
   if(oldList){
    const template=document.createElement('template');
@@ -740,7 +757,7 @@ window.addEventListener('popstate',()=>{
 });
 matchMedia('(min-width:901px)').addEventListener('change',e=>{if(e.matches&&drawerOpen)setDrawer(false);});
 
-async function getJSON(url){const r=await fetch(url);if(!r.ok)throw Error(url+': '+r.status);return r.json();}
+async function getJSON(url,options){const r=await fetch(url,options);if(!r.ok)throw Error(url+': '+r.status);return r.json();}
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 try {
  defaults=await getJSON('/content-defaults.json');
@@ -753,7 +770,7 @@ try {
 let cmsSettled=false;
 const cms=Promise.allSettled([
  getJSON('/api/content').then(data=>{source=data;}).catch(()=>{contentFailed=true;}),
- getJSON('/api/events').then(data=>{events=Array.isArray(data.events)?data.events:[];eventsLoaded=true;}).catch(()=>{eventsFailed=true;})
+ getJSON('/api/events',{cache:'no-store'}).then(data=>{if(!Array.isArray(data.events))throw Error('Invalid events response');events=data.events;eventsLoaded=true;eventsFailed=false;}).catch(()=>{eventsFailed=true;})
 ]).then(()=>{cmsSettled=true;});
 await Promise.race([cms,pause(700)]);
 render();
@@ -771,3 +788,42 @@ if(!cmsSettled){
  patchLateContent();
 }
 if(contentFailed)console.warn('NOVA content unavailable; bundled defaults are displayed.');
+
+/* Fresh event data after publication in another tab or after navigation.
+   The Worker already sends Cache-Control: no-store; bypass client caches too. */
+let eventRefreshPromise=null;
+let lastEventCheck=Date.now();
+async function refreshPublishedEvents(force=false){
+ if(!force&&document.hidden)return;
+ if(eventRefreshPromise)return eventRefreshPromise;
+ const now=Date.now();
+ if(!force&&now-lastEventCheck<1600)return;
+ lastEventCheck=now;
+ eventRefreshPromise=(async()=>{
+  try{
+   const data=await getJSON('/api/events',{cache:'no-store'});
+   if(!Array.isArray(data.events))throw Error('Invalid events response');
+   const changed=!eventsLoaded||eventsFailed||JSON.stringify(events)!==JSON.stringify(data.events);
+   events=data.events;
+   eventsLoaded=true;
+   eventsFailed=false;
+   if(changed)patchEventSections();
+  }catch(e){
+   // Never replace a previously valid lineup with an empty list on network failure.
+   if(!eventsLoaded){eventsFailed=true;patchEventSections();}
+   console.warn('NOVA events refresh failed',e);
+  }
+ })().finally(()=>{eventRefreshPromise=null;});
+ return eventRefreshPromise;
+}
+document.addEventListener('visibilitychange',()=>{
+ if(!document.hidden)void refreshPublishedEvents();
+});
+window.addEventListener('focus',()=>{if(!document.hidden)void refreshPublishedEvents();});
+window.addEventListener('pageshow',e=>{if(e.persisted)void refreshPublishedEvents();});
+if(typeof BroadcastChannel!=='undefined'){
+ const eventUpdates=new BroadcastChannel('nova-events-changed');
+ eventUpdates.addEventListener('message',event=>{
+  if(event.data==='changed')void refreshPublishedEvents(true);
+ });
+}
