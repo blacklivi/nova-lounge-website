@@ -499,14 +499,32 @@ function closeModal(instant=false){
   modalCloseTimer=setTimeout(finish,260);
  }else finish();
 }
-function contactPanel(id){const address=value('address_'+id),hours=value('hours_'+id),links=contactLinks(id);return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p>${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;}
+function contactPanel(id){
+ const address=value('address_'+id),hours=value('hours_'+id);
+ if(id==='zyb'){
+  const phone=value('phone_zyb'),route=safeURL(value('map_zyb')),telegram=safeURL(value('telegram_zyb'));
+  const items=[
+   address?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Адрес','Address')}</span><p>${text(address)}</p></div>`:'',
+   hours?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Часы работы','Opening hours')}</span><p class="venue-hours">${text(hours)}</p></div>`:''
+  ].filter(Boolean).join('');
+  const actions=[
+   phone&&validPhone(phone)?`<a class="hof-contact-action" href="tel:${esc(phone.replace(/[^+\d]/g,''))}"><span>${text(phone)}</span>${arrow}</a>`:'',
+   route?`<a class="hof-contact-action" href="${esc(route)}" target="_blank" rel="noopener noreferrer"><span>${t('Построить маршрут','Get directions')}</span>${arrow}</a>`:'',
+   telegram?`<a class="hof-contact-action" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer"><span>Telegram</span>${arrow}</a>`:''
+  ].filter(Boolean).join('');
+  if(!items&&!actions)return `<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`;
+  return `<div class="hof-contact-details">${items}${actions?`<div class="hof-contact-modal-actions">${actions}</div>`:''}</div>`;
+ }
+ const links=contactLinks(id);
+ return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p>${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;
+}
 function openModal(kind,id=selected){
  if(drawerOpen)setDrawer(false);
  if(kind==='menu-location'){const url=hrefFor('menu_'+id,'');if(url){window.open(url,'_blank','noopener,noreferrer');return;}}
  const dialog=document.querySelector('dialog');if(!dialog.open)lastFocus=document.activeElement;
  modalKind=kind;modalVenue=id||'';
  // A single booking component: HOF receives only a visual theme, not new data flow.
- dialog.dataset.theme=kind==='booking'&&id==='zyb'?'hof':'nova';
+ dialog.dataset.theme=(kind==='booking'||kind==='contacts')&&id==='zyb'?'hof':'nova';
  dialog.dataset.bookingVenue=kind==='booking'?(id||'all'):'';
  document.getElementById('modal-caption').textContent=id?(id==='zyb'?'HOF':name(id)):'MINSK';
  const body=document.getElementById('modal-body');
