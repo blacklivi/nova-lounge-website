@@ -17,7 +17,7 @@ const status=(message,error=false)=>{
  el.textContent=message;
  el.style.color=error?'#9c3e31':'#46553e';
 };
-const editableLanguage=field=>!['link','icon','image'].includes(field.type);
+const editableLanguage=field=>!['link','icon','image','toggle'].includes(field.type);
 const lang=()=>$('#page-editor-language').value;
 function fallback(field,l){
  const standard=defaults[l==='en'?'content_en':'content']||{};
@@ -69,7 +69,7 @@ function buildField(field){
  label.htmlFor='editor-field-'+field.key;
  box.append(label);
  const meta=create('small','editor-field-meta',
-   field.type==='link'?'Ссылка / адрес назначения':field.type==='image'?'Изображение':field.type==='icon'?'Иконка':lang()==='en'?'English':'Русский');
+   field.type==='link'?'Ссылка / адрес назначения':field.type==='image'?'Изображение':field.type==='icon'?'Иконка':field.type==='toggle'?'Видимость блока':lang()==='en'?'English':'Русский');
  box.append(meta);
  let input;
  if(field.type==='textarea'){
@@ -78,6 +78,9 @@ function buildField(field){
  }else if(field.type==='icon'){
   input=create('select','editor-input');
   for(const value of ICON_CHOICES){const option=create('option','',value);option.value=value;input.append(option)}
+ }else if(field.type==='toggle'){
+  input=create('select','editor-input');
+  for(const [value,label] of [['yes','Показывать'],['no','Скрыть']]){const option=create('option','',label);option.value=value;input.append(option)}
  }else{
   input=create('input','editor-input');input.type='text';input.maxLength=1600;
  }
