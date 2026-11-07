@@ -69,7 +69,7 @@ function I(key,fallback='arrow-right'){
  const id=editorValue(key)||fallback;
  if(id==='none')return '';
  const path=ICON_PATHS[ICON_CHOICES.includes(id)?id:fallback]||ICON_PATHS['arrow-right'];
- return '<svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+path+'</svg>';
+ return '<svg data-editor-icon="'+key+'" class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+path+'</svg>';
 }
 
 const content = (key, fallback='') => text(value(key) || fallback);
@@ -566,14 +566,50 @@ function navigate(id){
 // Page preview is read-only. Click targets select fields in the authorized parent editor.
 if(isEditorPreview){
  document.addEventListener('click',e=>{
-  const node=e.target.closest('[data-editor-key],[data-content],[data-image]');
+  const node=e.target.closest('[data-editor-icon],[data-editor-key],[data-content],[data-image]');
   e.preventDefault();e.stopImmediatePropagation();
-  const key=node?.dataset.editorKey||node?.dataset.content||node?.dataset.image||'';
+  const key=node?.dataset.editorIcon||node?.dataset.editorKey||node?.dataset.content||node?.dataset.image||'';
   window.parent.postMessage({source:'nova-cms-inspector',key},location.origin);
  },true);
- document.addEventListener('mouseover',e=>{
+  // Same-origin draft messages update the preview DOM only; never write to D1 or R2.
+ window.addEventListener('message',event=>{
+  if(event.source!==window.parent||event.origin!==location.origin||event.data?.source!=='nova-cms-draft')return;
+  const {key,value,type}=event.data;
+  if(typeof key!=='string'||!Object.hasOwn(EDITOR_BY_KEY,key)||typeof value!=='string'||value.length>1600)return;
+  if(type==='toggle'){
+   const selector=key==='home_story_visible'?'#about':
+     key==='home_events_visible'?'.home-events':
+     key==='home_booking_visible'?'#booking':
+     /^venue_(pob|east)_gallery_visible$/.test(key)?'.detail-gallery':null;
+   if(selector)document.querySelector(selector)?.style.setProperty('display',value==='no'?'none':'');
+   return;
+  }
+  if(type==='icon'){
+   if(!ICON_CHOICES.includes(value))return;
+   document.querySelectorAll('[data-editor-icon="'+key+'"]').forEach(svg=>{
+    if(value==='none'){svg.style.display='none';return}
+    svg.style.display='';
+    svg.innerHTML=ICON_PATHS[value]||ICON_PATHS['arrow-right'];
+   });
+   return;
+  }
+  const selectors=['[data-editor-key="'+key+'"]','[data-content="'+key+'"]','[data-image="'+key+'"]'];
+  for(const node of document.querySelectorAll(selectors.join(','))){
+   if(type==='image'){
+    if(node.tagName==='IMG'&&(/^\/media\/[A-Za-z0-9_.-]+\.(jpg|png|webp|svg)$/.test(value)||value.startsWith('blob:'+location.origin+'/')))node.src=value;
+   }else if(type==='link'){
+    if(validCmsHref(value)&&node.tagName==='A')node.setAttribute('href',value);
+    else node.title=value;
+   }else if(type==='text'||type==='textarea'){
+    const textNode=[...node.childNodes].find(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim());
+    if(textNode)textNode.textContent=typography(value,language);
+    else if(node.children.length===0)node.textContent=typography(value,language);
+   }
+  }
+ });
+document.addEventListener('mouseover',e=>{
   document.querySelectorAll('.cms-inspect-highlight').forEach(n=>n.classList.remove('cms-inspect-highlight'));
-  const el=e.target.closest('[data-editor-key],[data-content],[data-image]');el?.classList.add('cms-inspect-highlight');
+  const el=e.target.closest('[data-editor-icon],[data-editor-key],[data-content],[data-image]');el?.classList.add('cms-inspect-highlight');
  },{passive:true});
 }
 document.addEventListener('click',e=>{
