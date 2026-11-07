@@ -58,3 +58,19 @@ a .ui-arrow,button .ui-arrow{width:1em;height:1em;margin-left:.25em}
  .page-editor-preview-bar{display:block}
  .page-editor-preview-bar span{display:block;text-align:left;margin-top:6px}
 }
+
+
+/* Avoid the oversized historical admin masthead; the editor should appear
+   immediately when the authorized workspace opens. */
+#workspace .work-head{padding:28px 0 18px;max-width:none}
+#workspace .work-head .meta{font-size:10px;letter-spacing:.1em}
+#workspace .work-head h1{font-size:clamp(29px,3.4vw,46px);line-height:1.05;font-weight:400;letter-spacing:0;margin:12px 0 8px}
+#workspace .work-head h1 br{display:none}
+#workspace .work-head p{font-size:12px;line-height:1.5;max-width:790px;margin:0;color:var(--muted)}
+#workspace .tabs{margin:12px 0 22px}
+#workspace .tabs button{white-space:normal}
+@media(max-width:600px){
+ #workspace .work-head{padding:16px 0 10px}
+ #workspace .work-head h1{font-size:30px}
+ #workspace .tabs{margin:9px 0 17px}
+}
