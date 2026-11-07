@@ -24,7 +24,8 @@ assert.match(design,/height:calc\(100svh - var\(--header\)\)/,'First-screen HOF 
 assert.match(design,/body\.hof-active\.hof-dock-visible \.mobile-cta/,'Mobile booking dock appears only when triggered');
 assert.match(design,/@media\(prefers-reduced-motion:reduce\)/,'Animations respect reduced-motion preference');
 assert.match(app,/dialog\.dataset\.theme=\(kind==='booking'\|\|kind==='contacts'\)&&id==='zyb'\?'hof':'nova'/,'Venue theme must not alter booking data');
-assert.match(app,/const visible=Boolean\(hero&&hero\.getBoundingClientRect\(\)\.bottom<=header\+4&&!contactVisible\)/,'Dock must not duplicate hero or contact booking CTA');
+assert.match(app,/const visible=Boolean\(heroPassed&&!footerEntered\)/,'Dock must stay hidden during the hero and when the entire orange footer enters view');
+assert.match(app,/hofDockObserver\.observe\(hero\);[\s\S]*?hofDockObserver\.observe\(contact\);/,'Dock must observe both the hero and orange contact section');
 assert.match(app,/dock\.inert=!visible/,'Hidden dock must be removed from keyboard order');
 assert.match(app,/window\.addEventListener\('scroll',updateTop,\{passive:true\}\)/,'Mobile dock updates on scroll');
 assert.match(app,/window\.addEventListener\('resize',updateTop,\{passive:true\}\)/,'Mobile dock responds to device orientation');
