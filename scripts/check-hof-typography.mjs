@@ -40,4 +40,17 @@ assert.match(css,/\.hero-copy\{[\s\S]*?padding-bottom:calc\(69px \+ env\(safe-ar
 assert.match(css,/\.hero\{[\s\S]*?min-height:0;[\s\S]*?max-height:none;/,
   'Remove legacy hero min/max clamps that created a blank stripe on tall phones');
 
+// Brandbook regression gates based on HOF.pdf pp. 1–3.
+assert.match(css,/HOF 2026 BRAND GUIDE/,'Dedicated brandbook styles must be present');
+assert.match(css,/--hof-ink:#000000;--hof-paper:#ffffff;--hof-amber:#F04902/,
+ 'Brand palette must match source PDF: After Hours / First Light / Amber Pulse');
+assert.match(css,/\.hof-bottom \.hof-overline\{color:#000!important\}/,
+ 'Small labels on white must maintain legible contrast');
+assert.match(app,/src="\/media\/hof-wordmark\.svg"/,
+ 'Use exact extracted HÓF vector, not a substitute font');
+assert.match(app,/src="\/media\/hof-symbol\.svg"/,
+ 'Use supplied alternate mark with proper spacing');
+assert.match(app,/data-modal="booking" data-venue="zyb"/,
+ 'Keep HOF reservation attached to existing Zybitskaya venue ID');
+
 console.log('NOVA HOF typography checks passed (Hallmark-adapted subset, not official full audit).');
