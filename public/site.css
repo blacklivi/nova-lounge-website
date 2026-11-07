@@ -1535,3 +1535,99 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
 @media (hover:none),(pointer:coarse){
  .modal[data-theme="hof"] .nova-select{display:block!important}
 }
+
+
+/* HÓF — editorial event list: an open line-based layout, never boxed cards. */
+.hof-page .hof-event-list{
+ display:flex;
+ flex-direction:column;
+ gap:0;
+ padding:20px 0 0;
+ width:100%;
+ min-width:0;
+}
+.hof-page .hof-event-row{
+ display:grid;
+ grid-template-columns:64px minmax(0,1fr) 22px;
+ gap:18px;
+ align-items:center;
+ min-width:0;
+ width:100%;
+ box-sizing:border-box;
+ padding:20px 0;
+ margin:0;
+ border:0;
+ border-bottom:1px solid rgba(255,255,255,.12);
+ background:transparent;
+ color:#fff;
+ text-decoration:none;
+ transition:color .2s ease;
+}
+.hof-page .hof-event-row:first-child{
+ border-top:1px solid rgba(255,255,255,.12);
+}
+.hof-page .hof-event-row.no-image{grid-template-columns:minmax(0,1fr) 22px}
+.hof-page .hof-event-poster{
+ display:block;
+ width:64px;
+ height:80px;
+ max-width:none;
+ max-height:none;
+ aspect-ratio:4/5;
+ object-fit:cover;
+ border:0;
+ border-radius:0;
+ background:transparent;
+}
+.hof-page .hof-event-copy{display:flex;flex-direction:column;min-width:0;gap:6px}
+.hof-page .hof-event-copy time{
+ color:#8e8e93;
+ font-size:12px;
+ font-weight:500;
+ letter-spacing:.04em;
+ line-height:1.35;
+ text-transform:uppercase;
+ font-variant-numeric:tabular-nums;
+}
+.hof-page .hof-event-title{
+ display:block;
+ color:#fff;
+ font-size:20px;
+ font-weight:500;
+ line-height:1.22;
+ letter-spacing:-.018em;
+ overflow-wrap:anywhere;
+}
+.hof-page .hof-event-arrow{
+ justify-self:end;
+ align-self:center;
+ font-size:22px;
+ line-height:1;
+ color:rgba(255,255,255,.4);
+ transition:color .2s ease,transform .2s ease;
+}
+.hof-page .hof-event-row:hover .hof-event-arrow,
+.hof-page .hof-event-row:focus-visible .hof-event-arrow{
+ color:#F04902;
+ transform:translate(2px,-2px);
+}
+.hof-page .hof-event-row:focus-visible{outline:2px solid #F04902;outline-offset:3px}
+.hof-page .hof-events-footer{margin-top:32px}
+.hof-page .hof-events-footer .hof-event-more{margin:0}
+@media(max-width:600px){
+ .hof-page .hof-event-row{gap:14px;padding:20px 0}
+ .hof-page .hof-event-title{font-size:18px}
+ .hof-page .hof-event-copy time{font-size:12px}
+ body.hof-active .mobile-cta{
+  background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.58) 55%,rgba(0,0,0,0) 100%);
+  border:0;
+  padding:23px var(--gutter) calc(12px + env(safe-area-inset-bottom));
+  box-shadow:none;
+ }
+ body.hof-active .mobile-cta .button{
+  box-shadow:0 5px 18px rgba(0,0,0,.14);
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .hof-page .hof-event-row,.hof-page .hof-event-arrow{transition:none!important}
+}
