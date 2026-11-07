@@ -20,7 +20,8 @@ assert.match(app,/events\.filter\(e=>e\.venue===id&&!e\.demo\)/,'Scoped venue ca
 assert.match(app,/if\(scopedEventVenue\)return venueEventsPage\(scopedEventVenue\)/,'Global and venue pages must share same event source');
 assert.match(app,/function hofLineupLink\(\)/,'HOF lineup needs a venue-aware link');
 assert.match(app,/url==='\/events'\?'\/events\/hof':url/,'Legacy HOF /events CMS links must redirect to HOF');
-assert.match(app,/eventCard\(e,true,'\/events\/hof'\)/,'HOF preview cards must lead to HOF events');
+assert.match(app,/href="\/events\/hof#event-\$\{esc\(e\.id\)\}"/,'HOF editorial rows must link directly to each HOF event');
+assert.match(app,/upcoming\.map\(hofEventRow\)/,'HOF preview must use the venue editorial row component');
 assert.match(app,/venueEventsPreview\(id\)/,'Pobediteley/Vostok need direct events previews');
 assert.match(app,/function displayEvents\(\)/,'Global events calendar must remain present');
 assert.match(backend,/if\(path==='\/api\/events'&&request.method==='GET'\)/,'No duplicate API events source');
