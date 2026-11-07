@@ -8,6 +8,7 @@ const IMAGE_KEYS = new Set([...EDITABLE].filter(k=>k.endsWith('_image')||k.start
 for(const f of EDITOR_FIELDS)if(f.type==='image')IMAGE_KEYS.add(f.key);
 const LINK_KEYS = new Set(EDITOR_FIELDS.filter(f=>f.type==='link').map(f=>f.key));
 const ICON_KEYS = new Set(EDITOR_FIELDS.filter(f=>f.type==='icon').map(f=>f.key));
+const TOGGLE_KEYS = new Set(EDITOR_FIELDS.filter(f=>f.type==='toggle').map(f=>f.key));
 const ICON_SET = new Set(ICON_CHOICES);
 function validLink(v){
  if(!v)return true;
@@ -75,7 +76,7 @@ async function api(request,env,url){const path=url.pathname;
   if(request.method==='GET')return api(new Request(new URL('/api/content',request.url)),env,new URL('/api/content',request.url));
   if(request.method!=='PUT')return error('method_not_allowed',405);
   const b=await payload(request),entries=Object.entries(b.content||{}),english=Object.entries(b.content_en||{});
-  const valid=(k,v)=>EDITABLE.has(k)&&typeof v==='string'&&v.length<=1600&&(!IMAGE_KEYS.has(k)||validImage(v))&&(!LINK_KEYS.has(k)||validLink(v))&&(!ICON_KEYS.has(k)||ICON_SET.has(v));
+  const valid=(k,v)=>EDITABLE.has(k)&&typeof v==='string'&&v.length<=1600&&(!IMAGE_KEYS.has(k)||validImage(v))&&(!LINK_KEYS.has(k)||validLink(v))&&(!ICON_KEYS.has(k)||ICON_SET.has(v))&&(!TOGGLE_KEYS.has(k)||v==='yes'||v==='no');
   if((!entries.length&&!english.length)||entries.length>32||english.length>32||entries.some(([k,v])=>!valid(k,v))||
      english.some(([k,v])=>!valid(k,v)||IMAGE_KEYS.has(k)||LINK_KEYS.has(k)||ICON_KEYS.has(k)))return error('invalid_content');
   await env.DB.batch([
