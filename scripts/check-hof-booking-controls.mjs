@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const app=readFileSync('public/app.js','utf8');
+const selects=readFileSync('public/booking-selects.js','utf8');
+const css=readFileSync('public/site.css','utf8');
+assert.match(app,/enhanceBookingSelects\(body\.querySelector\('form'\),language,\{forceCustom:id==='zyb'\}\)/,'Only HÓF booking forces the branded chooser');
+assert.match(selects,/export function enhanceBookingSelects\(form, lang, \{forceCustom=false\}=\{\}\)/,'Other venues must retain original native touch behavior');
+assert.match(selects,/if\(!forceCustom&&!matchMedia\('\(hover: hover\) and \(pointer: fine\)'\)\.matches\) return/,'Coarse pointers should use custom chooser only on HÓF');
+assert.match(selects,/const needed=Math\.min\(248,window\.innerHeight\*\.34\)/,'Dropdown should have a bounded length');
+assert.match(selects,/list\.classList\.add\('nova-select-above'\)/,'Popup must reposition when below-viewport space is insufficient');
+assert.match(selects,/selected\.focus\(\{preventScroll:true\}\)/,'Selected value should remain keyboard accessible without scrolling the document');
+assert.match(selects,/select\.dispatchEvent\(new Event\('change',\{bubbles:true\}\)\)/,'Selection must update the original form field');
+assert.match(css,/body\.hof-active #drawer \.button\{\s*background:#F04902;\s*border:1px solid #F04902;\s*color:#000/,'HÓF navigation booking button uses orange');
+assert.match(css,/\.modal\[data-theme="hof"\] \.nova-select-list\{\s*max-height:min\(248px,34dvh\)/,'HÓF booking list is compact');
+assert.match(css,/\.modal\[data-theme="hof"\] \.nova-select-list\.nova-select-above/,'Compact list can open above its input');
+assert.match(css,/\.modal\[data-theme="hof"\] \.nova-select-option\[aria-selected="true"\]/,'HÓF option highlight uses its own branded colour');
+assert.match(css,/\.modal\[data-theme="hof"\] \.nova-select-trigger:hover/,'HÓF field hover no longer uses NOVA green');
+console.log('HÓF drawer colour and compact dropdown regression guards passed');
