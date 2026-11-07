@@ -4,6 +4,9 @@ import {enhanceBookingDate} from './booking-date.js';
 import {EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js';
 const app = document.querySelector('#app');
 const isEvents = document.body.dataset.page === 'events';
+const eventVenueSlugs={hof:'zyb',pobediteley:'pob',vostok:'east'};
+const scopedEventVenue=isEvents?(eventVenueSlugs[location.pathname.split('/')[2]]||null):null;
+const venueEventURLs={zyb:'/events/hof',pob:'/events/pobediteley',east:'/events/vostok'};
 const ids = ['zyb','pob','east'];
 const slugs={zyb:'zybitskaya',pob:'pobediteley',east:'vostok'};
 const paths=Object.fromEntries(Object.entries(slugs).map(([id,slug])=>[slug,id]));
@@ -114,22 +117,39 @@ function displayEvents(){
  const samples=demoEvents();
  return events.length?[...events,...splitEvents(samples).upcoming]:samples;
 }
-function eventCard(e,home=false){
+function eventCard(e,home=false,eventPath='/events'){
  const title=language==='en'?(e.title_en||t('','Event — translation pending')):e.title;
  const desc=language==='en'?(e.description_en||''):e.description;
  const date=new Date(e.starts_at+':00+03:00');
  const when=new Intl.DateTimeFormat(language==='en'?'en-GB':'ru-RU',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Minsk'}).format(date);
  const poster=localImage(e.image_url);
  const pic=poster?e.demo?`<div class="event-media"><img src="${esc(poster)}" alt="${text(title)}" loading="lazy" width="600" height="800"><span class="demo-poster-label">${t('ПРИМЕР АФИШИ','SAMPLE POSTER')}</span></div>`:`<img src="${esc(poster)}" alt="${text(title)}" loading="lazy" width="600" height="800">`:'';
- return `<${home?'a':'article'} ${home?`href="/events#event-${esc(e.id)}"`: `id="event-${esc(e.id)}"`} class="event-card ${poster?'':'no-image'} ${e.demo?'is-demo':''}">${pic}<div class="event-info">${e.demo?`<span class="event-demo-tag">${t('ДЕМО · НЕ РЕАЛЬНОЕ СОБЫТИЕ','DEMO · NOT A REAL EVENT')}</span>`:''}<time datetime="${esc(e.starts_at)}:00+03:00">${text(when)} · ${t('Минск','Minsk')}</time><h3>${text(title)}</h3>${!home&&desc?`<p>${text(desc)}</p>`:''}<div class="event-location">${brandName(e.venue)}</div></div></${home?'a':'article'}>`;
+ return `<${home?'a':'article'} ${home?`href="${eventPath}#event-${esc(e.id)}"`: `id="event-${esc(e.id)}"`} class="event-card ${poster?'':'no-image'} ${e.demo?'is-demo':''}">${pic}<div class="event-info">${e.demo?`<span class="event-demo-tag">${t('ДЕМО · НЕ РЕАЛЬНОЕ СОБЫТИЕ','DEMO · NOT A REAL EVENT')}</span>`:''}<time datetime="${esc(e.starts_at)}:00+03:00">${text(when)} · ${t('Минск','Minsk')}</time><h3>${text(title)}</h3>${!home&&desc?`<p>${text(desc)}</p>`:''}<div class="event-location">${brandName(e.venue)}</div></div></${home?'a':'article'}>`;
 }
 function home(){const next=splitEvents(displayEvents()).upcoming[0];return `<section class="hero" id="top"><div class="hero-copy"><span class="eyebrow" data-content="hero_kicker">${content('hero_kicker')}</span><h1 class="hero-title" aria-label="NOVA"><span class="hero-letter hero-letter-n" style="--letter-order:0" aria-hidden="true">N</span><span class="hero-letter hero-letter-o" style="--letter-order:1" aria-hidden="true">O</span><span class="hero-letter hero-letter-v" style="--letter-order:2" aria-hidden="true">V</span><span class="hero-letter hero-letter-a" style="--letter-order:3" aria-hidden="true">A</span></h1><p class="hero-tagline" data-content="hero_tagline">${content('hero_tagline')}</p></div><div class="hero-photo">${image('hero_image',t('Интерьер и коктейль — концептуальное изображение','Interior and cocktail — concept image'),true)}<div class="photo-side" data-editor-key="home_photo_side">${E('home_photo_side').replace(/\n/g,'<br>')}</div></div></section><section class="venues" id="venues" aria-labelledby="venues-heading"><h2 class="venues-heading" id="venues-heading" data-editor-key="home_locations_title">${E('home_locations_title')}</h2>${ids.map(id=>`<a class="venue-card ${id==='zyb'?'venue-card-hof':''}" href="${H('home_card_'+id+'_url',venueURL(id))}" ${hrefFor('home_card_'+id+'_url',venueURL(id))===venueURL(id)?'data-place="'+id+'"':''} data-editor-key="home_card_${id}_url"><div class="venue-img">${image('home_card_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id),false,'venue_'+id+'_image')}${id==='zyb'?'<span class="venue-hof-image-label" data-editor-key="home_card_hof_label">'+E('home_card_hof_label')+'</span>':''}</div><div class="venue-foot"><h3 class="venue-title">${id==='zyb'?'<img class="venue-hof-logo" data-editor-key="home_card_hof_logo_image" src="'+imageFor('home_card_hof_logo_image','/media/hof-wordmark-black.svg')+'" alt="HÓF" width="519" height="247"><span class="venue-by" data-editor-key="home_card_hof_by">'+E('home_card_hof_by')+'</span>':name(id)}</h3>${id==='zyb'?'<span class="venue-hof-location" data-editor-key="home_card_hof_location">'+E('home_card_hof_location')+'</span>':''}<p class="venue-description" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</p></div></a>`).join('')}</section><section class="story" id="about" ${shown('home_story_visible')?'':'style="display:none"'}><div class="story-copy"><span class="eyebrow muted" data-content="story_kicker">${content('story_kicker')}</span><h2 data-content="story_title">${content('story_title')}</h2><p data-content="story_description">${content('story_description')}</p><button class="text-link" data-editor-key="home_story_menu_text" data-modal="menu">${E('home_story_menu_text')} ${I('home_story_menu_icon')}</button></div><figure class="story-photo">${image('story_image',t('Подача блюда — демонстрационное изображение','Food presentation — concept image'))}<figcaption class="image-note" data-content="media_note">${content('media_note')}</figcaption></figure></section><section class="home-events" ${shown('home_events_visible')?'':'style="display:none"'}><a class="section-link" href="${H('home_events_url','/events')}" data-editor-key="home_events_url"><h2 data-editor-key="home_events_title">${E('home_events_title')}</h2>${I('home_events_icon')}</a><div>${next?eventCard(next,true)+(next.demo?`<p class="demo-note">${t('Пример оформления. Мероприятие не проводится.','Design preview only. This event is not scheduled.')}</p>`:''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):E('home_events_empty')}</p>`}</div></section><section class="book-strip" id="booking" ${shown('home_booking_visible')?'':'style="display:none"'}><div class="book-image">${image('booking_image',t('Детали интерьера — концепция','Interior details — concept image'))}</div><button class="book-main" type="button" data-modal="booking"><span class="book-welcome" data-editor-key="home_booking_welcome">${E('home_booking_welcome')}</span><span class="book-cta"><span data-content="booking_title">${content('booking_title')}</span>${I('home_booking_icon')}</span></button></section>`;}
 
 
+function hofLineupLink(){
+ const raw=editorValue('hof_events_more_text'),label=(raw==='Общая афиша NOVA'||raw==='NOVA events')?t('События HÓF','HÓF events'):raw;
+ const url=hrefFor('hof_events_more_url','/events/hof');
+ // Honor custom editor URLs, but migrate legacy /events to this venue's lineup.
+ const target=url==='/events'?'/events/hof':url;
+ return `<a class="hof-event-more hof-action" href="${esc(target)}" data-editor-key="hof_events_more_url">${text(label)} ${arrow}</a>`;
+}
 function hofLineup(){
  const upcoming=splitEvents(events.filter(e=>e.venue==='zyb'&&!e.demo)).upcoming.slice(0,2);
- if(upcoming.length)return `<div class="hof-event-list">${upcoming.map(e=>eventCard(e,true)).join('')}</div>`;
- return `<div class="hof-events-empty"><p>${E('hof_events_empty')}</p><a class="hof-event-more hof-action" href="${H('hof_events_more_url','/events')}" data-editor-key="hof_events_more_url">${E('hof_events_more_text')} ${arrow}</a></div>`;
+ if(upcoming.length)return `<div class="hof-event-list">${upcoming.map(e=>eventCard(e,true,'/events/hof')).join('')}</div><div class="hof-events-footer">${hofLineupLink()}</div>`;
+ return `<div class="hof-events-empty"><p>${E('hof_events_empty')}</p>${hofLineupLink()}</div>`;
+}
+function venueEventsPreview(id){
+ const upcoming=splitEvents(events.filter(e=>e.venue===id&&!e.demo)).upcoming.slice(0,2);
+ const target=hrefFor('venue_'+id+'_events_button_url',venueEventURLs[id]);
+ return `<section class="venue-events-teaser" aria-labelledby="venue-events-heading">
+  <div class="venue-events-teaser-top"><span class="eyebrow muted">${t('АФИША ЗАВЕДЕНИЯ','VENUE LINEUP')}</span><h2 id="venue-events-heading">${t('События','Events')} / ${name(id)}</h2>
+  <p>${upcoming.length?t('Ближайшие события этого пространства.','Coming up at this space.'):t('Пока нет анонсированных мероприятий.','No events announced yet.')}</p>
+  <a class="venue-events-link" href="${esc(target)}" data-editor-key="venue_${id}_events_button_url">${E('venue_'+id+'_events_button_text')} ${arrow}</a></div>
+  ${upcoming.length?`<div class="venue-events-teaser-list">${upcoming.map(e=>eventCard(e,true,venueEventURLs[id])).join('')}</div>`:''}
+ </section>`;
 }
 function hofDetail(){
  return `<article class="detail hof-page hof-editorial">
@@ -176,8 +196,27 @@ function hofDetail(){
  </article>`;
 }
 
-function detail(id){if(id==='zyb')return hofDetail();return `<article class="detail"><a href="${H('venue_'+id+'_back_url','/#venues')}" ${hrefFor('venue_'+id+'_back_url','/#venues')==='/#venues'?'data-home="venues"':''} class="detail-back" data-editor-key="venue_${id}_back_url">${arrow}${E('venue_'+id+'_back_text')}</a><div class="detail-grid"><div class="detail-copy"><span class="eyebrow muted" data-editor-key="venue_${id}_kicker">${E('venue_'+id+'_kicker')}</span><h1 data-editor-key="venue_${id}_name">${name(id)}</h1><div class="subtitle" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</div><p data-content="venue_${id}_desc">${content('venue_'+id+'_desc',t('Описание готовится.','Details coming soon.'))}</p><div class="detail-actions"><button class="button" data-editor-key="venue_${id}_booking_text" data-modal="booking" data-venue="${id}">${E('venue_'+id+'_booking_text')}</button><button class="button secondary" data-editor-key="menu_${id}" data-modal="menu-location" data-venue="${id}">${E('venue_'+id+'_menu_text')}</button></div></div><div class="detail-image">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id),true)}</div></div><div class="detail-bottom"><div><span class="eyebrow muted" data-editor-key="venue_${id}_atmosphere_kicker">${E('venue_'+id+'_atmosphere_kicker')}</span><h2 data-editor-key="venue_${id}_atmosphere_title">${E('venue_'+id+'_atmosphere_title')}</h2><p data-content="venue_${id}_second">${content('venue_'+id+'_second')}</p><p class="features" data-content="venue_${id}_features">${content('venue_'+id+'_features')}</p><button class="text-link" data-editor-key="venue_${id}_contacts_text" data-modal="contacts" data-venue="${id}">${E('venue_'+id+'_contacts_text')}</button></div><div><div class="detail-gallery" ${shown('venue_'+id+'_gallery_visible')?'':'style="display:none"'}>${[1,2].map(i=>image(`gallery_${id}_${i}_image`,t('Демонстрационное изображение','Concept image'))).join('')}</div><p class="image-note">${content('media_note')}</p></div></div></article>`;}
-function eventsPage(){const visible=displayEvents(),demo=visible.some(e=>e.demo);const {upcoming,past}=splitEvents(visible);return `<div class="events-page"><section class="events-intro"><span class="eyebrow muted">NOVA / MINSK</span><h1>${t('События','Events')}</h1><p>${t('Встречи, музыка и вечера, которые хочется повторить.','Music, good company and nights worth remembering.')}</p>${demo?`<p class="events-demo-notice" role="note">${t('ДЕМОНСТРАЦИОННАЯ АФИША — названия, даты и события вымышлены. Когда появится предстоящее опубликованное мероприятие, примеры автоматически исчезнут.','SAMPLE EVENT LINEUP — all titles, dates and events are fictional. Examples automatically disappear when an upcoming real event is published.')}</p>`:''}</section>${[[upcoming,t('Ближайшие','Coming up'),'future'],[past,t('Архив','Archive'),'archive']].map(([list,title,id])=>`<section class="events-section ${id}"><h2>${title}</h2><div class="events-list" id="${id}">${list.length?list.map(e=>eventCard(e)).join(''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):id==='future'?t('Сейчас нет анонсированных мероприятий.','No upcoming events announced yet.'):t('Архив мероприятий пока пуст.','No past events yet.')}</p>`}</div></section>`).join('')}</div>`;}
+function detail(id){if(id==='zyb')return hofDetail();return `<article class="detail"><a href="${H('venue_'+id+'_back_url','/#venues')}" ${hrefFor('venue_'+id+'_back_url','/#venues')==='/#venues'?'data-home="venues"':''} class="detail-back" data-editor-key="venue_${id}_back_url">${arrow}${E('venue_'+id+'_back_text')}</a><div class="detail-grid"><div class="detail-copy"><span class="eyebrow muted" data-editor-key="venue_${id}_kicker">${E('venue_'+id+'_kicker')}</span><h1 data-editor-key="venue_${id}_name">${name(id)}</h1><div class="subtitle" data-content="venue_${id}_subtitle">${content('venue_'+id+'_subtitle')}</div><p data-content="venue_${id}_desc">${content('venue_'+id+'_desc',t('Описание готовится.','Details coming soon.'))}</p><div class="detail-actions"><button class="button" data-editor-key="venue_${id}_booking_text" data-modal="booking" data-venue="${id}">${E('venue_'+id+'_booking_text')}</button><button class="button secondary" data-editor-key="menu_${id}" data-modal="menu-location" data-venue="${id}">${E('venue_'+id+'_menu_text')}</button></div></div><div class="detail-image">${image('venue_'+id+'_image',t('Концепция пространства ','Location concept: ')+name(id),true)}</div></div><div class="detail-bottom"><div><span class="eyebrow muted" data-editor-key="venue_${id}_atmosphere_kicker">${E('venue_'+id+'_atmosphere_kicker')}</span><h2 data-editor-key="venue_${id}_atmosphere_title">${E('venue_'+id+'_atmosphere_title')}</h2><p data-content="venue_${id}_second">${content('venue_'+id+'_second')}</p><p class="features" data-content="venue_${id}_features">${content('venue_'+id+'_features')}</p><button class="text-link" data-editor-key="venue_${id}_contacts_text" data-modal="contacts" data-venue="${id}">${E('venue_'+id+'_contacts_text')}</button></div><div><div class="detail-gallery" ${shown('venue_'+id+'_gallery_visible')?'':'style="display:none"'}>${[1,2].map(i=>image(`gallery_${id}_${i}_image`,t('Демонстрационное изображение','Concept image'))).join('')}</div><p class="image-note">${content('media_note')}</p></div></div>${venueEventsPreview(id)}</article>`;}
+function venueEventsPage(id){
+ const hof=id==='zyb';
+ // Never show example events from other locations or fictional samples in a venue view.
+ const live=events.filter(e=>e.venue===id&&!e.demo);
+ const {upcoming,past}=splitEvents(live);
+ const vname=hof?'HÓF':name(id);
+ const back=venueURL(id);
+ const brand=hof?`<img class="venue-events-logo" src="/media/hof-wordmark-orange.svg" alt="HÓF" width="290" height="140">`:`<span class="venue-events-nova-mark">NOVA</span>`;
+ return `<div class="events-page venue-events-page ${hof?'hof-events-page':'nova-venue-events-page'}" data-venue="${id}">
+ <section class="venue-events-intro" aria-labelledby="venue-events-title">
+  <div class="venue-events-intro-top"><span>${hof?'HOUSE OF FLOW':'NOVA / MINSK'}</span><a href="${back}">${t('К заведению','Back to venue')} ${arrow}</a></div>
+  ${brand}
+  <div class="venue-events-headerline"><div><span class="venue-events-overline">${t('ТОЛЬКО ЭТО ПРОСТРАНСТВО','THIS SPACE ONLY')}</span><h1 id="venue-events-title">${t('События','Events')}<span class="venue-events-period">.</span></h1>
+  <p>${hof?t('Музыка, вечеринки и встречи в HÓF на Зыбицкой.','Music, nights and events at HÓF on Zybitskaya.'):t('Афиша мероприятий именно этого заведения.','Events at this venue only.')}</p></div>
+  <a class="venue-events-all" href="/events">${t('Все события NOVA','All NOVA events')} ${arrow}</a></div>
+ </section>
+ ${[[upcoming,t('Ближайшие','Coming up'),'future'],[past,t('Архив','Archive'),'archive']].map(([list,title,key])=>`<section class="venue-events-section ${key}"><div class="venue-events-section-head"><h2>${title}</h2><span>${list.length.toString().padStart(2,'0')}</span></div><div class="events-list" id="${key}">${list.length?list.map(e=>eventCard(e)).join(''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):key==='future'?t('В этом заведении пока нет анонсированных событий.','No upcoming events at this venue yet.'):t('Архив мероприятий пока пуст.','No past events yet.')}</p>`}</div></section>`).join('')}
+ </div>`;
+}
+function eventsPage(){if(scopedEventVenue)return venueEventsPage(scopedEventVenue);const visible=displayEvents(),demo=visible.some(e=>e.demo);const {upcoming,past}=splitEvents(visible);return `<div class="events-page"><section class="events-intro"><span class="eyebrow muted">NOVA / MINSK</span><h1>${t('События','Events')}</h1><p>${t('Встречи, музыка и вечера, которые хочется повторить.','Music, good company and nights worth remembering.')}</p>${demo?`<p class="events-demo-notice" role="note">${t('ДЕМОНСТРАЦИОННАЯ АФИША — названия, даты и события вымышлены. Когда появится предстоящее опубликованное мероприятие, примеры автоматически исчезнут.','SAMPLE EVENT LINEUP — all titles, dates and events are fictional. Examples automatically disappear when an upcoming real event is published.')}</p>`:''}</section>${[[upcoming,t('Ближайшие','Coming up'),'future'],[past,t('Архив','Archive'),'archive']].map(([list,title,id])=>`<section class="events-section ${id}"><h2>${title}</h2><div class="events-list" id="${id}">${list.length?list.map(e=>eventCard(e)).join(''):`<p class="event-empty">${!eventsLoaded&&!eventsFailed?t('Загружаем афишу…','Loading events…'):id==='future'?t('Сейчас нет анонсированных мероприятий.','No upcoming events announced yet.'):t('Архив мероприятий пока пуст.','No past events yet.')}</p>`}</div></section>`).join('')}</div>`;}
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let heroIntroPending = !isEvents && location.pathname === '/' && !reducedMotion.matches;
@@ -394,7 +433,8 @@ function patchLateContent(){
 function render(){
  document.documentElement.lang=language;
  selected=!isEvents?(paths[location.pathname.split('/')[2]]||(ids.includes(location.hash.slice(1))?location.hash.slice(1):null)):null;
- document.body.classList.toggle('hof-active',selected==='zyb');
+ document.body.classList.toggle('hof-active',selected==='zyb'||(isEvents&&scopedEventVenue==='zyb'));
+ document.body.classList.toggle('hof-events-active',isEvents&&scopedEventVenue==='zyb');
  const titles={
  zyb:['HOF by NOVA (House of Flow) — музыка и вечеринки на Зыбицкой','HOF by NOVA (House of Flow) — Music and events on Zybitskaya'],
  pob:['NOVA Победителей — лаунж-кафе на проспекте Победителей, 89/3','NOVA Pobediteley — lounge café in Minsk'],
@@ -405,10 +445,10 @@ const descriptions={
  pob:['NOVA Победителей, 89/3: кухня, встречи, настольные игры и вечерняя музыка. Телефон +375 25 644-33-33.','NOVA at 89/3 Pobediteley Avenue, Minsk: food, board games and good company. Call +375 25 644-33-33.'],
  east:['NOVA Восток, ул. Франциска Скорины, 2: ланчи, кухня и вечера в своей атмосфере. Телефон +375 44 791-33-33.','NOVA Vostok at 2 Francyska Skaryny Street, Minsk: food and relaxed evenings. Call +375 44 791-33-33.']
 };
-document.title=isEvents?t('События — NOVA Minsk','Events — NOVA Minsk'):selected?titles[selected][language==='en'?1:0]:t('NOVA — три лаунж-кафе в Минске','NOVA — Three lounge cafés in Minsk');
+document.title=isEvents?(scopedEventVenue?(scopedEventVenue==='zyb'?t('События HÓF — House of Flow','HÓF events — House of Flow'):t('События — NOVA '+name(scopedEventVenue),'Events — NOVA '+name(scopedEventVenue))):t('События — NOVA Minsk','Events — NOVA Minsk')):selected?titles[selected][language==='en'?1:0]:t('NOVA — три лаунж-кафе в Минске','NOVA — Three lounge cafés in Minsk');
 const meta=document.querySelector('meta[name="description"]');
-if(meta)meta.content=selected?descriptions[selected][language==='en'?1:0]:isEvents?t('Афиша NOVA в Минске: DJ-сеты, вечеринки и ближайшие события.','NOVA events in Minsk: parties, DJ sets and upcoming nights.'):t('NOVA — три лаунж-кафе в Минске: Зыбицкая, Победителей и Восток. Кухня, ланчи, вечерние встречи и события.','NOVA — three lounge cafés in Minsk: Zybitskaya, Pobediteley and Vostok. Food, music and gatherings.');
-const canonical=document.querySelector('link[rel="canonical"]');if(canonical)canonical.href=location.origin+(isEvents?'/events':selected?venueURL(selected):'/');
+if(meta)meta.content=selected?descriptions[selected][language==='en'?1:0]:isEvents?(scopedEventVenue?t('Афиша мероприятий '+(scopedEventVenue==='zyb'?'HÓF':name(scopedEventVenue))+' в Минске.','Events at '+(scopedEventVenue==='zyb'?'HÓF':name(scopedEventVenue))+' in Minsk.'):t('Афиша NOVA в Минске: DJ-сеты, вечеринки и ближайшие события.','NOVA events in Minsk: parties, DJ sets and upcoming nights.')):t('NOVA — три лаунж-кафе в Минске: Зыбицкая, Победителей и Восток. Кухня, ланчи, вечерние встречи и события.','NOVA — three lounge cafés in Minsk: Zybitskaya, Pobediteley and Vostok. Food, music and gatherings.');
+const canonical=document.querySelector('link[rel="canonical"]');if(canonical)canonical.href=location.origin+(isEvents?(scopedEventVenue?venueEventURLs[scopedEventVenue]:'/events'):selected?venueURL(selected):'/');
  app.innerHTML=header()+`<main id="main" tabindex="-1">${isEvents?eventsPage():selected?detail(selected):home()}</main>`+footer()+layers();
  app.querySelector('dialog').addEventListener('cancel',e=>{e.preventDefault();closeModal();});
  app.querySelector('dialog').addEventListener('close',()=>{document.querySelector('dialog')?.classList.remove('is-visible');});
@@ -663,7 +703,7 @@ document.addEventListener('click',e=>{
  if(b.matches('[data-language]')){const next=b.dataset.language;if(next===language)return;const open=drawerOpen,kind=modalKind,id=modalVenue;language=next;try{localStorage.setItem('nova-language',language)}catch{}drawerOpen=false;document.body.classList.remove('lock');render();document.querySelector('main')?.classList.add('route-enter');if(open)setDrawer(true);if(kind&&kind!=='review')openModal(kind,id);document.querySelector(`[data-language="${next}"]`)?.focus();return;}
  if(b.matches('[data-drawer]')){setDrawer(!drawerOpen);return;}
  if(b.matches('[data-scroll]')){e.preventDefault();scrollToSection(b.dataset.scroll);return;}
- if(b.matches('[data-modal]')){openModal(b.dataset.modal,b.dataset.venue||selected);return;}
+ if(b.matches('[data-modal]')){openModal(b.dataset.modal,b.dataset.venue||selected||(isEvents?scopedEventVenue:null));return;}
  if(b.matches('[data-close]')){closeModal();return;}
  if(b.matches('[data-top]')){scrollToPosition(0);document.querySelector('.brand').focus({preventScroll:true});return;}
  if(b.matches('[data-place],[data-home]')&&!isEvents){e.preventDefault();navigate(b.dataset.place||b.dataset.home);return;}
