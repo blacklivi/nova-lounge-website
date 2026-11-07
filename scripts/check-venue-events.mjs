@@ -31,4 +31,20 @@ assert.match(schema,/f\('hof_events_more_url','Адрес афиши HÓF','link
 assert.match(css,/\.hof-events-page\{background:#12110f;color:#fff/,'HOF event listing must have dedicated dark theme');
 assert.match(css,/\.hof-events-page \.event-location\{color:#F04902/,'HOF event location styling must use brand orange');
 assert.match(css,/\.venue-events-page \.events-list/,'Scoped listings must have own event card layout');
+// After publishing, refresh public lineups instead of preserving a stale empty state.
+assert.match(app,/getJSON\('\/api\/events',\{cache:'no-store'\}\)/,'Initial event fetch must bypass browser caching');
+assert.match(app,/async function refreshPublishedEvents\(force=false\)/,'Published events must be refreshable in an open tab');
+assert.match(app,/window\.addEventListener\('focus',/,'Switching back from the admin must refresh events');
+assert.match(app,/document\.addEventListener\('visibilitychange',/,'Returning to the tab must refresh events');
+assert.match(app,/window\.addEventListener\('pageshow',e=>\{if\(e\.persisted\)/,'BFCache restore must refresh events');
+assert.match(app,/BroadcastChannel\('nova-events-changed'\)/,'Public tabs must subscribe to admin publish notification');
+assert.match(admin,/notifyEventChanged\(\);resetEvent\(\);await loadEvents\(\)/,'After every save/delete the admin should notify open site tabs');
+assert.match(admin,/channel\.postMessage\('changed'\)/,'Admin publishes only an invalidation signal');
+assert.match(app,/if\(changed\)patchEventSections\(\)/,'Skip UI replacements for unchanged API data');
+assert.match(app,/if\(selected==='pob'\|\|selected==='east'\)/,'Pobediteley and Vostok previews must update too');
+assert.match(app,/const current=app\.querySelector\('\.venue-events-teaser'\)/,'Venue preview must be patched without full page rerender');
+assert.match(app,/if\(isEvents\)\{[\s\S]*?template\.innerHTML=eventsPage\(\)/,'Venue and global event pages must update their cards and counters');
+assert.match(app,/eventsFailed&&!eventsLoaded\?t\('Не удалось загрузить афишу/,'Load failures must not masquerade as an empty venue calendar');
+assert.match(backend,/const noStore=\{ 'Cache-Control':'no-store'/,'Public API response must not be cached');
+
 console.log('Scoped HOF/NOVA events, CMS linkage, SEO, and shared data checks passed');
