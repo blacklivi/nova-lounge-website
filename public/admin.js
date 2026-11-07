@@ -33,9 +33,45 @@ function initFields(){const box=$('#content-fields');box.replaceChildren();for(c
  });
  field.append(inp);const small=document.createElement('small');small.textContent='JPEG / PNG / WebP / AVIF / HEIC → WebP автоматически · оригинал до 80 МБ';field.append(small)}else{let inp=document.createElement(type==='textarea'?'textarea':'input');inp.id='field-'+key;inp.dataset.field=key;if(type==='textarea')inp.rows=3;else inp.type='text';field.append(inp)}box.append(field)}}
 async function loadContent(){const r=await request('/api/admin/content');currentContent=r.content||{};currentContentEN=r.content_en||{};for(const [k] of keySpecs){const field=$('[data-field="'+k+'"]'),img=$('[data-preview="'+k+'"]');if(field)field.value=currentContent[k]??sourceDefaults[k]??'';if(img){let val=currentContent[k]||sourceDefaults[k];if(val){img.src=val;img.hidden=false}else img.hidden=true}}}
-async function loadEvents(){const r=await request('/api/admin/events');currentEvents=r.events||[];const box=$('#events-items');box.replaceChildren();for(const ev of currentEvents){let row=document.createElement('div');row.className='item';let div=document.createElement('div');let label=document.createElement('span');label.textContent=ev.starts_at.replace('T',' ')+' · '+(ev.published?'ОПУБЛИКОВАНО':'ЧЕРНОВИК');let title=document.createElement('strong');title.textContent=ev.title;div.append(label,title);let btn=document.createElement('button');btn.textContent='Изменить';btn.type='button';btn.addEventListener('click',()=>editEvent(ev.id));row.append(div,btn);box.append(row)}if(!currentEvents.length){let p=document.createElement('p');p.className='muted';p.textContent='Событий пока нет. Добавьте первую афишу.';box.append(p)}}
-function editEvent(id){let e=currentEvents.find(x=>x.id===id);if(!e)return;const f=$('#event-form');for(const k of ['title','description','starts_at','venue','image_url'])f.elements[k].value=e[k]||'';f.elements.published.checked=!!e.published;f.elements.id.value=e.id;$('#event-form-title').textContent='Редактировать событие';$('#event-delete').hidden=false;const img=$('#event-image-preview');img.src=e.image_url||'';img.hidden=!e.image_url;$('#event-image').value='';$('#event-status').textContent='';window.scrollTo({top:f.getBoundingClientRect().top+window.scrollY-35,behavior:'smooth'})}
-function resetEvent(){const f=$('#event-form');f.reset();f.elements.id.value='';f.elements.image_url.value='';$('#event-form-title').textContent='Новое событие';$('#event-delete').hidden=true;$('#event-image-preview').hidden=true;$('#event-status').textContent=''}
+const venueEventPaths={zyb:'/events/hof',pob:'/events/pobediteley',east:'/events/vostok'};
+const adminVenueNames={zyb:'HÓF / Зыбицкая',pob:'NOVA / Победителей',east:'NOVA / Восток'};
+function updateVenueEventPreview(){
+ const choice=$('#event-form')?.elements.venue.value||'zyb';
+ const a=$('#event-venue-preview');
+ if(a)a.href=venueEventPaths[choice]||'/events';
+}
+function renderEventList(){
+ const box=$('#events-items');
+ box.replaceChildren();
+ const scope=$('#events-venue-filter')?.value||'all';
+ const items=currentEvents.filter(ev=>scope==='all'||ev.venue===scope);
+ for(const ev of items){
+  const row=document.createElement('div');row.className='item';
+  const div=document.createElement('div');
+  const label=document.createElement('span');
+  label.textContent=ev.starts_at.replace('T',' ')+' · '+(adminVenueNames[ev.venue]||ev.venue)+' · '+(ev.published?'ОПУБЛИКОВАНО':'ЧЕРНОВИК');
+  const title=document.createElement('strong');title.textContent=ev.title;
+  div.append(label,title);
+  const actions=document.createElement('div');actions.className='event-row-actions';
+  const preview=document.createElement('a');
+  preview.href=(venueEventPaths[ev.venue]||'/events')+'#event-'+encodeURIComponent(ev.id);
+  preview.textContent='На сайте ↗';preview.target='_blank';preview.rel='noopener noreferrer';
+  const button=document.createElement('button');button.type='button';button.textContent='Изменить';
+  button.addEventListener('click',()=>editEvent(ev.id));
+  actions.append(preview,button);row.append(div,actions);box.append(row);
+ }
+ if(!items.length){
+  const p=document.createElement('p');p.className='muted';
+  p.textContent=scope==='all'?'Событий пока нет. Добавьте первую афишу.':'Для выбранного заведения пока нет событий.';
+  box.append(p);
+ }
+}
+async function loadEvents(){
+ const r=await request('/api/admin/events');currentEvents=r.events||[];
+ renderEventList();
+}
+function editEvent(id){let e=currentEvents.find(x=>x.id===id);if(!e)return;const f=$('#event-form');for(const k of ['title','description','starts_at','venue','image_url'])f.elements[k].value=e[k]||'';f.elements.published.checked=!!e.published;f.elements.id.value=e.id;updateVenueEventPreview();$('#event-form-title').textContent='Редактировать событие';$('#event-delete').hidden=false;const img=$('#event-image-preview');img.src=e.image_url||'';img.hidden=!e.image_url;$('#event-image').value='';$('#event-status').textContent='';window.scrollTo({top:f.getBoundingClientRect().top+window.scrollY-35,behavior:'smooth'})}
+function resetEvent(){const f=$('#event-form');f.reset();f.elements.id.value='';f.elements.image_url.value='';updateVenueEventPreview();$('#event-form-title').textContent='Новое событие';$('#event-delete').hidden=true;$('#event-image-preview').hidden=true;$('#event-status').textContent=''}
 async function authorized(){try{await request('/api/admin/session');return true}catch(e){return false}}
 async function start(){initFields();
  // Public pages are rendered client-side. Read the same versioned defaults JSON used by the site.
@@ -60,6 +96,9 @@ $('#event-image').addEventListener('change',async e=>{
  }catch(err){status($('#event-status'),'Ошибка обработки афиши: '+err.message,true);e.target.value=''}
 });
 $('#event-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,btn=f.querySelector('button[type=submit]');btn.disabled=true;status($('#event-status'),'Сохраняем…');try{let image_url=f.elements.image_url.value;const file=$('#event-image').files[0];if(file){status($('#event-status'),'Сжимаем афишу в WebP…');image_url=await upload(file,'event')}const event={title:f.elements.title.value,description:f.elements.description.value,starts_at:f.elements.starts_at.value,venue:f.elements.venue.value,image_url,published:f.elements.published.checked};const id=f.elements.id.value;const saved=await request(id?'/api/admin/events/'+id:'/api/admin/events',id?'PUT':'POST',event);resetEvent();await loadEvents();status($('#event-status'),saved.translation_pending?'Событие сохранено на русском. Английский перевод не удался — повторите сохранение.':'Событие опубликовано на русском и английском.',Boolean(saved.translation_pending))}catch(err){status($('#event-status'),'Ошибка: '+err.message,true)}finally{btn.disabled=false}});
+$('#event-form').elements.venue.addEventListener('change',updateVenueEventPreview);
+$('#events-venue-filter').addEventListener('change',renderEventList);
+updateVenueEventPreview();
 $('#event-reset').addEventListener('click',resetEvent);$('#reload-events').addEventListener('click',loadEvents);
 $('#event-delete').addEventListener('click',async()=>{const id=$('#event-id').value;if(!id||!confirm('Удалить событие без возможности восстановления?'))return;try{await request('/api/admin/events/'+id,'DELETE');resetEvent();await loadEvents();status($('#event-status'),'Событие удалено.')}catch(e){status($('#event-status'),e.message,true)}});
 start();

@@ -122,3 +122,16 @@ a .ui-arrow,button .ui-arrow{width:1em;height:1em;margin-left:.25em}
 .editor-group>summary:focus-visible{outline:2px solid var(--olive);outline-offset:-2px}
 .editor-inherited-note{display:block;font-size:10px;line-height:1.55;color:var(--muted);margin:7px 0 0}
 @media(prefers-reduced-motion:reduce){.editor-group>summary::after{transition:none}}
+
+
+/* One event editor, clearly divided by venue. */
+.venue-events-admin-help{font-size:13px;line-height:1.65;color:#4a5146;margin:4px 0 18px;max-width:65ch}
+.venue-events-admin-help a{color:#263a20;text-underline-offset:3px}
+.events-filter-label{display:inline-flex;align-items:center;gap:9px;font-size:13px;color:#40473e}
+.events-filter-label select{width:auto;min-width:180px;max-width:100%;padding:8px 32px 8px 12px;font-size:14px}
+.event-row-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.event-row-actions a{display:inline-flex;align-items:center;min-height:40px;color:#2c4328;text-decoration:underline;text-underline-offset:3px;font-size:13px}
+@media(max-width:700px){
+ .events-filter-label{width:100%}
+ .events-filter-label select{flex:1}
+}
