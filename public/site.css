@@ -594,7 +594,8 @@ body.hof-active .site-footer a:hover{color:#F04902}
 .hof-about-copy .hof-inline-link:hover{color:#fff;border-color:#fff}
 .hof-bottom{background:#fff;color:#000}
 .hof-bottom .hof-bottom-symbol{width:clamp(33px,3.7vw,52px);height:auto;display:block;margin-bottom:clamp(25px,3vw,42px)}
-.hof-bottom .hof-overline{color:#F04902!important}
+.hof-bottom .hof-overline{color:#000!important}
+.hof-bottom .hof-overline::before{content:'';display:inline-block;width:15px;height:8px;background:#F04902;margin-right:10px;vertical-align:middle}
 .hof-bottom h2{color:#000}
 .hof-bottom p{color:#000}
 .hof-bottom-actions .hof-text-button{color:#000;border-bottom-color:#000}
