@@ -118,7 +118,7 @@ function hofDetail(){
   <section class="hof-lineup hof-compact-events" id="hof-lineup" aria-labelledby="hof-lineup-title">
    <div class="hof-section-heading">
     <div><span class="hof-overline">HÓF / AFTER DARK</span><h2 id="hof-lineup-title">${t('События','Events')}</h2></div>
-    <img class="hof-compact-mark" src="/media/hof-mark-orange.svg" alt="" aria-hidden="true" width="94" height="125" loading="lazy">
+    <img class="hof-compact-mark" src="/media/hof-mark-black.svg" alt="" aria-hidden="true" width="94" height="125" loading="lazy">
    </div>
    <div id="hof-lineup-content">${hofLineup()}</div>
   </section>
