@@ -523,6 +523,7 @@ function openModal(kind,id=selected){
  if(kind==='menu-location'){const url=hrefFor('menu_'+id,'');if(url){window.open(url,'_blank','noopener,noreferrer');return;}}
  const dialog=document.querySelector('dialog');if(!dialog.open)lastFocus=document.activeElement;
  modalKind=kind;modalVenue=id||'';
+ dialog.dataset.kind=kind;
  // A single booking component: HOF receives only a visual theme, not new data flow.
  dialog.dataset.theme=(kind==='booking'||kind==='contacts')&&id==='zyb'?'hof':'nova';
  dialog.dataset.bookingVenue=kind==='booking'?(id||'all'):'';
