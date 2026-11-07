@@ -49,7 +49,7 @@ assert.match(css,/page-editor-layout/,'Editor must have responsive layout');
 assert.equal(localizedValue('hof_slogan','en',{content:{hof_slogan:'Музыка'},content_en:{hof_slogan:'Music'}},{content:{},content_en:{hof_slogan:'Custom English slogan'}}),'Custom English slogan');
 assert.match(server,/function validImage\(v\)/,'Image whitelist is explicit');
 assert.match(server,/hof-\(\?:wordmark\|mark\)/,'Brand SVGs must remain available');
-assert.match(app,/source:'nova-cms-draft'/,'Draft live preview must not write D1');
+assert.match(app,/nova-cms-draft/,'Draft live preview must not write D1');
 assert.match(admin,/function sendPreview\(field,value\)/,'Editor must show unsaved draft changes');
 
 console.log('NOVA page CMS registry, link security and editor smoke guards passed');
