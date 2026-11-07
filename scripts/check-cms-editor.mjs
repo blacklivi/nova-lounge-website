@@ -32,7 +32,8 @@ assert.match(app,/const E=key=>text\(editorValue\(key\)\)/,'Editable text must b
 assert.match(server,/import \{EDITOR_FIELDS,ICON_CHOICES\}/,'Backend must use same whitelist');
 assert.match(server,/function validLink\(v\)/,'Backend must validate destinations');
 assert.match(server,/const ICON_KEYS =/,'Backend must validate icon choices');
-assert.match(server,/content_en:Object\.fromEntries\(en\)/,'Manual EN writes must be supported');
+assert.match(server,/Object\.entries\(b\.content_en\|\|\{\}\)/,'Manual EN input must be supported');
+assert.match(server,/INSERT INTO site_content_en\(key,value,updated_at\)/,'English content must persist to D1');
 assert.match(server,/if\(!await checkAuth\(request,env\)\)/,'Existing admin authentication must be preserved');
 assert.match(server,/if\(request.method!=='GET'&&!jsonSecurity\(request\)\)/,'CSRF/origin protection must stay active');
 assert.match(html,/id="page-editor-frame"/,'Editor visual preview missing');
