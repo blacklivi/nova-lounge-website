@@ -932,3 +932,176 @@ body.hof-active .site-footer .footer-bottom{font-size:14px}
   min-height:52px;
  }
 }
+
+
+/* HÓF auxiliary actions: real outlined buttons, not underlined text links.
+   The existing logo, CMS values and button handlers remain unchanged. */
+.hof-page .hof-editorial-about .hof-text-button,
+.hof-page .hof-compact-events .hof-event-more{
+ box-sizing:border-box;
+ display:inline-flex;
+ align-items:center;
+ justify-content:space-between;
+ width:max-content;
+ max-width:100%;
+ min-height:52px;
+ height:auto;
+ padding:13px 17px;
+ margin:0;
+ gap:24px;
+ border:1px solid currentColor;
+ border-radius:0;
+ box-shadow:none;
+ background:transparent;
+ font-size:15px;
+ font-weight:500;
+ line-height:1.35;
+ text-decoration:none;
+ white-space:normal;
+ cursor:pointer;
+ transition:color .2s ease,border-color .2s ease;
+}
+.hof-page .hof-editorial-about .hof-text-button{
+ color:#111;
+ border-color:#111;
+}
+.hof-page .hof-compact-events .hof-event-more{
+ color:#fff;
+ border-color:#f04902;
+}
+.hof-page .hof-editorial-about .hof-text-button:hover{
+ background:transparent;
+ color:#d94400;
+ border-color:#d94400;
+}
+.hof-page .hof-compact-events .hof-event-more:hover{
+ background:transparent;
+ color:#ff7139;
+ border-color:#ff7139;
+}
+.hof-page .hof-editorial-about .hof-text-button .arrow,
+.hof-page .hof-compact-events .hof-event-more .arrow{
+ width:18px;
+ height:18px;
+ flex:0 0 18px;
+}
+@media(max-width:600px){
+ .hof-page .hof-editorial-about .hof-text-button,
+ .hof-page .hof-compact-events .hof-event-more{
+  min-height:52px;
+  padding:13px 15px;
+  font-size:15px;
+  gap:20px;
+ }
+ .hof-events-empty{align-items:flex-start;flex-wrap:wrap;gap:22px}
+}
+
+/* HÓF contacts: branded modal using the same black/orange identity as its page.
+   Scope strictly to contacts; booking and other venues keep their own layouts. */
+.modal[data-kind="contacts"][data-theme="hof"]{
+ background:#151411;
+ color:#fff;
+ border:1px solid #39342d;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .modal-shell{
+ padding:clamp(24px,4vw,40px);
+}
+.modal[data-kind="contacts"][data-theme="hof"] .modal-shell::before{
+ content:"";
+ display:block;
+ width:48px;
+ height:5px;
+ background:#F04902;
+ margin:0 0 22px;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .modal-top{
+ border-bottom:1px solid rgba(255,255,255,.19);
+ margin-bottom:24px;
+ padding-bottom:15px;
+}
+.modal[data-kind="contacts"][data-theme="hof"] #modal-title{
+ margin:0 0 clamp(25px,4vw,36px);
+ max-width:15ch;
+ font-size:clamp(28px,4.4vw,40px);
+ letter-spacing:-.035em;
+ font-weight:450;
+ line-height:1.13;
+ color:#fff;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .hof-contact-details{
+ display:grid;
+ gap:0;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .hof-contact-info{
+ padding:17px 0 20px;
+ border-top:1px solid #46423b;
+ min-width:0;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .hof-contact-label{
+ display:block;
+ color:#f36a38;
+ font-size:13px;
+ line-height:1.4;
+ letter-spacing:.045em;
+ text-transform:uppercase;
+ margin-bottom:11px;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .hof-contact-info p{
+ color:#f4f1eb;
+ font-size:16px;
+ line-height:1.55;
+ margin:0;
+ overflow-wrap:break-word;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .hof-contact-modal-actions{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:10px;
+ margin-top:17px;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .hof-contact-action{
+ box-sizing:border-box;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
+ min-width:0;
+ min-height:52px;
+ padding:13px 15px;
+ border:1px solid #a49e94;
+ border-radius:0;
+ color:#fff;
+ background:transparent;
+ text-decoration:none;
+ font-size:15px;
+ line-height:1.4;
+ transition:color .2s ease,border-color .2s ease;
+ overflow-wrap:anywhere;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .hof-contact-action .arrow{
+ width:18px;
+ height:18px;
+ flex:0 0 18px;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .hof-contact-action:hover,
+.modal[data-kind="contacts"][data-theme="hof"] .hof-contact-action:focus-visible{
+ color:#f36a38;
+ border-color:#f36a38;
+ background:transparent;
+}
+.modal[data-kind="contacts"][data-theme="hof"] .close{
+ color:#fff;
+ background:transparent;
+ border-radius:0;
+}
+@media(max-width:600px){
+ .modal[data-kind="contacts"][data-theme="hof"] .modal-shell{padding:23px 20px 26px}
+ .modal[data-kind="contacts"][data-theme="hof"] .hof-contact-modal-actions{grid-template-columns:1fr}
+ .modal[data-kind="contacts"][data-theme="hof"] .hof-contact-action{min-height:52px}
+ .modal[data-kind="contacts"][data-theme="hof"] .hof-contact-info p{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ .hof-page .hof-editorial-about .hof-text-button,
+ .hof-page .hof-compact-events .hof-event-more,
+ .modal[data-kind="contacts"][data-theme="hof"] .hof-contact-action{transition:none}
+}
