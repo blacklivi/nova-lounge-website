@@ -1529,3 +1529,9 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
  accent-color:#F04902;
  caret-color:#F04902;
 }
+
+
+/* Re-enable the HÓF custom chooser on touch: global NOVA rule hides .nova-select. */
+@media (hover:none),(pointer:coarse){
+ .modal[data-theme="hof"] .nova-select{display:block!important}
+}
