@@ -28,6 +28,9 @@ const home=[
  ]),
  g('locations','Карточки заведений',[
   f('home_locations_title','Заголовок списка','text','ВЫБРАТЬ ЗАВЕДЕНИЕ','EXPLORE OUR SPACES'),
+  f('home_card_zyb_image','Карточка HÓF · фотография на главной','image'),
+  f('home_card_pob_image','Карточка Победителей · фотография на главной','image'),
+  f('home_card_east_image','Карточка Восток · фотография на главной','image'),
   f('home_card_zyb_url','Куда ведёт карточка HÓF','link','/spaces/zybitskaya'),
   f('home_card_pob_url','Куда ведёт карточка Победителей','link','/spaces/pobediteley'),
   f('home_card_east_url','Куда ведёт карточка Восток','link','/spaces/vostok'),
@@ -58,7 +61,7 @@ const home=[
 ];
 const hof=[
  g('hof-hero','Первый экран HÓF',[
-  f('venue_zyb_image','Фотография первого экрана и карточки на главной','image'),
+  f('venue_zyb_image','Заглавная фотография страницы HÓF (не карточки)','image'),
   f('hof_top_name','Малая подпись бренда','text','HOUSE OF FLOW','HOUSE OF FLOW'),
   f('hof_top_location','Адрес в верхнем углу','text','МИНСК · ЗЫБИЦКАЯ, 2','MINSK · 2 ZYBITSKAYA ST.'),
   f('hof_hero_kicker','Подпись над логотипом','text','МУЗЫКА / ВЕЧЕРИНКИ','MUSIC / PARTIES'),
@@ -101,7 +104,7 @@ const venues={pob:'Победителей',east:'Восток'};
 function venueGroups(id){
  return [
   g('main','Первый экран',[
-   f('venue_'+id+'_image','Главная фотография','image'),
+   f('venue_'+id+'_image','Заглавная фотография страницы заведения (не карточки)','image'),
    f('venue_'+id+'_name','Название заведения','text',venues[id],id==='pob'?'Pobediteley':'Vostok'),
    f('venue_'+id+'_kicker','Надпись над заголовком','text','NOVA / MINSK','NOVA / MINSK'),
    f('venue_'+id+'_subtitle','Подпись под названием','text'),
