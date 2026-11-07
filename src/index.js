@@ -29,7 +29,9 @@ async function authenticated(req,env){if(!env.ADMIN_SIGNING_KEY)return false;con
 function originAllowed(request){const origin=request.headers.get('origin');return !origin||origin===new URL(request.url).origin}
 async function payload(req){if(!req.headers.get('content-type')?.includes('application/json'))throw Error('json_required');const data=await req.json();if(!data||typeof data!=='object'||Array.isArray(data))throw Error('invalid_json');return data}
 function short(v,n=180){return typeof v==='string'?v.trim().slice(0,n):''}
-function validImage(v){return !v||MEDIA_RE.test(v)||/^\/media\/hof-(?:wordmark|mark)-(?:orange|black|white)\.svg$/.test(v)}
+function validImage(v){
+ return !v||MEDIA_RE.test(v)||/^\/media\/[A-Za-z0-9_.-]+\.(?:jpg|png|webp)$/.test(v)||/^\/media\/hof-(?:wordmark|mark)-(?:orange|black|white)\.svg$/.test(v)
+}
 function checkAuth(req,env){return authenticated(req,env)}
 function jsonSecurity(req){return originAllowed(req) && req.headers.get('x-nova-admin')==='1'}
 const venueIDs=new Set(['zyb','pob','east']);
