@@ -35,6 +35,8 @@ export function localImage(value) { return /^\/media\/[\w.-]+\.(?:jpg|jpeg|png|w
 export function localizedValue(key, language, defaults, source) {
   const ru = source.content || {}, en = source.content_en || {};
   if (language === 'ru') return ru[key] ?? defaults.content[key] ?? '';
+  // Explicit English edits must always win, even if Russian was never overridden.
+  if (Object.hasOwn(en, key)) return en[key];
   if (Object.hasOwn(ru, key)) {
     if (!/[А-Яа-яЁё]/.test(ru[key]) || /^(phone|menu|instagram|telegram)_/.test(key) || key.endsWith('_image')) return ru[key];
     // Never mix un-translated editorial Russian into the English interface.
