@@ -25,7 +25,7 @@ document.addEventListener('keydown',e=>{if(['Tab','Enter',' ','Escape'].includes
 // Apply the same line-break protection to fixed UI copy and CMS copy.
 const t = (ru,en) => typography(language === 'en' ? en : ru, language);
 const text = value => esc(typography(value,language));
-const name = id => value('venue_'+id+'_name') || names[language][id] || 'NOVA';
+const name = id => text(value('venue_'+id+'_name') || names[language][id] || 'NOVA');
 const brandName = id => id === 'zyb' ? 'HOF by NOVA' : 'NOVA / '+name(id);
 const venueLabel = id => id === 'zyb' ? 'HOF by NOVA · '+name(id) : 'NOVA / '+name(id);
 const value = key => localizedValue(key,language,defaults,source);
