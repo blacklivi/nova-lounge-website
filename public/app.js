@@ -505,6 +505,9 @@ function openModal(kind,id=selected){
  if(kind==='menu-location'){const url=hrefFor('menu_'+id,'');if(url){window.open(url,'_blank','noopener,noreferrer');return;}}
  const dialog=document.querySelector('dialog');if(!dialog.open)lastFocus=document.activeElement;
  modalKind=kind;modalVenue=id||'';
+ // A single booking component: HOF receives only a visual theme, not new data flow.
+ dialog.dataset.theme=kind==='booking'&&id==='zyb'?'hof':'nova';
+ dialog.dataset.bookingVenue=kind==='booking'?(id||'all'):'';
  document.getElementById('modal-caption').textContent=id?(id==='zyb'?'HOF':name(id)):'MINSK';
  const body=document.getElementById('modal-body');
  if(kind==='booking'){
@@ -543,7 +546,31 @@ function reviewBooking(e){
  document.getElementById('modal-body').innerHTML=`<h2 id="modal-title" tabindex="-1">${t('Проверьте данные','Review your details')}</h2><dl class="summary">${fields.map(([k,v])=>`<dt>${text(k)}</dt><dd>${text(v)}</dd>`).join('')}</dl><p class="demo-note">${t('Это только предварительный просмотр. Сообщение никому не отправлено, бронь не оформлена, данные не сохранены.','This is a preview only. No message has been sent, no table is reserved, and the information is not saved.')}</p><button class="button form-submit" data-close>${t('Закрыть','Close')}</button>`;
  document.getElementById('modal-title').focus();modalKind='review';
 }
-function updateTop(){const button=document.querySelector('[data-top]');if(button)button.hidden=scrollY<600;}
+function syncBookingDock(){
+ // HOF first screen already contains a reservation action. Expose the sticky
+ // action only after the hero has passed the sticky header.
+ const active=document.body.classList.contains('hof-active');
+ const hero=active?document.querySelector('.hof-editorial-hero'):null;
+ const header=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header'))||72;
+ const dock=document.querySelector('.mobile-cta');
+ const contact=active?document.querySelector('.hof-compact-contact [data-modal="booking"]'):null;
+ const contactRect=contact?.getBoundingClientRect();
+ const dockHeight=dock?.getBoundingClientRect().height||85;
+ // When the in-section booking action itself becomes available, the fixed
+ // action retreats instead of covering the same button near the footer.
+ const contactVisible=Boolean(contactRect&&contactRect.top<innerHeight-dockHeight&&contactRect.bottom>header);
+ const visible=Boolean(hero&&hero.getBoundingClientRect().bottom<=header+4&&!contactVisible);
+ document.body.classList.toggle('hof-dock-visible',visible);
+ if(dock){
+  if(active){dock.inert=!visible;dock.setAttribute('aria-hidden',String(!visible))}
+  else{dock.inert=false;dock.removeAttribute('aria-hidden')}
+ }
+}
+function updateTop(){
+ const button=document.querySelector('[data-top]');
+ if(button)button.hidden=scrollY<600;
+ syncBookingDock();
+}
 function navigate(id){
  closeModal(true);
  if(drawerOpen)setDrawer(false);
@@ -635,6 +662,7 @@ document.addEventListener('keydown',e=>{
  if(drawerOpen&&e.key==='Tab'){const controls=[...document.querySelectorAll('.site-header button,.site-header a,#drawer a,#drawer button')].filter(x=>x.offsetParent!==null),first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
 });
 window.addEventListener('scroll',updateTop,{passive:true});
+window.addEventListener('resize',updateTop,{passive:true});
 window.addEventListener('popstate',()=>{
  cancelGuidedScroll();
  closeModal(true);
