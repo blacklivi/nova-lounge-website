@@ -129,7 +129,7 @@ function home(){const next=splitEvents(displayEvents()).upcoming[0];return `<sec
 function hofLineup(){
  const upcoming=splitEvents(events.filter(e=>e.venue==='zyb'&&!e.demo)).upcoming.slice(0,2);
  if(upcoming.length)return `<div class="hof-event-list">${upcoming.map(e=>eventCard(e,true)).join('')}</div>`;
- return `<div class="hof-events-empty"><p>${E('hof_events_empty')}</p><a class="hof-event-more" href="${H('hof_events_more_url','/events')}" data-editor-key="hof_events_more_url">${E('hof_events_more_text')} ${arrow}</a></div>`;
+ return `<div class="hof-events-empty"><p>${E('hof_events_empty')}</p><a class="hof-event-more hof-action" href="${H('hof_events_more_url','/events')}" data-editor-key="hof_events_more_url">${E('hof_events_more_text')} ${arrow}</a></div>`;
 }
 function hofDetail(){
  return `<article class="detail hof-page hof-editorial">
@@ -145,7 +145,7 @@ function hofDetail(){
     </div>
     <div class="hof-cover-bottom">
      <div class="hof-hero-message"><p class="hof-manifesto" data-editor-key="hof_slogan">${E('hof_slogan')}</p><span data-editor-key="hof_description_short">${E('hof_description_short')}</span></div>
-     <div class="hof-hero-actions"><a class="hof-outline" href="${H('hof_events_button_url','#hof-lineup')}" ${hrefFor('hof_events_button_url','#hof-lineup')==='#hof-lineup'?'data-scroll="hof-lineup"':''} data-editor-key="hof_events_button_url">${E('hof_events_button_text')} ${I('hof_hero_icon')}</a><button class="hof-outline hof-primary-cta" type="button" data-editor-key="hof_booking_button_text" data-modal="booking" data-venue="zyb">${E('hof_booking_button_text')} ${I('hof_hero_icon')}</button></div>
+     <div class="hof-hero-actions"><a class="hof-outline hof-action" href="${H('hof_events_button_url','#hof-lineup')}" ${hrefFor('hof_events_button_url','#hof-lineup')==='#hof-lineup'?'data-scroll="hof-lineup"':''} data-editor-key="hof_events_button_url">${E('hof_events_button_text')} ${I('hof_hero_icon')}</a><button class="hof-outline hof-primary-cta hof-action" type="button" data-editor-key="hof_booking_button_text" data-modal="booking" data-venue="zyb">${E('hof_booking_button_text')} ${I('hof_hero_icon')}</button></div>
     </div>
    </div>
   </section>
@@ -155,7 +155,7 @@ function hofDetail(){
     <span class="hof-overline">${E('hof_about_kicker')}</span>
     <h2 id="hof-about-heading" data-editor-key="hof_about_title">${E('hof_about_title')}</h2>
     <p data-editor-key="hof_about_description">${E('hof_about_description')}</p>
-    <button class="hof-text-button" data-editor-key="menu_zyb" type="button" data-modal="menu-location" data-venue="zyb">${E('hof_menu_button_text')} ${I('hof_menu_button_icon')}</button>
+    <button class="hof-text-button hof-action" data-editor-key="menu_zyb" type="button" data-modal="menu-location" data-venue="zyb">${E('hof_menu_button_text')} ${I('hof_menu_button_icon')}</button>
    </div>
   </section>
   <div class="hof-editorial-grid">
@@ -168,8 +168,8 @@ function hofDetail(){
     <h2 data-editor-key="hof_contact_title">${E('hof_contact_title')}</h2>
     <p data-content="address_zyb">${content('address_zyb')}</p>
     <div class="hof-bottom-actions">
-     <button class="hof-outline hof-primary-cta" type="button" data-editor-key="hof_book_button_text" data-modal="booking" data-venue="zyb">${E('hof_book_button_text')} ${arrow}</button>
-     <button class="hof-text-button" data-editor-key="hof_contacts_button_text" type="button" data-modal="contacts" data-venue="zyb">${E('hof_contacts_button_text')} ${arrow}</button>
+     <button class="hof-outline hof-primary-cta hof-action" type="button" data-editor-key="hof_book_button_text" data-modal="booking" data-venue="zyb">${E('hof_book_button_text')} ${arrow}</button>
+     <button class="hof-text-button hof-action" data-editor-key="hof_contacts_button_text" type="button" data-modal="contacts" data-venue="zyb">${E('hof_contacts_button_text')} ${arrow}</button>
     </div>
    </section>
   </div>
