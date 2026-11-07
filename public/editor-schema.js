@@ -87,8 +87,8 @@ const hof=[
   f('hof_events_kicker','Малая подпись','text','HÓF / AFTER DARK','HÓF / AFTER DARK'),
   f('hof_events_title','Заголовок афиши','text','Афиша','Events'),
   f('hof_events_empty','Подпись при отсутствии событий','textarea','Новые события скоро появятся здесь.','New events will appear here soon.'),
-  f('hof_events_more_text','Надпись перехода на афишу NOVA','text','Общая афиша NOVA','NOVA events'),
-  f('hof_events_more_url','Адрес общей афиши','link','/events'),
+  f('hof_events_more_text','Кнопка перехода на события только HÓF','text','События HÓF','HÓF events'),
+  f('hof_events_more_url','Адрес афиши HÓF','link','/events/hof'),
  ]),
  g('hof-contact','Контакты и бронирование HÓF',[
   f('hof_contact_kicker','Малая подпись','text','ЗЫБИЦКАЯ / МИНСК','ZYBITSKAYA / MINSK'),
@@ -114,6 +114,8 @@ function venueGroups(id){
    f('venue_'+id+'_booking_text','Бронирование — надпись кнопки','text','Забронировать стол','Reserve a table'),
    f('venue_'+id+'_menu_text','Меню — надпись кнопки','text','Посмотреть меню','View the menu'),
    f('menu_'+id,'Адрес QR-меню (выбранного заведения)','link'),
+   f('venue_'+id+'_events_button_text','Кнопка событий именно этого заведения','text','Афиша заведения','Venue events'),
+   f('venue_'+id+'_events_button_url','Ссылка на события этого заведения','link','/events/'+(id==='pob'?'pobediteley':'vostok')),
   ]),
   g('atmosphere','Атмосфера и галерея',[
    f('venue_'+id+'_gallery_visible','Показывать фотографии галереи','toggle','yes'),
