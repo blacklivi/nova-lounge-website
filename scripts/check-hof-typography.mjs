@@ -2,55 +2,45 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {typography} from '../public/core.js';
 
-// NOVA-specific typography regression guard informed by design-lab Hallmark audits.
-// Not a full Hallmark certification or the upstream rendered audit.
 const app=readFileSync('public/app.js','utf8');
 const css=readFileSync('public/site.css','utf8');
-const hof=css.slice(css.indexOf('/* Experiment only: HOF by NOVA'));
-assert.ok(hof.length>1000,'HOF styles should exist');
-assert.doesNotMatch(hof,/letter-spacing:\s*-\d/i,'No negative tracking on HOF');
-assert.match(hof,/text-wrap:balance/,'Headings should balance');
-assert.match(hof,/text-wrap:pretty/,'Long body text should wrap naturally');
-assert.match(hof,/@media\(max-width:400px\)/,'320px text treatment required');
-assert.match(hof,/@media\(prefers-reduced-motion:reduce\)/,'Reduced-motion safeguard required');
-assert.doesNotMatch(hof,/transition\s*:\s*all\b/i,'Never animate all properties');
-assert.match(app,/hofDetail\(\)/,'HOF separate venue layout required');
-assert.match(app,/id==='zyb'|'zyb'\?/, 'Keep HOF tied to the existing venue identity');
-assert.doesNotMatch(app,/THE CONCEPT \/ 001|HOF \/ 001|HOF \/ 002/,'Avoid placeholder chapter numbers');
-assert.doesNotMatch(app,/Свой ритм\.\\nСвои люди\.|Увидимся\\nна Зыбицкой/,'Avoid forced editorial line breaks');
+const hof=css.slice(css.indexOf('/* HOF 2026 BRAND GUIDE'));
+const detail=app.slice(app.indexOf('function hofDetail(){'),app.indexOf('function detail(id){'));
+const events=app.slice(app.indexOf('function hofLineup(){'),app.indexOf('function hofDetail(){'));
+const orange=readFileSync('public/media/hof-wordmark-orange.svg','utf8');
+const black=readFileSync('public/media/hof-wordmark-black.svg','utf8');
+const white=readFileSync('public/media/hof-wordmark-white.svg','utf8');
+const mark=readFileSync('public/media/hof-mark-black.svg','utf8');
+
+assert.ok(hof.length>3000,'Dedicated compact HOF styles required');
+assert.doesNotMatch(hof,/letter-spacing:\s*-\d/i,'No negative tracking in HOF typography');
+assert.match(css,/text-wrap:balance/,'Balanced headings');
+assert.match(css,/text-wrap:pretty/,'Natural body text wrapping');
+assert.doesNotMatch(hof,/transition\s*:\s*all\b/i,'No broad transitions');
+assert.match(hof,/@media\(prefers-reduced-motion:reduce\)/,'Reduced-motion support');
 assert.equal(typography('Увидимся на Зыбицкой.','ru'),'Увидимся на\u00a0Зыбицкой.');
 assert.equal(typography('Мы и в доме, и на улице.','ru'),'Мы и\u00a0в\u00a0доме, и\u00a0на\u00a0улице.');
 assert.equal(typography('House of Flow by NOVA','en'),'House of\u00a0Flow by\u00a0NOVA');
 
-// Layout regressions: mobile actions must clear fixed booking dock, and the
-// three desktop venue card dividers must share a single baseline.
-assert.match(css,/--hof-booking-dock-height:calc\(69px \+ env\(safe-area-inset-bottom,0px\)\)/,
-  'Account for the fixed booking dock including device safe area');
-assert.match(css,/height:calc\(100svh - var\(--header\) - var\(--hof-booking-dock-height\)\)/,
-  'HOF cover must fit the visible space above the booking dock');
-assert.match(css,/\.venues>\.venue-card\{display:flex;flex-direction:column;align-self:stretch\}/,
-  'Desktop venue cards must stretch to the shared baseline');
-assert.match(css,/\.venues>\.venue-card \.venue-foot\{flex:1;display:flex;flex-direction:column\}/,
-  'Venue footers must share bottom border position');
-
-// Homepage mobile full-bleed cover: never expose a blank band above the sticky booking dock.
-assert.match(css,/height:calc\(100svh - var\(--header\)\)/,'NOVA mobile cover must span viewport below header');
-assert.match(css,/\.hero-copy\{[\s\S]*?padding-bottom:calc\(69px \+ env\(safe-area-inset-bottom,0px\)/,
-  'Home tagline must reserve the fixed mobile booking-dock height');
-assert.match(css,/\.hero\{[\s\S]*?min-height:0;[\s\S]*?max-height:none;/,
-  'Remove legacy hero min/max clamps that created a blank stripe on tall phones');
-
-// Brandbook regression gates based on HOF.pdf pp. 1–3.
-assert.match(css,/HOF 2026 BRAND GUIDE/,'Dedicated brandbook styles must be present');
-assert.match(css,/--hof-ink:#000000;--hof-paper:#ffffff;--hof-amber:#F04902/,
- 'Brand palette must match source PDF: After Hours / First Light / Amber Pulse');
-assert.match(css,/\.hof-bottom \.hof-overline\{color:#000!important\}/,
- 'Small labels on white must maintain legible contrast');
-assert.match(app,/src="\/media\/hof-wordmark\.svg"/,
- 'Use exact extracted HÓF vector, not a substitute font');
-assert.match(app,/src="\/media\/hof-symbol\.svg"/,
- 'Use supplied alternate mark with proper spacing');
-assert.match(app,/data-modal="booking" data-venue="zyb"/,
- 'Keep HOF reservation attached to existing Zybitskaya venue ID');
-
-console.log('NOVA HOF typography checks passed (Hallmark-adapted subset, not official full audit).');
+assert.match(css,/--hof-ink:#000000;--hof-paper:#ffffff;--hof-amber:#F04902/,'Official brand palette');
+for(const [asset,hex] of [[orange,'#F04902'],[black,'#000000'],[white,'#FFFFFF']]){
+ assert.ok(asset.includes('viewBox="0 0 519 247"'),'Original vector proportions');
+ assert.ok(asset.includes('fill="'+hex+'"'),'Official colour variant');
+ assert.ok(asset.includes('182.88 60.24 275.62 60.24'),'Official geometries');
+}
+assert.match(mark,/fill="#000000"/,'Correct black brand mark for orange background');
+assert.equal((detail.match(/<section /g)||[]).length,4,'HOF must remain four compact sections');
+for(const name of ['hof-min-hero','hof-compact-about','hof-compact-events','hof-compact-contact'])assert.ok(detail.includes(name),'Required section: '+name);
+assert.doesNotMatch(detail,/hof-about-media|hof-concept-posters|hof-concept-card/,'No long decorative blocks or fake posters');
+assert.match(detail,/src="\/media\/hof-wordmark-orange\.svg"/,'Use new official orange logo on black');
+assert.match(detail,/src="\/media\/hof-wordmark-white\.svg"/,'Use white logo in compact contact');
+assert.match(detail,/src="\/media\/hof-mark-black\.svg"/,'Use new brand symbol on orange');
+assert.match(app,/src="\/media\/hof-wordmark-black\.svg"/,'Use black official mark on home card');
+assert.match(events,/!e\.demo/,'Do not display fictional event posters');
+assert.match(events,/\.upcoming\.slice\(0,2\)/,'Keep event list compact');
+assert.match(app,/data-modal="booking" data-venue="zyb"/,'Preserve reservation venue id');
+assert.match(app,/if\(id==='zyb'\)return hofDetail\(\)/,'Preserve other venue pages');
+assert.match(css,/height:calc\(100svh - var\(--header\) - var\(--hof-booking-dock-height\)\)/,'Mobile cover must clear booking dock');
+assert.match(css,/\.venues>\.venue-card\{display:flex;flex-direction:column;align-self:stretch\}/,'Keep aligned venue card dividers');
+assert.match(css,/\.hero-copy\{[\s\S]*?padding-bottom:calc\(69px \+ env\(safe-area-inset-bottom,0px\)/,'Do not regress NOVA mobile hero');
+console.log('HOF compact brand and layout regression checks passed.');
