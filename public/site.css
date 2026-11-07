@@ -1464,3 +1464,68 @@ body.hof-active{
 @media(max-width:600px){
  .hof-event-list{grid-template-columns:minmax(0,1fr)}
 }
+
+
+/* HÓF: the mobile navigation and the booking choices must never inherit NOVA olive. */
+body.hof-active #drawer .button{
+ background:#F04902;
+ border:1px solid #F04902;
+ color:#000;
+}
+body.hof-active #drawer .button:hover{
+ background:#fff;
+ border-color:#fff;
+ color:#000;
+}
+body.hof-active #drawer .button:focus-visible{
+ outline:2px solid #F04902;
+ outline-offset:4px;
+}
+body.hof-active #drawer nav a:hover,
+body.hof-active #drawer nav a:focus-visible{color:#F04902}
+
+.modal[data-theme="hof"] .nova-select-trigger{
+ background:#faf8f4;
+ border-color:#b7aaa0;
+ color:#181818;
+}
+.modal[data-theme="hof"] .nova-select-trigger:hover,
+.modal[data-theme="hof"] .nova-select-trigger:focus-visible{
+ border-color:#F04902;
+ outline-color:#F04902;
+}
+.modal[data-theme="hof"] .nova-select-list{
+ max-height:min(248px,34dvh);
+ overflow-y:auto;
+ overscroll-behavior:contain;
+ border-color:#F04902;
+ background:#faf8f4;
+ box-shadow:0 12px 26px rgba(0,0,0,.22);
+ scrollbar-color:#F04902 #f4eee8;
+}
+.modal[data-theme="hof"] .nova-select-list.nova-select-above{
+ top:auto;
+ bottom:calc(100% + 4px);
+}
+.modal[data-theme="hof"] .nova-select-option{
+ min-height:39px;
+ padding:9px 12px;
+ color:#1a1916;
+}
+.modal[data-theme="hof"] .nova-select-option:hover,
+.modal[data-theme="hof"] .nova-select-option:focus-visible{
+ background:#ffe5d9;
+ color:#1a1916;
+}
+.modal[data-theme="hof"] .nova-select-option[aria-selected="true"],
+.modal[data-theme="hof"] .nova-select-option[aria-selected="true"]:hover,
+.modal[data-theme="hof"] .nova-select-option[aria-selected="true"]:focus-visible{
+ background:#F04902;
+ color:#000;
+}
+.modal[data-theme="hof"] .field input,
+.modal[data-theme="hof"] .field select,
+.modal[data-theme="hof"] .nova-select-trigger{
+ accent-color:#F04902;
+ caret-color:#F04902;
+}
