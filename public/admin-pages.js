@@ -40,6 +40,19 @@ function updatePreview(){
  $('#editor-new-tab').href=page.path;
  $('#page-editor-frame').src=previewUrl();
 }
+function sendPreview(field,value){
+ const frame=$('#page-editor-frame');
+ if(frame?.contentWindow)frame.contentWindow.postMessage({source:'nova-cms-draft',key:field.key,type:field.type,value:String(value)},location.origin);
+}
+function replayPreview(){
+ const fields=getPage().sections.flatMap(section=>section.fields);
+ for(const field of fields){
+  if(images.has(field.key))continue; // The original uploaded photo remains visible until the file is published.
+  const l=editableLanguage(field)?lang():'ru';
+  if(drafts[l].has(field.key))sendPreview(field,drafts[l].get(field.key));
+ }
+}
+$('#page-editor-frame').addEventListener('load',replayPreview);
 function dirtyCount(){return drafts.ru.size+drafts.en.size+images.size}
 function dirtyMessage(){status(dirtyCount()?dirtyCount()+' несохранённых изменений':'Все изменения опубликованы')}
 function remember(field,value,l=lang()){
@@ -48,6 +61,7 @@ function remember(field,value,l=lang()){
  if(value===String(prev))drafts[l].delete(field.key);
  else drafts[l].set(field.key,value);
  dirtyMessage();
+ sendPreview(field,value);
 }
 function linkIsValid(value){
  if(!value)return true;
@@ -114,6 +128,7 @@ function buildField(field){
    }
    images.set(field.key,file);
    preview.src=URL.createObjectURL(file);preview.hidden=false;
+   sendPreview(field,preview.src);
    dirtyMessage();
   });
   box.append(uploadInput);
@@ -183,10 +198,17 @@ async function upload(file){
  if(!r.ok)throw Error(data.error||'upload_failed');
  return data.url;
 }
+function editorBusy(state){
+ busy=state;
+ $('#page-editor-save').disabled=state;
+ for(const node of document.querySelectorAll('#page-editor-fields input,#page-editor-fields select,#page-editor-fields textarea,#page-editor-select,#page-editor-language')){
+  node.disabled=state;
+ }
+}
 async function publish(){
  if(busy)return;
  if(!dirtyCount()){status('Нет несохранённых изменений');return}
- busy=true;const button=$('#page-editor-save');button.disabled=true;
+ editorBusy(true);
  try{
   status('Загружаем фотографии…');
   for(const [key,file] of [...images]){
@@ -206,13 +228,13 @@ async function publish(){
     content:Object.fromEntries(ru),content_en:Object.fromEntries(en)
    });
    pending+=result.translation_pending||0;
-   for(const [key,value] of ru){saved.content[key]=value;drafts.ru.delete(key)}
-   for(const [key,value] of en){saved.content_en[key]=value;drafts.en.delete(key)}
+   for(const [key,value] of ru){saved.content[key]=value;if(drafts.ru.get(key)===value)drafts.ru.delete(key)}
+   for(const [key,value] of en){saved.content_en[key]=value;if(drafts.en.get(key)===value)drafts.en.delete(key)}
   }
   renderFields();updatePreview();
   status(pending?'Опубликовано, но '+pending+' автоматических переводов не получилось. Откройте English и введите перевод вручную.':'Опубликовано. Текст, ссылки, иконки и фотографии обновлены на сайте.',Boolean(pending));
  }catch(e){status('Ошибка публикации: '+e.message,true)}
- finally{busy=false;button.disabled=false}
+ finally{editorBusy(false)}
 }
 function switchPage(){
  if(dirtyCount())status('Несохранённые изменения сохранены в редакторе до нажатия «Опубликовать»');
