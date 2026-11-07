@@ -1114,3 +1114,177 @@ body.hof-active .site-footer .footer-bottom{font-size:14px}
  .hof-page .hof-events-empty{flex-direction:column;align-items:flex-start;gap:18px}
  .hof-page .hof-compact-events .hof-event-more{flex-shrink:0}
 }
+
+
+/* HÓF ACTION DESIGN SYSTEM v2
+   All principal HÓF actions use ONE width/height token per breakpoint.
+   Primary/secondary colors differ; their geometry cannot diverge.
+   Utility controls (language, menu toggle, back-to-top, close) are not CTAs. */
+body.hof-active{
+ --hof-action-width:234px;
+ --hof-action-height:56px;
+ --hof-action-text:15px;
+ --hof-action-pad:14px;
+}
+.hof-page .hof-hero-actions{
+ display:grid;
+ grid-template-columns:repeat(2,var(--hof-action-width));
+ width:max-content;
+ max-width:100%;
+ gap:10px;
+ align-items:stretch;
+ flex:0 0 auto;
+}
+.hof-page .hof-compact-contact .hof-bottom-actions{
+ display:grid;
+ grid-template-columns:repeat(2,var(--hof-action-width));
+ width:max-content;
+ max-width:100%;
+ gap:12px;
+ align-items:stretch;
+}
+.hof-page .hof-hero-actions > .hof-action,
+.hof-page .hof-editorial-about .hof-action,
+.hof-page .hof-compact-events .hof-action,
+.hof-page .hof-compact-contact .hof-bottom-actions > .hof-action{
+ box-sizing:border-box;
+ display:inline-flex;
+ flex:0 0 auto;
+ align-items:center;
+ justify-content:space-between;
+ width:var(--hof-action-width);
+ min-width:0;
+ max-width:100%;
+ height:var(--hof-action-height);
+ min-height:var(--hof-action-height);
+ max-height:var(--hof-action-height);
+ padding:9px var(--hof-action-pad);
+ margin:0;
+ gap:9px;
+ border-width:1px;
+ border-style:solid;
+ border-radius:0;
+ font-family:Manrope,Arial,sans-serif;
+ font-size:var(--hof-action-text);
+ font-weight:500;
+ line-height:1.27;
+ text-decoration:none;
+ white-space:normal;
+ cursor:pointer;
+}
+.hof-page .hof-action .arrow{
+ flex:0 0 18px;
+ width:18px;
+ height:18px;
+}
+.hof-page .hof-editorial-about .hof-action,
+.hof-page .hof-compact-events .hof-action{
+ background:transparent;
+}
+/* Preserve original palette while standardizing button geometry. */
+.hof-page .hof-editorial-about .hof-action{color:#111;border-color:#111}
+.hof-page .hof-compact-events .hof-action{color:#fff;border-color:#F04902}
+body.hof-active .header-book{
+ box-sizing:border-box;
+ width:var(--hof-action-width);
+ height:var(--hof-action-height);
+ min-height:var(--hof-action-height);
+ max-height:var(--hof-action-height);
+ padding-inline:var(--hof-action-pad);
+ font-size:var(--hof-action-text);
+ border-radius:0;
+}
+/* Tablet: hero and contact each need room for two full-size buttons. */
+@media(min-width:601px) and (max-width:1100px){
+ .hof-page .hof-cover-bottom{
+  flex-direction:column;
+  align-items:flex-start;
+  gap:18px;
+ }
+ .hof-page .hof-hero-actions{
+  grid-template-columns:repeat(2,var(--hof-action-width));
+ }
+}
+@media(min-width:601px) and (max-width:1360px){
+ .hof-page .hof-compact-contact .hof-bottom-actions{
+  grid-template-columns:var(--hof-action-width);
+  width:var(--hof-action-width);
+ }
+}
+@media(max-width:600px){
+ body.hof-active{
+  --hof-action-width:260px;
+  --hof-action-height:56px;
+  --hof-action-text:15px;
+  --hof-action-pad:15px;
+ }
+ /* A single column is needed to preserve identical button widths on phones. */
+ .hof-page .hof-hero-actions{
+  display:grid;
+  grid-template-columns:var(--hof-action-width);
+  width:var(--hof-action-width);
+  max-width:100%;
+  gap:8px;
+  align-items:stretch;
+ }
+ .hof-page .hof-cover-bottom{align-items:flex-start}
+ .hof-page .hof-compact-contact .hof-bottom-actions{
+  grid-template-columns:var(--hof-action-width);
+  width:var(--hof-action-width);
+  max-width:100%;
+  gap:10px;
+ }
+ .hof-page .hof-hero-actions > .hof-action,
+ .hof-page .hof-editorial-about .hof-action,
+ .hof-page .hof-compact-events .hof-action,
+ .hof-page .hof-compact-contact .hof-bottom-actions > .hof-action{
+  height:var(--hof-action-height);
+  min-height:var(--hof-action-height);
+  max-height:var(--hof-action-height);
+  width:var(--hof-action-width);
+  max-width:100%;
+  padding:10px var(--hof-action-pad);
+  font-size:var(--hof-action-text);
+  gap:9px;
+ }
+ .hof-page .hof-hero-actions .hof-action .arrow{
+  width:18px;
+  height:18px;
+  flex-basis:18px;
+ }
+ /* Sticky action is now the same size as all other HÓF actions. */
+ body.hof-active .mobile-cta{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+ }
+ body.hof-active .mobile-cta .button{
+  box-sizing:border-box;
+  flex:0 0 auto;
+  width:var(--hof-action-width);
+  max-width:100%;
+  height:var(--hof-action-height);
+  min-height:var(--hof-action-height);
+  max-height:var(--hof-action-height);
+  padding:10px var(--hof-action-pad);
+  margin:0 auto;
+  font-family:Manrope,Arial,sans-serif;
+  font-size:var(--hof-action-text);
+  line-height:1.27;
+  border-radius:0;
+ }
+}
+@media(max-width:600px) and (max-height:690px){
+ /* Keep both full-size hero buttons inside the first screen on short phones. */
+ .hof-page .hof-editorial-hero .hof-cover-inner{
+  padding-top:8px;
+  padding-bottom:8px;
+  gap:5px;
+ }
+ .hof-page .hof-editorial-hero .hof-wordmark{width:min(60vw,235px)}
+ .hof-page .hof-by-nova{font-size:17px;margin-top:4px}
+ .hof-page .hof-hero-eyebrow{margin-bottom:6px!important}
+ .hof-page .hof-manifesto{font-size:clamp(19px,5.7vw,23px)}
+ .hof-page .hof-cover-bottom{gap:7px}
+ .hof-page .hof-hero-actions{gap:6px}
+}

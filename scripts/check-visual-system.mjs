@@ -55,4 +55,20 @@ assert.match(auxiliaryRules,/width:min\(100%,260px\);\s*max-width:100%;\s*min-he
 assert.match(auxiliaryRules,/justify-content:space-between/,'Right-side arrows should align in a common column');
 assert.match(auxiliaryRules,/\.hof-page \.hof-compact-events \.hof-event-more\{\s*color:#fff;/,'Dark panel keeps a high-contrast border');
 
+// The complete HÓF action set is governed by one geometry token per viewport.
+const hofMarkup=app.slice(app.indexOf('function hofLineup(){'),app.indexOf('function detail(id){'));
+assert.equal((hofMarkup.match(/hof-action/g)||[]).length,6,'Hero, menu, events, and contacts must share one action class (6 total)');
+const system=css.slice(css.indexOf('/* HÓF ACTION DESIGN SYSTEM v2'));
+assert.ok(system.startsWith('/* HÓF ACTION DESIGN SYSTEM v2'),'Responsive action system must exist');
+assert.match(system,/--hof-action-width:234px;\s*--hof-action-height:56px;/,'Desktop actions need uniform 234×56 sizing');
+assert.match(system,/@media\(max-width:600px\)\s*\{\s*body\.hof-active\{\s*--hof-action-width:260px;\s*--hof-action-height:56px;/,'Mobile actions need uniform 260×56 sizing');
+assert.match(system,/\.hof-page \.hof-hero-actions > \.hof-action,\s*\.hof-page \.hof-editorial-about \.hof-action,\s*\.hof-page \.hof-compact-events \.hof-action,\s*\.hof-page \.hof-compact-contact \.hof-bottom-actions > \.hof-action/,'All four HÓF CTA contexts must use exactly the same geometry rule');
+assert.match(system,/height:var\(--hof-action-height\);\s*min-height:var\(--hof-action-height\);\s*max-height:var\(--hof-action-height\)/,'Height may not vary by content or parent');
+assert.match(system,/\.hof-page \.hof-hero-actions\{\s*display:grid;/,'Hero actions must have a predictable grid');
+assert.match(system,/\.hof-page \.hof-compact-contact \.hof-bottom-actions\{\s*display:grid;/,'Contacts must have a predictable grid');
+assert.match(system,/\.hof-page \.hof-hero-actions\{\s*display:grid;\s*grid-template-columns:var\(--hof-action-width\)/,'Phone hero CTAs must stack instead of shrinking to half width');
+assert.match(system,/body\.hof-active \.mobile-cta \.button\{/,'Mobile sticky reservation action must follow same geometry');
+assert.match(system,/body\.hof-active \.header-book\{/,'Desktop header reservation action must follow same geometry');
+assert.match(system,/@media\(max-width:600px\) and \(max-height:690px\)/,'Short phone poster needs a fit adjustment');
+
 console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');
