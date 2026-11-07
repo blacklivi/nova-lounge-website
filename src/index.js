@@ -114,7 +114,7 @@ async function api(request,env,url){const path=url.pathname;
   const x=new Uint8Array(bytes);const jpg=x[0]===255&&x[1]===216&&x[2]===255,png=x[0]===137&&x[1]===80&&x[2]===78&&x[3]===71,webp=String.fromCharCode(...x.slice(0,4))==='RIFF'&&String.fromCharCode(...x.slice(8,12))==='WEBP';
   if((type==='image/jpeg'&&!jpg)||(type==='image/png'&&!png)||(type==='image/webp'&&!webp))return error('invalid_image_signature');
   const key='upload-'+crypto.randomUUID()+'.'+({ 'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[type]);
-  await env.MEDIA.put(key,bytes,{httpMetadata:{contentType:type,cacheControl:'public, max-age=86400'}});
+  await env.MEDIA.put(key,bytes,{httpMetadata:{contentType:type,cacheControl:type==='image/webp'?'public, max-age=31536000, immutable':'public, max-age=86400'}});
   return respond({ok:true,url:'/media/'+key},201)
  }
  return error('not_found',404)
@@ -135,7 +135,7 @@ export default {async fetch(request,env){const url=new URL(request.url),p=url.pa
   }
   if(p.startsWith('/media/upload-')&&MEDIA_RE.test(p)){
     const k=p.substring('/media/'.length),obj=await env.MEDIA.get(k);
-    if(!obj)return new Response('Not found',{status:404});const h=new Headers({'Content-Type':obj.httpMetadata?.contentType||'application/octet-stream','Cache-Control':'public, max-age=86400','X-Content-Type-Options':'nosniff'});return new Response(obj.body,{headers:h});
+    if(!obj)return new Response('Not found',{status:404});const h=new Headers({'Content-Type':obj.httpMetadata?.contentType||'application/octet-stream','Cache-Control':obj.httpMetadata?.cacheControl||'public, max-age=86400','X-Content-Type-Options':'nosniff'});return new Response(obj.body,{headers:h});
   }
   return env.ASSETS.fetch(request);
  }catch(e){console.error('NOVA request error',p,String(e));return error('request_failed',500)}
