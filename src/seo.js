@@ -5,6 +5,7 @@ const VENUES={
  pobediteley:{id:'pob',name:'Победителей',nameEN:'Pobediteley',street:'просп. Победителей, 89, корп. 3, 2-й этаж',phone:'+375 25 644-33-33',map:'https://yandex.ru/maps/org/myata_lounge/1498688403',image:'/media/clean-04578c785a8dd9.jpg',title:'NOVA Победителей — лаунж-кафе на проспекте Победителей, 89/3',description:'NOVA Победителей, 89/3: кухня, встречи с друзьями, настольные игры и вечерняя музыка. Телефон +375 25 644-33-33.',opening:[{days:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],closes:'02:00'}]},
  vostok:{id:'east',name:'Восток',nameEN:'Vostok',street:'ул. Франциска Скорины, 2',phone:'+375 44 791-33-33',map:'https://yandex.ru/maps/org/136614972290',image:'/media/clean-5cb8311007919b.jpg',title:'NOVA Восток — лаунж-кафе на Франциска Скорины, 2',description:'NOVA Восток, ул. Франциска Скорины, 2: кухня, ланчи, кальяны и встречи в Минске. Телефон +375 44 791-33-33.',opening:[{days:['Monday','Tuesday','Wednesday','Thursday','Sunday'],closes:'02:00'},{days:['Friday','Saturday'],closes:'04:00'}]}
 };
+const EVENT_ROUTES={hof:{name:'HÓF / House of Flow',description:'События, DJ-сеты и вечеринки HÓF by NOVA на Зыбицкой, 2 в Минске.'},pobediteley:{name:'NOVA Победителей',description:'События и встречи в NOVA Победителей, Минск.'},vostok:{name:'NOVA Восток',description:'События и встречи в NOVA Восток, Минск.'}};
 const htmlEscape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const scriptJson=obj=>JSON.stringify(obj).replace(/</g,'\\u003c').replace(/>/g,'\\u003e');
 const noindexHost=host=>host.endsWith('.workers.dev')||host==='localhost'||host.endsWith('.pages.dev');
@@ -40,18 +41,19 @@ function fallback(route,v,origin,over,def){
   const map=htmlEscape(val('map_'+v.id)||v.map);
   return '<main id="seo-fallback"><h1>'+(v.id==='zyb'?'':'NOVA — ')+n+'</h1><p>'+desc+'</p><address>'+address+', Минск</address><p><a href="tel:'+phone.replace(/[^\d+]/g,'')+'">'+phone+'</a></p><p><a href="'+map+'">Открыть карточку заведения на карте</a></p><nav><a href="/">Все пространства NOVA</a></nav></main>';
  }
+ if(route.startsWith('/events/')){const name=EVENT_ROUTES[route.split('/')[2]]?.name;if(name)return '<main id="seo-fallback"><h1>События '+htmlEscape(name)+'</h1><p>Афиша выбранного пространства NOVA.</p><a href="/events">Все события NOVA</a></main>'}
  if(route==='/events')return '<main id="seo-fallback"><h1>События NOVA в Минске</h1><p>Афиша вечеринок и DJ-сетов NOVA.</p><a href="/">Все пространства</a></main>';
  return '<main id="seo-fallback"><h1>NOVA — три лаунж-кафе в Минске</h1><p>Зыбицкая, Победителей и Восток: кухня, встречи, вечеринки и ланчи.</p><ul>'+Object.entries(VENUES).map(([slug,item])=>'<li><a href="/spaces/'+slug+'">'+(item.id==='zyb'?'':'NOVA ')+htmlEscape(item.name)+' — '+htmlEscape(item.street)+'</a></li>').join('')+'</ul></main>';
 }
 export async function publicPage(request,env,route){
- const url=new URL(request.url),v=VENUES[route.split('/')[2]],origin=url.origin;
- const asset=route==='/events'?'/events.html':'/index.html';
+ const url=new URL(request.url),v=VENUES[route.split('/')[2]],eventVenue=route.startsWith('/events/')?EVENT_ROUTES[route.split('/')[2]]:null,origin=url.origin;
+ const asset=route.startsWith('/events')?'/events.html':'/index.html';
  const [page,def,over]=await Promise.all([env.ASSETS.fetch(new Request(new URL(asset,request.url),request)),defaultsFor(env,request.url),overrides(env)]);
  if(!page.ok)return page;
- const title=v?v.title:route==='/events'?'События NOVA — афиша Минска':'NOVA — три лаунж-кафе в Минске';
- const desc=v?v.description:route==='/events'?'Афиша NOVA в Минске: DJ-сеты, вечеринки и ближайшие события.':'NOVA — три лаунж-кафе в Минске: Зыбицкая, Победителей, Восток. Кухня, ланчи и вечерние встречи.';
+ const title=v?v.title:eventVenue?'События '+eventVenue.name+' — афиша Минска':route==='/events'?'События NOVA — афиша Минска':'NOVA — три лаунж-кафе в Минске';
+ const desc=v?v.description:eventVenue?eventVenue.description:route==='/events'?'Афиша NOVA в Минске: DJ-сеты, вечеринки и ближайшие события.':'NOVA — три лаунж-кафе в Минске: Зыбицкая, Победителей, Восток. Кухня, ланчи и вечерние встречи.';
  const canonical=origin+route;
- const ld=v?structuredBusiness(v,origin,over,def):{'@context':'https://schema.org','@type':route==='/events'?'CollectionPage':'Organization',name:'NOVA',url:canonical,description:desc};
+ const ld=v?structuredBusiness(v,origin,over,def):{'@context':'https://schema.org','@type':(route==='/events'||eventVenue)?'CollectionPage':'Organization',name:'NOVA',url:canonical,description:desc};
  const head='<link rel="canonical" href="'+htmlEscape(canonical)+'">'+
  '<meta property="og:site_name" content="NOVA">'+
  '<meta property="og:type" content="website">'+
@@ -76,10 +78,10 @@ export function seoRoute(request){
  if(p==='/robots.txt')return new Response(demo?'User-agent: *\nDisallow: /\n':'User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: '+u.origin+'/sitemap.xml\n',{headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'public, max-age=300'}});
  if(p==='/sitemap.xml'){
   if(demo)return new Response('Demo domain is not indexable',{status:404,headers:{'X-Robots-Tag':'noindex'}});
-  const paths=['/','/events',...Object.keys(VENUES).map(x=>'/spaces/'+x)];
+  const paths=['/','/events',...Object.keys(EVENT_ROUTES).map(x=>'/events/'+x),...Object.keys(VENUES).map(x=>'/spaces/'+x)];
   const xml='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+paths.map(x=>'<url><loc>'+htmlEscape(u.origin+x)+'</loc></url>').join('')+'</urlset>';
   return new Response(xml,{headers:{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=300'}});
  }
  return null;
 }
-export const isPublicPage=p=>p==='/'||p==='/events'||/^\/spaces\/(?:zybitskaya|pobediteley|vostok)\/?$/.test(p);
+export const isPublicPage=p=>p==='/'||p==='/events'||/^\/events\/(?:hof|pobediteley|vostok)\/?$/.test(p)||/^\/spaces\/(?:zybitskaya|pobediteley|vostok)\/?$/.test(p);
