@@ -15,6 +15,7 @@
       "/media/upload-*",
       "/admin",
       "/events",
+      "/events/*",
       "/spaces/*",
       "/robots.txt",
       "/sitemap.xml"
