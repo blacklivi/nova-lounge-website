@@ -37,6 +37,7 @@ const home=[
   f('home_card_hof_location','Подпись HÓF в карточке','text','HOUSE OF FLOW · ЗЫБИЦКАЯ','HOUSE OF FLOW · ZYBITSKAYA'),
  ]),
  g('story','О нас и кухня',[
+  f('home_story_visible','Показывать раздел «О нас»','toggle','yes'),
   f('story_kicker','Подпись над блоком','text'),f('story_title','Основной заголовок','textarea'),
   f('story_description','Описание','textarea'),f('story_image','Фотография','image'),
   f('home_story_menu_text','Кнопка меню','text','Посмотреть меню','View the menu'),
@@ -44,11 +45,13 @@ const home=[
   f('media_note','Примечание к фотографии','textarea')
  ]),
  g('events','Афиша главной',[
+  f('home_events_visible','Показывать раздел событий','toggle','yes'),
   f('home_events_title','Заголовок','text','События','Events'),f('home_events_url','Переход к афише','link','/events'),
   f('home_events_icon','Иконка перехода','icon','arrow-right'),
   f('home_events_empty','Подпись, когда нет афиши','text','Афиша пока пуста.','No events yet.')
  ]),
  g('booking','Нижний блок бронирования',[
+  f('home_booking_visible','Показывать нижний блок бронирования','toggle','yes'),
   f('booking_image','Фотография','image'),f('home_booking_welcome','Текст приглашения','textarea','Мы с нетерпением ждём встречи с вами.','We look forward to seeing you.'),
   f('booking_title','Надпись на кнопке','textarea'),f('home_booking_icon','Иконка бронирования','icon','arrow-right'),
  ])
@@ -110,6 +113,7 @@ function venueGroups(id){
    f('menu_'+id,'Адрес QR-меню (выбранного заведения)','link'),
   ]),
   g('atmosphere','Атмосфера и галерея',[
+   f('venue_'+id+'_gallery_visible','Показывать фотографии галереи','toggle','yes'),
    f('venue_'+id+'_atmosphere_kicker','Малая подпись','text','Атмосфера NOVA','NOVA atmosphere'),
    f('venue_'+id+'_atmosphere_title','Крупный заголовок','textarea','В своём ритме.','Your kind of evening.'),
    f('venue_'+id+'_second','Описание','textarea'),
