@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {EDITOR_PAGES,EDITOR_FIELDS,EDITOR_BY_KEY,ICON_CHOICES} from '../public/editor-schema.js';
+import {localizedValue} from '../public/core.js';
 
 const app=readFileSync('public/app.js','utf8');
 const admin=readFileSync('public/admin-pages.js','utf8');
@@ -44,4 +45,11 @@ assert.match(admin,/\['yes','Показывать'\]/,'Optional sections should 
 assert.match(admin,/new URL\(pageUrl\(\),location.origin\)/,'Editor preview must stay same-origin');
 assert.match(admin,/event.origin!==location.origin/,'Preview messages must be origin-checked');
 assert.match(css,/page-editor-layout/,'Editor must have responsive layout');
+// English data is editable independently of Russian even when no RU override exists.
+assert.equal(localizedValue('hof_slogan','en',{content:{hof_slogan:'Музыка'},content_en:{hof_slogan:'Music'}},{content:{},content_en:{hof_slogan:'Custom English slogan'}}),'Custom English slogan');
+assert.match(server,/function validImage\(v\)/,'Image whitelist is explicit');
+assert.match(server,/hof-\(\?:wordmark\|mark\)/,'Brand SVGs must remain available');
+assert.match(app,/source:'nova-cms-draft'/,'Draft live preview must not write D1');
+assert.match(admin,/function sendPreview\(field,value\)/,'Editor must show unsaved draft changes');
+
 console.log('NOVA page CMS registry, link security and editor smoke guards passed');
