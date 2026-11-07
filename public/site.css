@@ -459,3 +459,170 @@ main.route-enter{animation:novaRouteEnter .3s ease-out both}
  .hero h1{margin-top:clamp(10px,2svh,20px);font-size:clamp(62px,26vw,118px)}
  .hero-tagline{font-size:clamp(13px,3.7vw,17px);line-height:1.35}
 }
+
+
+/* HOF 2026 BRAND GUIDE — extracted from user-supplied HOF.pdf, pages 1–3.
+   After Hours #000000, First Light #FFFFFF, Amber Pulse #F04902.
+   Primary and alternate marks are ORIGINAL vector contours from page 2.
+   All changes are scoped to HOF; NOVA/Pobediteley/Vostok stay unchanged. */
+body.hof-active,.hof-page{
+ --hof-ink:#000000;--hof-paper:#ffffff;--hof-amber:#F04902;
+ --hof-dim:rgba(255,255,255,.67);
+}
+body.hof-active .site-header{background:#000;color:#fff;border-bottom-color:#272727}
+body.hof-active .site-header .brand,
+body.hof-active .site-header .main-nav a{color:#fff}
+body.hof-active .site-header .language button{color:#a7a7a7}
+body.hof-active .site-header .language button[aria-pressed="true"]{color:#fff;text-decoration-color:var(--hof-amber)}
+body.hof-active .site-header .header-book{border-color:#fff;color:#fff}
+body.hof-active .site-header .header-book:hover{background:var(--hof-amber);border-color:var(--hof-amber);color:#000}
+body.hof-active .menu-toggle span{background:#fff}
+body.hof-active .drawer{background:#000;color:#fff}
+body.hof-active .drawer nav a{border-color:#363636}
+body.hof-active .mobile-cta{background:#000;border-top-color:#303030}
+body.hof-active .mobile-cta .button{background:#F04902;color:#000;border-color:#F04902}
+body.hof-active .mobile-cta .button:hover{background:#fff;border-color:#fff}
+body.hof-active .site-footer{background:#000;color:#fff;border-top:1px solid #282828}
+body.hof-active .site-footer a,body.hof-active .site-footer h3,body.hof-active .site-footer strong{color:#fff}
+body.hof-active .site-footer p,body.hof-active .site-footer span{color:#bdbdbd}
+body.hof-active .site-footer a:hover{color:#F04902}
+.hof-page{background:#000;color:#fff;font-family:Manrope,Arial,sans-serif}
+.hof-page :focus-visible{outline:2px solid #F04902;outline-offset:4px}
+.hof-page p{color:#eee}
+.hof-page .hof-overline,.hof-page .hof-side-mark,.hof-page .hof-note{color:#bcbcbc}
+.hof-cover{background:#000;isolation:isolate}
+.hof-cover-media img{
+ filter:grayscale(.72) sepia(.83) saturate(2.6) hue-rotate(-18deg) contrast(1.16) brightness(.69);
+ opacity:.74;
+}
+.hof-cover-shade{
+ background:
+  radial-gradient(ellipse at 74% 26%,rgba(240,73,2,.66) 0%,rgba(240,73,2,.25) 22%,transparent 50%),
+  linear-gradient(90deg,rgba(0,0,0,.89) 0%,rgba(0,0,0,.5) 49%,rgba(0,0,0,.16) 100%),
+  linear-gradient(0deg,rgba(0,0,0,.94) 0%,transparent 38%,rgba(0,0,0,.3) 100%);
+}
+.hof-cover-shade::after{
+ content:'';position:absolute;right:-7%;top:6%;
+ width:min(46vw,740px);aspect-ratio:1;border:1px solid rgba(255,116,35,.30);
+ border-radius:50%;box-shadow:0 0 70px rgba(240,73,2,.21),inset 0 0 45px rgba(240,73,2,.19);
+ transform:rotate(-19deg) scaleY(.56);pointer-events:none;
+}
+.hof-cover-top{color:#fff}
+.hof-cover-brand{max-width:min(1450px,100%)}
+.hof-cover-brand h1{margin:0;font-size:0;line-height:0}
+.hof-cover-brand .hof-wordmark{
+ display:block;width:clamp(310px,43vw,680px);max-width:100%;height:auto;
+ filter:invert(1);
+}
+.hof-cover-brand .hof-by-nova{
+ font-size:clamp(23px,2.4vw,44px);font-weight:400;
+ margin:clamp(24px,5.2vw,78px) 0 0;
+ line-height:1.2;color:#fff;
+}
+.hof-manifesto{color:#fff!important}
+.hof-note{font-weight:400}
+.hof-page .hof-outline{
+ color:#fff;background:transparent;border-color:#fff;
+ transition:color .28s ease,background-color .28s ease,border-color .28s ease;
+}
+.hof-page .hof-outline:hover{background:#fff;color:#000;border-color:#fff}
+.hof-page .hof-hero-actions button[data-modal="booking"],
+.hof-page .hof-bottom-actions button[data-modal="booking"]{
+ color:#000;background:#F04902;border-color:#F04902;
+}
+.hof-page .hof-hero-actions button[data-modal="booking"]:hover,
+.hof-page .hof-bottom-actions button[data-modal="booking"]:hover{
+ background:#fff;color:#000;border-color:#fff;
+}
+.hof-lineup{background:#000;color:#fff}
+.hof-section-heading{border-bottom-color:#F04902}
+.hof-section-heading h2{color:#fff}
+.hof-overline{color:#F04902!important}
+.hof-lineup .hof-side-mark{color:#fff}
+.hof-demo-notice{color:#c6c6c6!important}
+.hof-concept-posters{gap:clamp(15px,2.7vw,46px)}
+.hof-concept-photo{isolation:isolate;aspect-ratio:1.14;background:#000;overflow:hidden}
+.hof-concept-photo-amber{
+ background:
+  radial-gradient(circle at 71% 29%,#ffae20 0%,#F04902 37%,#aa2004 67%,#280400 100%);
+}
+.hof-concept-photo-black{
+ background:
+  radial-gradient(ellipse at 74% 72%,rgba(240,73,2,.78),transparent 45%),#030100;
+}
+.hof-concept-photo::before{
+ content:'';position:absolute;inset:-15%;opacity:.78;
+ background:
+  radial-gradient(ellipse at 60% 60%,transparent 36.5%,rgba(0,0,0,.85) 37%,rgba(0,0,0,.85) 38%,transparent 38.7%),
+  radial-gradient(ellipse at 80% 20%,transparent 28%,rgba(0,0,0,.73) 28.5%,rgba(0,0,0,.73) 29.5%,transparent 30%);
+ transform:rotate(-14deg);
+}
+.hof-concept-photo-black::before{opacity:.83;filter:invert(1) sepia(1) saturate(6) hue-rotate(-30deg)}
+.hof-concept-photo::after{background:linear-gradient(0deg,rgba(0,0,0,.45),transparent 65%);z-index:0}
+.hof-concept-photo > img.hof-poster-symbol{
+ position:absolute;z-index:1;right:clamp(19px,3vw,50px);top:clamp(22px,3vw,48px);
+ inset:auto;width:clamp(36px,5.4vw,74px);height:auto;max-height:96px;
+ object-fit:contain;opacity:1;filter:none;
+}
+.hof-concept-photo-black > img.hof-poster-symbol{filter:invert(1)}
+.hof-concept-photo .hof-poster-type{z-index:2}
+.hof-concept-photo .hof-poster-type>span{font-size:10px;color:#fff}
+.hof-concept-photo .hof-poster-type>strong{
+ color:#fff;font-size:clamp(36px,5vw,110px);font-weight:500;
+ letter-spacing:0;line-height:1;text-wrap:balance;max-width:8em;
+}
+.hof-poster-caption{color:#fff}
+.hof-future-note{color:#bdbdbd!important}
+.hof-event-list .event-info h3{color:#fff}
+.hof-event-list .event-info time,.hof-event-list .event-location{color:#F04902}
+.hof-about{background:#000;min-height:640px}
+.hof-about-media{background:#080201;position:relative}
+.hof-about-media img{
+ filter:grayscale(.8) sepia(.75) saturate(2.8) hue-rotate(-16deg) contrast(1.16);
+}
+.hof-about-media::after{
+ content:'';pointer-events:none;position:absolute;inset:0;
+ background:linear-gradient(120deg,rgba(240,73,2,.18),transparent 60%);
+}
+.hof-about-copy{background:#F04902;color:#000}
+.hof-about-copy .hof-about-symbol{width:clamp(35px,4.6vw,66px);height:auto;display:block;margin:0 0 clamp(28px,4vw,54px)}
+.hof-about-copy .hof-overline{color:#000!important}
+.hof-about-copy h2{color:#000}
+.hof-about-copy p{color:#000!important}
+.hof-about-copy .hof-detail-small{color:rgba(0,0,0,.78)}
+.hof-about-copy .hof-inline-link{color:#000;border-bottom-color:#000}
+.hof-about-copy .hof-inline-link:hover{color:#fff;border-color:#fff}
+.hof-bottom{background:#fff;color:#000}
+.hof-bottom .hof-bottom-symbol{width:clamp(33px,3.7vw,52px);height:auto;display:block;margin-bottom:clamp(25px,3vw,42px)}
+.hof-bottom .hof-overline{color:#F04902!important}
+.hof-bottom h2{color:#000}
+.hof-bottom p{color:#000}
+.hof-bottom-actions .hof-text-button{color:#000;border-bottom-color:#000}
+.hof-bottom-actions .hof-text-button:hover{color:#F04902;border-bottom-color:#F04902}
+.hof-page .hof-bottom-actions .hof-outline:hover{background:#000;color:#fff;border-color:#000}
+@media(max-width:1000px){
+ .hof-cover-brand .hof-wordmark{width:min(66vw,560px)}
+}
+@media(max-width:600px){
+ .hof-cover-shade{
+  background:
+   radial-gradient(ellipse at 79% 29%,rgba(240,73,2,.35),transparent 58%),
+   linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.36) 39%,rgba(0,0,0,.85) 100%);
+ }
+ .hof-cover-shade::after{right:-60px;top:10%;width:84vw;opacity:.53}
+ .hof-cover-brand .hof-wordmark{width:min(74vw,340px)}
+ .hof-cover-brand .hof-by-nova{
+  font-size:clamp(20px,5.6vw,28px);margin-top:clamp(20px,6vw,34px);
+ }
+ .hof-concept-photo .hof-poster-type>strong{font-size:clamp(42px,12vw,75px)}
+ .hof-concept-photo > img.hof-poster-symbol{width:45px;top:22px;right:22px}
+ .hof-about-copy .hof-about-symbol{width:40px}
+ .hof-cover-top{font-size:9px}
+}
+@media(max-width:600px) and (max-height:700px){
+ .hof-cover-brand .hof-wordmark{width:min(67vw,280px)}
+ .hof-cover-brand .hof-by-nova{font-size:20px;margin-top:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ .hof-page .hof-outline,.hof-active .mobile-cta .button{transition:none!important}
+}
