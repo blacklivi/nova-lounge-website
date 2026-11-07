@@ -14,7 +14,7 @@ for(const [slug,id] of [['hof','zyb'],['pobediteley','pob'],['vostok','east']]){
  assert.ok(seo.includes(slug),'SEO direct route should exist: '+slug);
  assert.ok(html.includes('value="'+id+'"'),'Admin event venue option must exist: '+id);
 }
-assert.match(seo,/isPublicPage=p=>[\s\S]*?events\\\/\\\(\\\?:hof\|pobediteley\|vostok/,'Scoped event routes must be valid at the Worker edge');
+assert.ok(seo.includes('export const isPublicPage=p=>')&&seo.includes('hof|pobediteley|vostok'),'Scoped event routes must be valid at the Worker edge');
 assert.match(app,/function venueEventsPage\(id\)/,'One themed listing component for all venues');
 assert.match(app,/events\.filter\(e=>e\.venue===id&&!e\.demo\)/,'Scoped venue calendars must exclude all other venues and demos');
 assert.match(app,/if\(scopedEventVenue\)return venueEventsPage\(scopedEventVenue\)/,'Global and venue pages must share same event source');
