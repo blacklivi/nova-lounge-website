@@ -136,9 +136,39 @@ function hofLineupLink(){
  const target=url==='/events'?'/events/hof':url;
  return `<a class="hof-event-more hof-action" href="${esc(target)}" data-editor-key="hof_events_more_url">${text(label)} ${arrow}</a>`;
 }
+const hofMonths={
+ ru:['ЯНВ','ФЕВ','МАР','АПР','МАЙ','ИЮН','ИЮЛ','АВГ','СЕН','ОКТ','НОЯ','ДЕК'],
+ en:['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
+};
+const hofDays={
+ ru:['ВС','ПН','ВТ','СР','ЧТ','ПТ','СБ'],
+ en:['SUN','MON','TUE','WED','THU','FRI','SAT']
+};
+function hofEventDate(date){
+ // Stored event times are local to Minsk: don't let the viewer's timezone
+ // change the weekday, displayed day or start time.
+ const match=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(date||'');
+ if(!match)return date||'';
+ const [,year,month,day,hour,minute]=match;
+ const index=new Date(Date.UTC(Number(year),Number(month)-1,Number(day))).getUTCDay();
+ const lang=language==='en'?'en':'ru';
+ return `${Number(day)} ${hofMonths[lang][Number(month)-1]}, ${hofDays[lang][index]} · ${hour}:${minute}`;
+}
+function hofEventRow(e){
+ const title=language==='en'?(e.title_en||e.title):e.title;
+ const poster=localImage(e.image_url);
+ return `<a class="hof-event-row ${poster?'':'no-image'}" href="/events/hof#event-${esc(e.id)}" aria-label="${text(title)}, ${text(hofEventDate(e.starts_at))}">
+  ${poster?`<img class="hof-event-poster" src="${esc(poster)}" alt="" loading="lazy" width="64" height="80">`:''}
+  <span class="hof-event-copy">
+   <time datetime="${esc(e.starts_at)}:00+03:00">${text(hofEventDate(e.starts_at))}</time>
+   <span class="hof-event-title">${text(title)}</span>
+  </span>
+  <span class="hof-event-arrow" aria-hidden="true">↗</span>
+ </a>`;
+}
 function hofLineup(){
  const upcoming=splitEvents(events.filter(e=>e.venue==='zyb'&&!e.demo)).upcoming.slice(0,2);
- if(upcoming.length)return `<div class="hof-event-list">${upcoming.map(e=>eventCard(e,true,'/events/hof')).join('')}</div><div class="hof-events-footer">${hofLineupLink()}</div>`;
+ if(upcoming.length)return `<div class="hof-event-list">${upcoming.map(hofEventRow).join('')}</div><div class="hof-events-footer">${hofLineupLink()}</div>`;
  return `<div class="hof-events-empty"><p>${E('hof_events_empty')}</p>${hofLineupLink()}</div>`;
 }
 function venueEventsPreview(id){
@@ -471,6 +501,7 @@ const canonical=document.querySelector('link[rel="canonical"]');if(canonical)can
  app.querySelector('dialog').addEventListener('close',()=>{document.querySelector('dialog')?.classList.remove('is-visible');});
  app.querySelector('dialog').addEventListener('click',e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
  updateTop();
+ setupHofDockObserver();
  attachMotion();
 }
 // Coordinated, bounded-duration anchor scrolling. Native smooth scroll can take
@@ -622,20 +653,34 @@ function reviewBooking(e){
  document.getElementById('modal-body').innerHTML=`<h2 id="modal-title" tabindex="-1">${t('Проверьте данные','Review your details')}</h2><dl class="summary">${fields.map(([k,v])=>`<dt>${text(k)}</dt><dd>${text(v)}</dd>`).join('')}</dl><p class="demo-note">${t('Это только предварительный просмотр. Сообщение никому не отправлено, бронь не оформлена, данные не сохранены.','This is a preview only. No message has been sent, no table is reserved, and the information is not saved.')}</p><button class="button form-submit" data-close>${t('Закрыть','Close')}</button>`;
  document.getElementById('modal-title').focus();modalKind='review';
 }
+let hofDockObserver=null;
+function setupHofDockObserver(){
+ hofDockObserver?.disconnect();
+ hofDockObserver=null;
+ if(!document.body.classList.contains('hof-active')||!('IntersectionObserver' in window))return;
+ const hero=document.querySelector('.hof-editorial-hero');
+ const contact=document.querySelector('.hof-compact-contact');
+ if(!hero||!contact)return;
+ const header=document.querySelector('.site-header')?.getBoundingClientRect().height||72;
+ // Observe the whole hero and orange panel, not the final booking button:
+ // the dock should retreat at the first appearance of the footer panel.
+ hofDockObserver=new IntersectionObserver(()=>syncBookingDock(),{
+  rootMargin:`-${Math.round(header)}px 0px 0px 0px`,
+  threshold:0
+ });
+ hofDockObserver.observe(hero);
+ hofDockObserver.observe(contact);
+}
 function syncBookingDock(){
- // HOF first screen already contains a reservation action. Expose the sticky
- // action only after the hero has passed the sticky header.
  const active=document.body.classList.contains('hof-active');
  const hero=active?document.querySelector('.hof-editorial-hero'):null;
- const header=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header'))||72;
+ const panel=active?document.querySelector('.hof-compact-contact'):null;
+ const header=document.querySelector('.site-header')?.getBoundingClientRect().height||72;
  const dock=document.querySelector('.mobile-cta');
- const contact=active?document.querySelector('.hof-compact-contact [data-modal="booking"]'):null;
- const contactRect=contact?.getBoundingClientRect();
- const dockHeight=dock?.getBoundingClientRect().height||85;
- // When the in-section booking action itself becomes available, the fixed
- // action retreats instead of covering the same button near the footer.
- const contactVisible=Boolean(contactRect&&contactRect.top<innerHeight-dockHeight&&contactRect.bottom>header);
- const visible=Boolean(hero&&hero.getBoundingClientRect().bottom<=header+4&&!contactVisible);
+ const panelRect=panel?.getBoundingClientRect();
+ const footerEntered=Boolean(panelRect&&panelRect.top<innerHeight&&panelRect.bottom>header);
+ const heroPassed=Boolean(hero&&hero.getBoundingClientRect().bottom<=header+4);
+ const visible=Boolean(heroPassed&&!footerEntered);
  document.body.classList.toggle('hof-dock-visible',visible);
  if(dock){
   if(active){dock.inert=!visible;dock.setAttribute('aria-hidden',String(!visible))}
