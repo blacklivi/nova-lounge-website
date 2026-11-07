@@ -53,6 +53,15 @@ function replayPreview(){
  }
 }
 $('#page-editor-frame').addEventListener('load',replayPreview);
+function inheritedCardImage(field){
+ const match=/^home_card_(zyb|pob|east)_image$/.exec(field.key);
+ if(!match)return '';
+ const heroKey='venue_'+match[1]+'_image';
+ return drafts.ru.get(heroKey)??saved.content[heroKey]??defaults.content[heroKey]??'';
+}
+function previewImageValue(field,value){
+ return value||inheritedCardImage(field);
+}
 function dirtyCount(){return drafts.ru.size+drafts.en.size+images.size}
 function dirtyMessage(){status(dirtyCount()?dirtyCount()+' несохранённых изменений':'Все изменения опубликованы')}
 function remember(field,value,l=lang()){
@@ -104,10 +113,13 @@ function buildField(field){
   if(field.type==='link'){
    input.setCustomValidity(linkIsValid(input.value.trim())?'':'Допустимы HTTPS, /страница или #раздел');
   }
+  if(field.type==='image')images.delete(field.key);
   remember(field,input.value.trim(),editableLanguage(field)?lang():'ru');
   if(field.type==='image'){
-   preview.src=input.value.trim();
-   preview.hidden=!input.value.trim();
+   const photo=previewImageValue(field,input.value.trim());
+   preview.src=photo;
+   preview.hidden=!photo;
+   sendPreview(field,photo);
   }
  });
  box.append(input);
@@ -115,9 +127,13 @@ function buildField(field){
   const preview=create('img','editor-image-preview');
   preview.alt='Текущая фотография / логотип';
   preview.loading='lazy';
-  preview.src=input.value.trim();
-  preview.hidden=!input.value.trim();
+  const existing=previewImageValue(field,input.value.trim());
+  preview.src=existing;
+  preview.hidden=!existing;
   box.append(preview);
+  if(inheritedCardImage(field)&&!input.value.trim()){
+   box.append(create('small','editor-inherited-note','Пока используется заглавная фотография страницы. Загрузите отдельную фотографию для карточки — заглавная при этом не изменится.'));
+  }
   const uploadInput=create('input','editor-upload');
   uploadInput.type='file';uploadInput.accept='image/jpeg,image/png,image/webp';
   uploadInput.addEventListener('change',()=>{
