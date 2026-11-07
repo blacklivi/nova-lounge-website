@@ -11,12 +11,14 @@ const shared=[
   f('nav_contacts_text','Кнопка «Контакты»','text','Контакты','Contacts'),f('nav_contacts_url','Адрес «Контакты»','link','#contacts'),
   f('global_booking_text','Бронирование в шапке и на телефоне','text','Забронировать стол','Reserve a table'),
   f('global_logo_url','Переход по логотипу NOVA','link','/'),
+  f('global_logo_image','Логотип NOVA в шапке (необязательно)','image'),
  ]),
  g('footer','Общий подвал',[
   f('footer_tagline','Описание NOVA','textarea'),
   f('footer_left','Нижняя подпись слева','text','NOVA · MINSK','NOVA · MINSK'),
   f('footer_right','Нижняя подпись справа','textarea','Демонстрационная версия · заявки не отправляются','Demo website · booking requests are not sent'),
   f('footer_logo_text','Текст логотипа в подвале','text','NOVA','NOVA'),
+  f('global_instagram_icon','Иконка Instagram','icon','instagram'),f('global_map_icon','Иконка карты','icon','map-pin'),
  ])
 ];
 const home=[
@@ -31,6 +33,7 @@ const home=[
   f('home_card_east_url','Куда ведёт карточка Восток','link','/spaces/vostok'),
   f('home_card_hof_label','Надпись над фотографией HÓF','text','HÓF / HOUSE OF FLOW','HÓF / HOUSE OF FLOW'),
   f('home_card_hof_by','Надпись рядом с логотипом HÓF','text','by NOVA','by NOVA'),
+  f('home_card_hof_logo_image','Логотип HÓF в карточке','image','/media/hof-wordmark-black.svg'),
   f('home_card_hof_location','Подпись HÓF в карточке','text','HOUSE OF FLOW · ЗЫБИЦКАЯ','HOUSE OF FLOW · ZYBITSKAYA'),
  ]),
  g('story','О нас и кухня',[
@@ -67,6 +70,7 @@ const hof=[
  ]),
  g('hof-about','Короткое описание HÓF',[
   f('hof_about_kicker','Малая подпись','text','О ПРОСТРАНСТВЕ','THE SPACE'),
+  f('hof_about_mark_image','Фирменный знак в блоке «О пространстве»','image','/media/hof-mark-orange.svg'),
   f('hof_about_title','Крупный заголовок','textarea','Свой ритм. Свои люди.','Your rhythm. Your people.'),
   f('hof_about_description','Описание заведения','textarea','HÓF — новое направление NOVA на Зыбицкой. Здесь больше музыки, DJ-сетов и вечеринок. Кухня и бар остаются частью вечера.','HÓF is NOVA’s nightlife-led space on Zybitskaya. More music, DJ sets and parties, with food and drinks throughout the night.'),
   f('hof_menu_button_text','Кнопка меню','text','Кухня и бар','Food & bar'),
@@ -82,6 +86,7 @@ const hof=[
  ]),
  g('hof-contact','Контакты и бронирование HÓF',[
   f('hof_contact_kicker','Малая подпись','text','ЗЫБИЦКАЯ / МИНСК','ZYBITSKAYA / MINSK'),
+  f('hof_contact_mark_image','Фирменный знак блока контактов','image','/media/hof-mark-black.svg'),
   f('hof_contact_title','Крупный заголовок','textarea','Ночь начинается здесь.','The night starts here.'),
   f('address_zyb','Адрес','text'),f('phone_zyb','Телефон','text'),f('hours_zyb','Часы работы','textarea'),
   f('hof_contacts_button_text','Кнопка контактов','text','Контакты','Contacts'),
