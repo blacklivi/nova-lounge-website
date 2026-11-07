@@ -15,4 +15,5 @@ assert.match(css,/\.modal\[data-theme="hof"\] \.nova-select-list\{\s*max-height:
 assert.match(css,/\.modal\[data-theme="hof"\] \.nova-select-list\.nova-select-above/,'Compact list can open above its input');
 assert.match(css,/\.modal\[data-theme="hof"\] \.nova-select-option\[aria-selected="true"\]/,'HÓF option highlight uses its own branded colour');
 assert.match(css,/\.modal\[data-theme="hof"\] \.nova-select-trigger:hover/,'HÓF field hover no longer uses NOVA green');
+assert.match(css,/@media \(hover:none\),\(pointer:coarse\)\{[\s\S]*?\.modal\[data-theme="hof"\] \.nova-select\{display:block!important\}/,'HÓF touch chooser must override global mobile display:none!important rule');
 console.log('HÓF drawer colour and compact dropdown regression guards passed');
