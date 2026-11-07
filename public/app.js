@@ -552,9 +552,15 @@ function syncBookingDock(){
  const active=document.body.classList.contains('hof-active');
  const hero=active?document.querySelector('.hof-editorial-hero'):null;
  const header=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header'))||72;
- const visible=Boolean(hero&&hero.getBoundingClientRect().bottom<=header+4);
- document.body.classList.toggle('hof-dock-visible',visible);
  const dock=document.querySelector('.mobile-cta');
+ const contact=active?document.querySelector('.hof-compact-contact [data-modal="booking"]'):null;
+ const contactRect=contact?.getBoundingClientRect();
+ const dockHeight=dock?.getBoundingClientRect().height||85;
+ // When the in-section booking action itself becomes available, the fixed
+ // action retreats instead of covering the same button near the footer.
+ const contactVisible=Boolean(contactRect&&contactRect.top<innerHeight-dockHeight&&contactRect.bottom>header);
+ const visible=Boolean(hero&&hero.getBoundingClientRect().bottom<=header+4&&!contactVisible);
+ document.body.classList.toggle('hof-dock-visible',visible);
  if(dock){
   if(active){dock.inert=!visible;dock.setAttribute('aria-hidden',String(!visible))}
   else{dock.inert=false;dock.removeAttribute('aria-hidden')}
