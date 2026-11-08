@@ -5,6 +5,7 @@ import {validateReservation} from '../src/reservations.js';
 const worker=readFileSync('src/index.js','utf8');
 const module=readFileSync('src/reservations.js','utf8');
 const auth=readFileSync('src/reserved-auth.js','utf8');
+const {PBKDF2_ITERATIONS}=await import('../src/reserved-auth.js');
 const app=readFileSync('public/app.js','utf8');
 const staff=readFileSync('public/reserved.js','utf8');
 const html=readFileSync('public/reserved.html','utf8');
@@ -38,6 +39,9 @@ assert.match(auth,/Secure; HttpOnly; SameSite=Strict/,'Personal sessions must be
 assert.match(auth,/currentReservedUser\(req,env\)/,'All sessions must be resolved against D1');
 assert.match(auth,/DELETE FROM reservation_sessions WHERE user_id=/,'Password changes and deactivations must revoke staff sessions');
 assert.match(auth,/PBKDF2/,'Staff passwords must have a slow salted key derivation');
+assert.equal(PBKDF2_ITERATIONS,100000,'Cloudflare Workers PBKDF2 ceiling: values above 100,000 cause production HTTP 500');
+assert.match(auth,/iterations:PBKDF2_ITERATIONS/,'Staff password hashing must use the safe Worker iteration limit');
+assert.doesNotMatch(auth,/iterations:\s*(?:1[0-9]{5}|[2-9][0-9]{5,})/,'Never hardcode unsupported PBKDF2 costs in a Worker');
 assert.match(auth,/actor\.role!=='owner'/,'Only owner can manage venue users');
 assert.match(staffMigration,/active INTEGER NOT NULL DEFAULT 1/,'Staff accounts have a persisted deactivation state');
 assert.match(auth,/b\.active===true\?1:b\.active===false\?0:null/,'Owner must be able to deactivate staff');
