@@ -6,7 +6,7 @@ import {cropPattern,DEFAULT_CROP} from '../public/photo-crop.js';
 // Secrets ADMIN_PASSWORD and ADMIN_SIGNING_KEY are Cloudflare Worker secrets, never committed.
 const EDITABLE = new Set(['hero_tagline','hero_kicker','hero_image','story_title','story_description','story_kicker','story_image','booking_title','booking_image','venue_zyb_image','venue_pob_image','venue_east_image','venue_zyb_subtitle','venue_pob_subtitle','venue_east_subtitle','venue_zyb_desc','venue_pob_desc','venue_east_desc','venue_zyb_second','venue_pob_second','venue_east_second','venue_zyb_features','venue_pob_features','venue_east_features','gallery_zyb_1_image','gallery_zyb_2_image','gallery_pob_1_image','gallery_pob_2_image','gallery_east_1_image','gallery_east_2_image','instagram_zyb','instagram_pob','instagram_east','telegram_zyb','telegram_pob','telegram_east','menu_zyb','menu_pob','menu_east','address_zyb','address_pob','address_east','phone_zyb','phone_pob','phone_east','footer_tagline','media_note','hours_zyb','hours_pob','hours_east','map_zyb','map_pob','map_east']);
 for(const f of [...EDITOR_FIELDS,...PHOTO_CROP_FIELDS])EDITABLE.add(f.key);
-const IMAGE_KEYS = new Set([...EDITABLE].filter(k=>k.endsWith('_image')||k.startsWith('gallery_')));
+const IMAGE_KEYS = new Set([...EDITABLE].filter(k=>(k.endsWith('_image')||k.startsWith('gallery_'))&&!k.endsWith('_crop')));
 for(const f of EDITOR_FIELDS)if(f.type==='image')IMAGE_KEYS.add(f.key);
 const LINK_KEYS = new Set(EDITOR_FIELDS.filter(f=>f.type==='link').map(f=>f.key));
 const ICON_KEYS = new Set(EDITOR_FIELDS.filter(f=>f.type==='icon').map(f=>f.key));
