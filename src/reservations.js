@@ -99,12 +99,15 @@ async function submit(req,env){
 }
 async function login(req,env){
  if(!originOK(req)||req.headers.get('x-nova-reserved')!=='1')return fail('forbidden',403);
- if(!env.RESERVATIONS_PASSWORD||!env.ADMIN_SIGNING_KEY)return fail('not_configured',503);
+ // An optional dedicated staff secret overrides the existing admin password.
+ // This keeps the page protected even before the separate secret is configured.
+ const configuredPassword=env.RESERVATIONS_PASSWORD||env.ADMIN_PASSWORD;
+ if(!configuredPassword||!env.ADMIN_SIGNING_KEY)return fail('not_configured',503);
  const body=await json(req),password=typeof body.password==='string'&&body.password.length<=256?body.password:'';
  const ip='reserved:'+(req.headers.get('cf-connecting-ip')||'unknown').slice(0,90);
  const row=await env.DB.prepare('SELECT attempts,locked_until FROM login_limits WHERE ip=?').bind(ip).first();
  if(row?.locked_until>Date.now())return fail('too_many_attempts',429);
- if(!await same(password,env.RESERVATIONS_PASSWORD)){
+ if(!await same(password,configuredPassword)){
   const attempts=(row?.attempts||0)+1;
   await env.DB.prepare(`INSERT INTO login_limits(ip,attempts,locked_until) VALUES(?,?,?)
    ON CONFLICT(ip) DO UPDATE SET attempts=excluded.attempts,locked_until=excluded.locked_until`)
