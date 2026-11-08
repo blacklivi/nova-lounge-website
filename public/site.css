@@ -1807,3 +1807,57 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
 @media(prefers-reduced-motion:reduce){
  .hof-page .hof-instagram-link{transition:none}
 }
+/* Phone reservations remain usable for guests while online intake is not connected. */
+.modal .booking-phone-list{display:grid;gap:10px;margin-top:18px}
+.modal .booking-phone-action{
+ box-sizing:border-box;
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto;
+ align-items:center;
+ column-gap:12px;
+ row-gap:6px;
+ width:100%;
+ min-height:78px;
+ padding:14px 16px;
+ border:1px solid var(--line);
+ color:var(--ink);
+ background:transparent;
+ text-decoration:none;
+ transition:background-color .2s ease,color .2s ease,border-color .2s ease;
+}
+.modal .booking-phone-name{grid-column:1;font-size:15px;font-weight:500;overflow-wrap:anywhere}
+.modal .booking-phone-number{grid-column:1;font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.modal .booking-phone-label{
+ grid-column:2;
+ grid-row:1/3;
+ display:inline-flex;
+ align-items:center;
+ gap:8px;
+ font-size:14px;
+ white-space:nowrap;
+}
+.modal .booking-phone-label .arrow{width:17px;height:17px;flex:none}
+.modal .booking-phone-action:hover,
+.modal .booking-phone-action:focus-visible{
+ color:#fff;
+ background:var(--olive);
+ border-color:var(--olive);
+}
+.modal .booking-phone-action:hover .booking-phone-number,
+.modal .booking-phone-action:focus-visible .booking-phone-number{color:#fff}
+.modal[data-theme="hof"] .booking-phone-action{border-color:#a49e94;color:#fff}
+.modal[data-theme="hof"] .booking-phone-number{color:#d2cec6}
+.modal[data-theme="hof"] .booking-phone-action:hover,
+.modal[data-theme="hof"] .booking-phone-action:focus-visible{
+ background:#F04902;
+ border-color:#F04902;
+ color:#000;
+}
+.modal[data-theme="hof"] .booking-phone-action:hover .booking-phone-number,
+.modal[data-theme="hof"] .booking-phone-action:focus-visible .booking-phone-number{color:#000}
+@media(max-width:600px){
+ .modal .booking-phone-action{padding:12px 14px;min-height:74px}
+}
+@media(prefers-reduced-motion:reduce){
+ .modal .booking-phone-action{transition:none}
+}
