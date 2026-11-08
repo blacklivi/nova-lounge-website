@@ -30,7 +30,7 @@ assert.match(app,/H\('home_card_'\+id\+'_url'/,'Homepage venue destinations must
 assert.match(app,/hrefFor\('menu_'\+id,''\)/,'Menu destinations must support valid internal or external URLs');
 assert.match(app,/function validCmsHref\(link\)/,'Public navigation must validate user-controlled destinations');
 assert.match(app,/const E=key=>text\(editorValue\(key\)\)/,'Editable text must be escaped');
-assert.match(server,/import \{EDITOR_FIELDS,ICON_CHOICES\}/,'Backend must use same whitelist');
+assert.match(server,/import \{EDITOR_FIELDS,PHOTO_CROP_FIELDS,ICON_CHOICES\}/,'Backend must use same whitelist and crop metadata keys');
 assert.match(server,/function validLink\(v\)/,'Backend must validate destinations');
 assert.match(server,/const ICON_KEYS =/,'Backend must validate icon choices');
 assert.match(server,/Object\.entries\(b\.content_en\|\|\{\}\)/,'Manual EN input must be supported');

@@ -1,4 +1,5 @@
 // Shared site content registry: the admin, public renderer and API use one source of truth.
+import {isPhotoKey,DEFAULT_CROP,cropKey} from './photo-crop.js';
 // Only a curated set of fields may be edited; layout and executable behavior stay code-owned.
 export const ICON_CHOICES=['arrow-right','arrow-up-right','chevron-right','external-link','calendar-days','map-pin','phone','instagram','music-2','utensils','none'];
 const f=(key,label,type='text',ru='',en='')=>({key,label,type,ru,en});
@@ -140,4 +141,8 @@ export const EDITOR_PAGES=[
  {id:'east',title:'Восток',path:'/spaces/vostok',sections:venueGroups('east')}
 ];
 export const EDITOR_FIELDS=EDITOR_PAGES.flatMap(p=>p.sections.flatMap(s=>s.fields));
-export const EDITOR_BY_KEY=Object.fromEntries(EDITOR_FIELDS.map(f=>[f.key,f]));
+// Crop positions are independent language-neutral content values; they are never
+// presented as raw text fields, but are saved by the visual photo editor.
+export const PHOTO_CROP_FIELDS=EDITOR_FIELDS.filter(f=>f.type==='image'&&isPhotoKey(f.key))
+ .map(f=>({key:cropKey(f.key),label:f.label+' · положение кадра',type:'crop',ru:DEFAULT_CROP,en:DEFAULT_CROP}));
+export const EDITOR_BY_KEY=Object.fromEntries([...EDITOR_FIELDS,...PHOTO_CROP_FIELDS].map(f=>[f.key,f]));

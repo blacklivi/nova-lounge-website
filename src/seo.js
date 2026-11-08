@@ -49,7 +49,7 @@ async function publishedEventsForPage(env){
  if(!env.DB)return null;
  try{
   const result=await env.DB.prepare(
-   'SELECT id,title,description,title_en,description_en,starts_at,venue,image_url FROM events WHERE published = 1 ORDER BY starts_at ASC'
+   'SELECT id,title,description,title_en,description_en,starts_at,venue,image_url,image_crop FROM events WHERE published = 1 ORDER BY starts_at ASC'
   ).all();
   return result.results||[];
  }catch(error){
