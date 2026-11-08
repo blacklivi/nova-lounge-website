@@ -55,6 +55,7 @@ export function validateReservation(input,now=Date.now()){
  const time=cleanString(input.time,5);
  const guests=Number(input.guests);
  const comment=cleanString(input.comment||'',500);
+ if(typeof input.comment!=='undefined'&&(typeof input.comment!=='string'||input.comment.length>500))return null;
  const consent=input.consent===true;
  if(!VENUES.has(venue)||name.length<2||name.length>80||!validPhone(phone)||
     !parseDate(date)||!/^([01]\d|2[0-3]):(00|15|30|45)$/.test(time)||
