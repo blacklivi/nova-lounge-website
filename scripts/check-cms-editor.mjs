@@ -80,4 +80,14 @@ assert.doesNotMatch(app,/class="venue-hof-image-label"/,'The old top-left photo 
 assert.match(siteCss,/\.venue-card-hof \.venue-img \.venue-hof-overlay-logo\{/,'Logo needs a dedicated position and sizing');
 assert.match(siteCss,/filter:brightness\(0\) invert\(1\)!important/,'Wordmark must always be white');
 
+// Vostok menu: every entry point (venue page and the generic menu selector)
+// must resolve to the same editable destination and navigate without an intermediate modal.
+assert.equal(EDITOR_BY_KEY.menu_east.ru,'https://menu.nova-vostok.by/menu','Vostok RU menu link must be configured');
+assert.equal(EDITOR_BY_KEY.menu_east.en,'https://menu.nova-vostok.by/menu','Vostok EN menu link must be configured');
+assert.match(app,/data-modal="menu-location" data-venue="\$\{id\}"/,'Venue page menu uses shared action');
+assert.match(app,/data-modal="menu-location" data-venue="\$\{i\}"/,'Home menu picker uses shared action');
+assert.match(app,/const url=hrefFor\('menu_'\+id,''\)/,'All menu actions must use editable, validated CMS URLs');
+assert.match(app,/if\(id==='east'\)window\.location\.assign\(url\)/,'Vostok menu must navigate immediately in the current tab');
+assert.match(app,/else window\.open\(url,'_blank','noopener,noreferrer'\)/,'Other venue menu behavior must remain unchanged');
+
 console.log('NOVA page CMS registry, link security and editor smoke guards passed');
