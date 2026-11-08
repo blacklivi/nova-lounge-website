@@ -95,4 +95,19 @@ assert.match(app,/data-modal="menu-location" data-venue="zyb"/,'HÓF kitchen and
 assert.match(app,/window\.location\.assign\(url\)/,'All three venue menus must navigate immediately in the current tab');
 assert.doesNotMatch(app,/window\.open\(url,'_blank','noopener,noreferrer'\)/,'No venue menu should open an extra tab');
 
+// HÓF Instagram must be restored everywhere the venue's social links appear.
+const defaultsJSON=JSON.parse(readFileSync('public/content-defaults.json','utf8'));
+const hofInstagram='https://www.instagram.com/myata.zybitskaya?cplk=MXE4OW5heml3NHQ1OA==';
+assert.equal(defaultsJSON.content.instagram_zyb,hofInstagram,'RU Zybitskaya Instagram link must be updated');
+assert.equal(defaultsJSON.content_en.instagram_zyb,hofInstagram,'EN Zybitskaya Instagram link must be updated');
+assert.equal(EDITOR_BY_KEY.instagram_zyb.type,'link','HÓF Instagram must remain CMS-editable');
+assert.match(app,/instagram=safeURL\(value\('instagram_'\+id\)\)/,'Do not suppress HÓF Instagram in general footer');
+assert.doesNotMatch(app,/instagram=id==='zyb'\?'':/,'HÓF Instagram must not be hidden');
+assert.match(app,/function hofInstagramSocial\(\)/,'Orange HÓF contact section must render Instagram');
+assert.match(app,/\$\{hofInstagramSocial\(\)\}/,'HÓF orange footer must include Instagram icon');
+assert.match(app,/data-editor-key="instagram_zyb"/,'HÓF Instagram must be inspectable in CMS preview');
+assert.match(app,/instagram=hofInstagramURL\(\)/,'HÓF contact modal must resolve the same Instagram URL');
+assert.match(app,/instagram\?\x60<a class="hof-contact-action"/,'HÓF contact modal must link to Instagram');
+assert.match(siteCss,/\.hof-page \.hof-instagram-link\{/,'HÓF Instagram icon needs dedicated footer styling');
+
 console.log('NOVA page CMS registry, link security and editor smoke guards passed');
