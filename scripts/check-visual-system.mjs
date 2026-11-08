@@ -18,8 +18,8 @@ assert.match(design,/\.hof-page \.hof-text-button,[\s\S]*?font-size:15px/,'Text 
 assert.match(design,/\.modal \.field label\{font-size:14px/,'Form labels must be readable');
 assert.match(design,/\.modal \.field input,\.modal \.field select/,'Modal inputs must share base geometry');
 assert.match(design,/\.modal\[data-theme="hof"\]/,'HOF modal has its own colour theme');
-assert.match(design,/\.modal\[data-theme="hof"\] \.form-submit\{/,'HOF submit uses a brand-colour primary action');
-assert.match(design,/\.modal \ .demo-note|\.modal \.demo-note/,'Demo warning must remain readable');
+assert.match(design,/\.modal\[data-theme="hof"\] \.booking-phone-action/,'HÓF phone reservations use branded action styling');
+assert.match(design,/\.modal \.booking-phone-list\{/,'Phone reservations must have a legible action list');
 assert.match(design,/height:calc\(100svh - var\(--header\)\)/,'First-screen HOF hero fills available mobile viewport');
 assert.match(design,/body\.hof-active\.hof-dock-visible \.mobile-cta/,'Mobile booking dock appears only when triggered');
 assert.match(design,/@media\(prefers-reduced-motion:reduce\)/,'Animations respect reduced-motion preference');
@@ -30,9 +30,10 @@ assert.match(app,/dock\.inert=!visible/,'Hidden dock must be removed from keyboa
 assert.match(app,/window\.addEventListener\('scroll',updateTop,\{passive:true\}\)/,'Mobile dock updates on scroll');
 assert.match(app,/window\.addEventListener\('resize',updateTop,\{passive:true\}\)/,'Mobile dock responds to device orientation');
 assert.match(app,/data-modal="booking" data-venue="zyb"/,'HOF fixed venue booking ID must be retained');
-assert.match(app,/enhanceBookingDate/,'Existing date component must remain wired');
-assert.match(app,/enhanceBookingSelects/,'Existing select component must remain wired');
-assert.match(app,/function reviewBooking\(e\)/,'Booking review flow must not be removed');
+assert.match(app,/function bookingPhonePanel\(requestedVenue\)/,'Guest booking must offer working venue phone actions');
+assert.match(app,/href="tel:\$\{esc\(number\)\}"/,'Phone booking actions need dialable links');
+assert.match(app,/validPhone\(raw\)/,'Only validated venue phone numbers can be linked');
+assert.doesNotMatch(app,/function reviewBooking\(e\)|id="book-form"/,'Do not expose a request form without a working booking backend');
 
 assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions\s*\{\s*display:grid;\s*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/,'HOF contact buttons must use equal-width grid tracks');
 assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions > button\s*\{[^}]*height:100%/s,'Both HOF contact buttons must share a common row height');
