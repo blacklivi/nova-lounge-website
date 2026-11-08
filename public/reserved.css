@@ -67,3 +67,38 @@ input,select{min-height:46px;border:1px solid #cbd3c7;border-radius:0;background
 @media(max-width:1000px){.reservation{grid-template-columns:150px minmax(0,1fr)}.reservation-controls{grid-column:1/-1;display:flex;align-items:end}.reservation-controls select{max-width:240px}}
 @media(max-width:600px){.reserved-header{height:68px;padding:0 18px}.reserved-staff{gap:12px;font-size:12px}.dashboard{padding:25px 16px}.dashboard-title{align-items:start}.dashboard-title h1{font-size:39px}.lead{font-size:13px}.big-number{font-size:40px}.dashboard-toolbar{padding:12px;gap:10px}.dashboard-toolbar label{flex:1 1 130px}.dashboard-toolbar .refresh{flex:1}.reservation{padding:17px;grid-template-columns:1fr;gap:16px}.reservation-controls{grid-column:auto;display:grid;gap:6px}.reservation-controls select{max-width:none}.reservation-date{font-size:18px}.reservation-name{font-size:18px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Role-scoped access and owner-only staff management. */
+.staff-identity{color:#636d63;font-size:12px;white-space:normal;text-align:right}
+.reserved-staff #users-toggle{font-weight:500;text-decoration:none;border-bottom:1px solid var(--dark);padding:8px 0}
+.scope-label{margin:0 0 12px;font-size:13px;font-weight:500;color:var(--green)}
+.users-panel{padding:clamp(16px,3vw,32px);margin-bottom:30px;border:1px solid #d3dad0;background:#fff}
+.users-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:24px}
+.users-head h2{font-size:clamp(26px,3vw,36px);margin:8px 0;font-weight:400;letter-spacing:-.04em}
+.users-head p:not(.overline){color:var(--muted);font-size:13px;line-height:1.6;max-width:70ch}
+.user-create-form{margin:0 0 25px;padding:22px;background:#f4f6f2}
+.user-create-form h3{font-size:19px;margin:0 0 20px;font-weight:500}
+.user-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.user-form-grid .user-password{grid-column:1/-1}
+.user-form-grid label,.user-field{display:block;font-size:12px}
+.user-form-grid input,.user-form-grid select,.user-field input{display:block;width:100%;margin-top:8px;min-height:46px}
+.user-form-grid small{display:block;font-size:11px;color:var(--muted);margin-top:7px}
+.user-create-form .primary-button,.user-edit-form .primary-button{margin-top:20px}
+.users-list{display:grid;gap:14px}
+.user-record{border:1px solid var(--line);padding:18px;background:#fff}
+.user-record-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:15px}
+.user-record-head h3{font-size:16px;font-weight:500;line-height:1.5;overflow-wrap:anywhere}
+.user-state{font-size:12px;flex:none;color:var(--green)}
+.user-record:has(select[name=active] option[value=no]:checked) .user-state{color:#9a4137}
+.user-edit-form{margin:0}
+.user-edit-form .user-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:720px){
+ .reserved-header{height:auto;min-height:68px;flex-wrap:wrap;padding-top:12px;padding-bottom:12px}
+ .reserved-staff{flex-wrap:wrap;justify-content:flex-end;gap:8px 14px}
+ .staff-identity{flex:1 0 100%;font-size:11px}
+ .users-head{flex-direction:column}
+ .user-form-grid,.user-edit-form .user-form-grid{grid-template-columns:1fr}
+ .user-form-grid .user-password{grid-column:auto}
+ .users-panel{padding:15px}
+ .user-create-form{padding:16px}
+}

@@ -14,6 +14,8 @@
   <header class="reserved-header">
    <div class="reserved-brand"><span>NOVA</span><span class="reserved-slash">/</span><span>RESERVED</span></div>
    <div id="staff-actions" class="reserved-staff" hidden>
+    <span id="staff-identity" class="staff-identity"></span>
+    <button id="users-toggle" type="button" hidden>Пользователи</button>
     <a href="/" target="_blank" rel="noopener noreferrer">На сайт</a>
     <button id="logout" type="button">Выйти</button>
    </div>
@@ -21,9 +23,11 @@
   <section id="login-panel" class="login-panel">
    <p class="overline">СЛУЖЕБНЫЙ ДОСТУП</p>
    <h1>Бронирования.</h1>
-   <p class="login-help">Заявки гостей NOVA, HÓF, Победителей и Востока. Доступ только для сотрудников.</p>
+   <p class="login-help">Персональный вход. Сотрудники видят бронирования только своего заведения. Доступ к остальным площадкам есть только у владельца.</p>
    <form id="login-form">
-    <label for="password">Пароль администратора NOVA</label>
+    <label for="username">Логин</label>
+    <input id="username" name="username" type="text" autocomplete="username" placeholder="owner или логин сотрудника" value="owner" minlength="3" maxlength="32" autocapitalize="none" spellcheck="false" required>
+    <label for="password">Пароль</label>
     <input id="password" name="password" type="password" autocomplete="current-password" minlength="8" required>
     <button type="submit" class="primary-button">Войти</button>
     <p id="login-status" class="status" role="status"></p>
@@ -31,11 +35,28 @@
   </section>
   <section id="dashboard" class="dashboard" hidden>
    <div class="dashboard-title">
-    <div><p class="overline">NOVA / МИНСК</p><h1>Бронирования.</h1><p class="lead">Новые заявки требуют подтверждения администратором. Уведомления в Telegram пока не подключены.</p></div>
+    <div><p class="overline">NOVA / МИНСК</p><h1>Бронирования.</h1><p id="scope-label" class="scope-label"></p><p class="lead">Новые заявки требуют подтверждения администратором. Уведомления в Telegram пока не подключены.</p></div>
     <div class="dashboard-meta"><span id="total-count" class="big-number">—</span><span>заявок по фильтру</span></div>
    </div>
+   <section id="users-panel" class="users-panel" hidden aria-labelledby="users-title">
+    <div class="users-head"><div><p class="overline">УПРАВЛЕНИЕ ДОСТУПОМ</p><h2 id="users-title">Сотрудники.</h2><p>Каждому сотруднику назначается одно заведение и уровень доступа. Изменение прав или пароля немедленно завершает его активные сеансы.</p></div><button type="button" class="ghost-button" id="users-close">Закрыть</button></div>
+    <form id="user-create-form" class="user-create-form">
+     <h3>Добавить сотрудника</h3>
+     <div class="user-form-grid">
+      <label>Логин <input name="username" pattern="[a-z][a-z0-9._-]{2,31}" placeholder="hof_manager" autocomplete="off" minlength="3" maxlength="32" required></label>
+      <label>Имя сотрудника <input name="display_name" placeholder="Имя и фамилия" maxlength="80" required></label>
+      <label>Заведение <select name="venue" required><option value="zyb">HÓF / Зыбицкая</option><option value="pob">Победителей</option><option value="east">Восток</option></select></label>
+      <label>Права <select name="role" required><option value="manager">Администратор — просмотр и изменение статусов</option><option value="viewer">Наблюдатель — только просмотр</option></select></label>
+      <label class="user-password">Пароль сотрудника <input name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required><small>Минимум 12 символов. Передайте лично; пароль нельзя посмотреть после сохранения.</small></label>
+     </div>
+     <button type="submit" class="primary-button">Создать учётную запись</button>
+     <p id="user-create-status" class="status" role="status"></p>
+    </form>
+    <div id="users-list" class="users-list" aria-live="polite"></div>
+    <p id="users-status" class="status" role="status"></p>
+   </section>
    <div class="dashboard-toolbar" role="group" aria-label="Фильтры заявок">
-    <label>Заведение<select id="filter-venue">
+    <label id="filter-venue-wrap">Заведение<select id="filter-venue">
       <option value="all">Все заведения</option><option value="zyb">HÓF / Зыбицкая</option>
       <option value="pob">Победителей</option><option value="east">Восток</option>
     </select></label>
