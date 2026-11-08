@@ -13,11 +13,13 @@ assert.match(app,/shown\('home_events_visible'\)&&next/,'Do not show an empty ev
 assert.match(app,/id!=='archive'\|\|list\.length/,'Empty global archive must not appear');
 assert.match(app,/key!=='archive'\|\|list\.length/,'Empty venue archives must not appear');
 
-// Visitors must never enter a booking form that does not submit a reservation.
-assert.doesNotMatch(app,/function reviewBooking\(|id="book-form"|Это только предварительный просмотр|Demo mode/,'No non-functional booking form or preview');
-assert.match(app,/function bookingPhonePanel\(requestedVenue\)/,'Phone booking alternative must be available');
-assert.match(app,/href="tel:\$\{esc\(number\)\}"/,'Venue telephone actions must be dialable');
-assert.match(css,/\.modal \.booking-phone-action\{/,'Telephone links must be styled as real actions');
+// Live reservations must only show success after a successful API response.
+assert.match(app,/function bookingFormHTML\(requestedVenue\)/,'Public form must exist');
+assert.match(app,/async function sendBooking\(e\)/,'Public form needs submit handler');
+assert.match(app,/fetch\('\/api\/reservations'/,'Submissions must go to the real reservation API');
+assert.match(app,/if\(!response\.ok\|\|!answer\.ok\)throw new Error/,'No false success when persistence fails');
+assert.match(app,/data-close/,'Confirmation must be dismissible');
+assert.doesNotMatch(app,/Это только предварительный просмотр|Demo mode/,'No demo booking messages');
 
 assert.equal(EDITOR_BY_KEY.footer_right.ru,'Три пространства. Один ритм.');
 assert.equal(EDITOR_BY_KEY.footer_right.en,'Three spaces. One rhythm.');
