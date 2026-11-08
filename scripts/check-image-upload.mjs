@@ -33,8 +33,8 @@ assert.match(optimizer,/blob\.type!==WEBP_MIME/,'Unsupported WebP encoding must 
 assert.match(optimizer,/new WeakMap\(\)/,'Multiple previews and saves must reuse a single conversion');
 assert.match(optimizer,/headers:\{'X-Nova-Admin':'1','Content-Type':WEBP_MIME\}/,'Uploads must send WebP to API');
 
-assert.match(admin,/import \{preparePhoto,uploadPhoto/,'Legacy editor must import shared compressor');
-assert.match(admin,/await upload\(file,key\)/,'Legacy content uploader uses correct image profile');
+assert.match(admin,/import \{preparePhoto,uploadPhoto/,'Events editor must import shared compressor');
+assert.doesNotMatch(admin,/await upload\(file,key\)/,'Removed legacy content uploader must not be reintroduced');
 assert.match(admin,/await upload\(file,'event'\)/,'Event poster uploader uses compact profile');
 assert.match(pages,/import \{preparePhoto,uploadPhoto/,'Page editor must import shared compressor');
 assert.match(pages,/await preparePhoto\(file,field\.key\)/,'Page editor previews optimized WebP');
