@@ -103,4 +103,16 @@ assert.match(css,/@media\(max-width:600px\) and \(max-height:690px\)\{[\s\S]*?\.
 assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions > \.hof-action\{\s*height:var\(--hof-action-height\);\s*min-height:var\(--hof-action-height\);\s*max-height:var\(--hof-action-height\)/,'HÓF orange-panel buttons must not grow taller on mobile');
 assert.doesNotMatch(css,/--hof-action-height:64px|\.hof-page \.hof-hero-actions > \.hof-action\{height:64px|min-height:64px;\s*max-height:64px;/,'No HÓF action may force an extra-tall 64px mobile button');
 
+
+// Regression: removing old demo-event CSS once left three orphan .events-list
+// selectors before .book-strip. The reservation layout then lost its grid
+// and the image and button were rendered as misaligned blocks.
+assert.doesNotMatch(css,/\.events-list\s+\.events-list\s+\.events-list\s+\.book-strip/,'No orphan selectors may swallow the NOVA booking grid');
+assert.match(css,/(?:^|\})\s*\.book-strip\{\s*display:grid;\s*grid-template-columns:minmax\(0,44fr\) minmax\(0,56fr\)/,'NOVA booking grid must be a top-level CSS rule with fixed proportional tracks');
+assert.match(css,/\.book-strip\{[\s\S]*?height:clamp\(390px,32vw,560px\);/,'NOVA booking split must have a predictable shared desktop height');
+assert.match(css,/\.book-image img\{\s*position:absolute;\s*inset:0;[\s\S]*?max-height:none;\s*object-fit:cover/,'Booking photo must fill its grid cell without a 520px height cap');
+assert.match(css,/@media\(max-width:600px\)\{\s*\.book-strip\{display:block;height:auto;min-height:0;/,'NOVA mobile booking returns to a single column without forced desktop height');
+assert.match(css,/\.book-strip \.book-main \.book-cta\.nova-compact-cta\.nova-compact-cta--inverse\{[\s\S]*?border:0;\s*border-bottom:1px solid/,'NOVA footer booking action must retain its understated underlined style');
+assert.match(app,/class="book-strip" id="booking"/,'Home reservation strip must remain rendered and connected to the booking modal');
+
 console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');
