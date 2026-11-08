@@ -1,63 +1,13 @@
-import {preparePhoto,uploadPhoto,validatePhoto,formatBytes,IMAGE_ACCEPT} from './image-upload.js';
-import {DEFAULT_CROP,applyPhotoCrop,cropKey,cropPresets} from './photo-crop.js';
+import {preparePhoto,uploadPhoto,validatePhoto,formatBytes} from './image-upload.js';
+import {DEFAULT_CROP,applyPhotoCrop} from './photo-crop.js';
 import {openPhotoCropEditor} from './photo-crop-editor.js';
 import {minskNow} from './core.js';
 const $=q=>document.querySelector(q),$$=q=>[...document.querySelectorAll(q)];
-const keySpecs=[
- ['hero_kicker','Первый экран · верхняя подпись','textarea'],['hero_tagline','Первый экран · слоган','textarea'],['hero_image','Первый экран · фотография','image'],
- ['story_kicker','О нас · надпись над заголовком','text'],['story_title','Основной заголовок','textarea'],['story_description','Основной текст','textarea'],['story_image','Кухня · фотография','image'],
- ['booking_title','Бронирование · заголовок','textarea'],['booking_image','Бронирование · фотография','image'],['footer_tagline','Футер · подпись NOVA','textarea'],['media_note','Изображения · отметка о демонстрационном контенте','textarea'],
- ['venue_zyb_subtitle','Зыбицкая · подпись','text'],['venue_zyb_desc','Зыбицкая · описание','textarea'],['venue_zyb_second','Зыбицкая · второй блок текста','textarea'],['venue_zyb_features','Зыбицкая · особенности','text'],['gallery_zyb_1_image','Зыбицкая · галерея 1','image'],['gallery_zyb_2_image','Зыбицкая · галерея 2','image'],['venue_zyb_image','Зыбицкая · фотография','image'],
- ['venue_pob_subtitle','Победителей · подпись','text'],['venue_pob_desc','Победителей · описание','textarea'],['venue_pob_second','Победителей · второй блок текста','textarea'],['venue_pob_features','Победителей · особенности','text'],['gallery_pob_1_image','Победителей · галерея 1','image'],['gallery_pob_2_image','Победителей · галерея 2','image'],['venue_pob_image','Победителей · фотография','image'],
- ['venue_east_subtitle','Восток · подпись','text'],['venue_east_desc','Восток · описание','textarea'],['venue_east_second','Восток · второй блок текста','textarea'],['venue_east_features','Восток · особенности','text'],['gallery_east_1_image','Восток · галерея 1','image'],['gallery_east_2_image','Восток · галерея 2','image'],['venue_east_image','Восток · фотография','image'],
- ...['zyb','pob','east'].flatMap((v,i)=>[['address_'+v,['Зыбицкая','Победителей','Восток'][i]+' · адрес','text'],['phone_'+v,'Телефон','text'],['hours_'+v,'Часы работы','text'],['map_'+v,'Маршрут на Яндекс Картах (https://)','text'],['instagram_'+v,'Instagram (https://)','text'],['telegram_'+v,'Telegram (https://)','text'],['menu_'+v,'Ссылка на QR-меню (https://)','text']])];
-const sourceDefaults={};let currentContent={},currentContentEN={},currentEvents=[];
-const pendingCrops=new Map();
-function status(el,msg,err=false){el.textContent=msg;el.style.color=err?'#a44c43':'#414a36'}
+const $=q=>document.querySelector(q),$$=q=>[...document.querySelectorAll(q)];
+let currentEvents=[];
+function status(el,msg,err=false){if(!el)return;el.textContent=msg;el.style.color=err?'#a44c43':'#414a36'}
 async function request(path,method='GET',body){const opts={method,credentials:'same-origin',headers:{'X-Nova-Admin':'1'}};if(body!==undefined){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(body)}const r=await fetch(path,opts),b=await r.json().catch(()=>({error:'invalid_response'}));if(!r.ok)throw Error(b.error||('HTTP '+r.status));return b}
-async function upload(file,key='general'){
- if(!file)return '';
- return (await uploadPhoto(file,key)).url;
-}
-function initFields(){const box=$('#content-fields');box.replaceChildren();for(const [key,title,type] of keySpecs){let field=document.createElement('div');field.className='field';const label=document.createElement('label');label.htmlFor='field-'+key;label.textContent=title;field.append(label);if(type==='image'){const im=document.createElement('img');im.className='photo-preview';im.alt='Изображение';im.dataset.preview=key;im.hidden=true;
- const photoFrame=document.createElement('div');photoFrame.className='legacy-photo-frame';
- photoFrame.style.aspectRatio=String(cropPresets(key)[0].ratio);
- photoFrame.append(im);field.append(photoFrame);
- const cropButton=document.createElement('button');cropButton.type='button';cropButton.className='crop-inline-button';
- cropButton.textContent='Настроить кадр / масштаб';cropButton.disabled=true;
- cropButton.addEventListener('click',async()=>{
-  if(!im.src)return;
-  const value=await openPhotoCropEditor({src:im.src,key,initial:pendingCrops.get(key)||currentContent[cropKey(key)]||DEFAULT_CROP,title:'Кадрирование · '+title});
-  if(value!==null){pendingCrops.set(key,value);applyPhotoCrop(im,value);status($('#content-status'),'Кадр настроен. Нажмите «Сохранить изменения».')}
- });
- field.append(cropButton);
- const inp=document.createElement('input');inp.type='file';inp.id='field-'+key;inp.accept=IMAGE_ACCEPT;inp.dataset.image=key;
- inp.addEventListener('change',async()=>{
-  const file=inp.files?.[0];if(!file)return;
-  const preview=im;
-  try{
-   validatePhoto(file);
-   status($('#content-status'),'Готовим WebP из '+file.name+'…');
-   const result=await preparePhoto(file,key);
-   if(inp.files?.[0]!==file)return;
-   if(preview.dataset.objectUrl)URL.revokeObjectURL(preview.dataset.objectUrl);
-   preview.dataset.objectUrl=URL.createObjectURL(result.file);
-   preview.src=preview.dataset.objectUrl;preview.hidden=false;
-   cropButton.disabled=false;
-   pendingCrops.set(key,DEFAULT_CROP);
-   applyPhotoCrop(preview,DEFAULT_CROP);
-   const value=await openPhotoCropEditor({src:preview.dataset.objectUrl,key,initial:DEFAULT_CROP,title:'Кадрирование · '+title});
-   if(value!==null){pendingCrops.set(key,value);applyPhotoCrop(preview,value)}
-   status($('#content-status'),'WebP: '+result.originalWidth+'×'+result.originalHeight+' → '+result.width+'×'+result.height+
-     ', '+formatBytes(result.originalBytes)+' → '+formatBytes(result.bytes)+'. Нажмите «Сохранить».');
-  }catch(err){status($('#content-status'),'Не удалось обработать изображение: '+err.message,true);inp.value=''}
- });
- field.append(inp);const small=document.createElement('small');small.textContent='JPEG / PNG / WebP / AVIF / HEIC → WebP автоматически · оригинал до 80 МБ';field.append(small)}else{let inp=document.createElement(type==='textarea'?'textarea':'input');inp.id='field-'+key;inp.dataset.field=key;if(type==='textarea')inp.rows=3;else inp.type='text';field.append(inp)}box.append(field)}}
-async function loadContent(){const r=await request('/api/admin/content');currentContent=r.content||{};currentContentEN=r.content_en||{};for(const [k] of keySpecs){const field=$('[data-field="'+k+'"]'),img=$('[data-preview="'+k+'"]');if(field)field.value=currentContent[k]??sourceDefaults[k]??'';if(img){let val=currentContent[k]||sourceDefaults[k];if(val){img.src=val;img.hidden=false}else img.hidden=true;
- const crop=img.closest('.field')?.querySelector('.crop-inline-button');
- if(crop)crop.disabled=!val;
- applyPhotoCrop(img,pendingCrops.get(k)||currentContent[cropKey(k)]||DEFAULT_CROP);
-}}}
+async function upload(file,key='event'){return (await uploadPhoto(file,key)).url}
 function notifyEventChanged(){
  // Notify other open NOVA tabs immediately; no event content or admin data is sent.
  if(typeof BroadcastChannel==='undefined')return;
@@ -115,16 +65,21 @@ function editEvent(id){let e=currentEvents.find(x=>x.id===id);if(!e)return;const
 function resetEvent(){const f=$('#event-form');f.reset();f.elements.id.value='';f.elements.image_url.value='';updateVenueEventPreview();$('#event-form-title').textContent='Новое событие';$('#event-delete').hidden=true;$('#event-image-preview').hidden=true;$('#event-image-frame').hidden=true;$('#event-crop-open').disabled=true;
  f.elements.image_crop.value=DEFAULT_CROP;$('#event-status').textContent=''}
 async function authorized(){try{await request('/api/admin/session');return true}catch(e){return false}}
-async function start(){initFields();
- // Public pages are rendered client-side. Read the same versioned defaults JSON used by the site.
- try{const r=await fetch('/content-defaults.json',{cache:'no-cache'});if(!r.ok)throw Error('defaults_unavailable');const defaults=await r.json();Object.assign(sourceDefaults,defaults.content||{});}catch(e){console.warn('NOVA defaults unavailable',e)}
- if(await authorized())showWorkspace();else {$('#login').hidden=false;$('#workspace').hidden=true}}
-async function showWorkspace(){$('#login').hidden=true;$('#workspace').hidden=false;$('#logout').hidden=false;try{await Promise.all([loadContent(),loadEvents()])}catch(e){status($('#content-status'),'Ошибка загрузки: '+e.message,true)}}
+async function showWorkspace(){
+ $('#login').hidden=true;$('#workspace').hidden=false;$('#logout').hidden=false;
+ try{await loadEvents()}catch(e){status($('#event-status'),'Не удалось загрузить афиши: '+e.message,true)}
+}
+async function start(){
+ if(await authorized())await showWorkspace();
+ else{$('#login').hidden=false;$('#workspace').hidden=true}
+}
 $('#login-form').addEventListener('submit',async e=>{e.preventDefault();const btn=e.currentTarget.querySelector('button');btn.disabled=true;try{const b=await request('/api/admin/login','POST',{password:$('#password').value});if(b.ok){$('#password').value='';await showWorkspace()}}catch(err){status($('#login-message'),err.message==='invalid_password'?'Неверный пароль':err.message==='too_many_attempts'?'Слишком много попыток. Повторите позже.':'Ошибка входа: '+err.message,true)}finally{btn.disabled=false}});
 $('#logout').addEventListener('click',async()=>{await request('/api/admin/logout','POST');location.reload()});
-$$('[data-tab]').forEach(b=>b.addEventListener('click',()=>{$$('[data-tab]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-selected',String(x===b))});$('#content-section').hidden=b.dataset.tab!=='content';$('#events-section').hidden=b.dataset.tab!=='events'}));
-$('#content-form').addEventListener('submit',async e=>{e.preventDefault();const btn=e.currentTarget.querySelector('button[type=submit]');btn.disabled=true;status($('#content-status'),'Сохраняем…');try{const content={};for(const [key,,type] of keySpecs){if(type==='image'){const file=$('[data-image="'+key+'"]').files[0];if(file){status($('#content-status'),'Сжимаем и загружаем WebP для '+key+'…');content[key]=await upload(file,key);const img=$('[data-preview="'+key+'"]');img.src=content[key];img.hidden=false}}else{const value=$('[data-field="'+key+'"]').value.trim();if(value!==String(currentContent[key]??sourceDefaults[key]??'')||((currentContent[key]!==undefined)&&/[А-Яа-яЁё]/.test(value)&&!currentContentEN[key]&&!['address_','phone_'].some(p=>key.startsWith(p))))content[key]=value}}for(const [key,value] of pendingCrops)content[cropKey(key)]=value;
- if(Object.keys(content).length){const saved=await request('/api/admin/content','PUT',{content});window.NOVA_LAST_TRANSLATION_PENDING=saved.translation_pending||0;Object.assign(currentContent,content);pendingCrops.clear();await loadContent()}status($('#content-status'),window.NOVA_LAST_TRANSLATION_PENDING?'Русская версия сохранена. Перевод '+window.NOVA_LAST_TRANSLATION_PENDING+' полей пока не удался; требуется повторное сохранение.':'Сохранено на двух языках. Изменения уже доступны на сайте.',Boolean(window.NOVA_LAST_TRANSLATION_PENDING))}catch(err){status($('#content-status'),'Не удалось сохранить: '+err.message,true)}finally{btn.disabled=false}});
+$$('[data-tab]').forEach(b=>b.addEventListener('click',()=>{
+ $$('[data-tab]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-selected',String(x===b))});
+ $('#pages-section').hidden=b.dataset.tab!=='pages';
+ $('#events-section').hidden=b.dataset.tab!=='events';
+}));
 $('#event-image').addEventListener('change',async e=>{
  const file=e.target.files[0];if(!file)return;
  try{
