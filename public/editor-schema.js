@@ -37,7 +37,6 @@ const home=[
   f('home_card_hof_title','Заголовок карточки HÓF справа','text','ЗЫБИЦКАЯ','ZYBITSKAYA'),
   f('home_card_hof_by','Подпись BY NOVA на фотографии рядом с логотипом','text','BY NOVA','BY NOVA'),
   f('home_card_hof_logo_image','Логотип HÓF поверх фотографии','image','/media/hof-wordmark-black.svg'),
-  f('home_card_hof_location','Подзаголовок под «Зыбицкая»','text','HOUSE OF FLOW','HOUSE OF FLOW'),
  ]),
  g('story','О нас и кухня',[
   f('home_story_visible','Показывать раздел «О нас»','toggle','yes'),

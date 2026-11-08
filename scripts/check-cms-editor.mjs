@@ -71,11 +71,11 @@ const siteCss=readFileSync('public/site.css','utf8');
 // The selected homepage variant overlays the official logo and BY NOVA on the CMS photo.
 assert.equal(EDITOR_BY_KEY.home_card_hof_title.ru,'ЗЫБИЦКАЯ');
 assert.equal(EDITOR_BY_KEY.home_card_hof_title.en,'ZYBITSKAYA');
-assert.equal(EDITOR_BY_KEY.home_card_hof_location.ru,'HOUSE OF FLOW');
+assert.equal(EDITOR_BY_KEY.home_card_hof_location,undefined,'Removed HÓF subtitle must not remain in the CMS editor');
 assert.match(app,/class="venue-hof-overlay-logo" data-editor-key="home_card_hof_logo_image"/,'HÓF SVG logo must be independently editable from the card photo');
 assert.match(app,/class="venue-hof-overlay-by" data-editor-key="home_card_hof_by"/,'BY NOVA must be over the photo beside the logo');
 assert.match(app,/class="venue-title"\$\{id==='zyb'\?' data-editor-key="home_card_hof_title"/,'Zybitskaya must replace the right-hand logo');
-assert.match(app,/function homeHofSubtitle\(\)/,'Legacy CMS subtitle needs normalization');
+assert.doesNotMatch(app,/homeHofSubtitle|class="venue-hof-location"/,'HÓF card must show only venue title and description');
 assert.doesNotMatch(app,/class="venue-hof-image-label"/,'The old top-left photo label must not compete with the wordmark');
 assert.match(siteCss,/\.venue-card-hof \.venue-img \.venue-hof-overlay-logo\{/,'Logo needs a dedicated position and sizing');
 assert.match(siteCss,/filter:brightness\(0\) invert\(1\)!important/,'Wordmark must always be white');
