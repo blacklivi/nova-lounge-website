@@ -5,7 +5,7 @@ import {PHOTO_CROP_FIELDS,EDITOR_BY_KEY} from '../public/editor-schema.js';
 
 const read=path=>readFileSync(path,'utf8');
 const site=read('public/app.js'),css=read('public/site.css');
-const pages=read('public/admin-pages.js'),legacy=read('public/admin.js'),ui=read('public/photo-crop-editor.js');
+const pages=read('public/admin-pages.js'),eventsAdmin=read('public/admin.js'),ui=read('public/photo-crop-editor.js');
 const adminHTML=read('public/admin.html'),adminCSS=read('public/admin.css');
 const api=read('src/index.js'),seo=read('src/seo.js'),migration=read('migrations/0004_event_image_crop.sql');
 
@@ -43,9 +43,10 @@ assert.match(site,/if\(type==='crop'\)/,'Site preview should apply crop drafts i
 assert.match(pages,/openPhotoCropEditor\(/,'Pages editor must open visual crop editor');
 assert.match(pages,/remember\(cropField,changed,'ru'\)/,'Saved crop must be staged for publication');
 assert.match(pages,/key\.endsWith\('_crop'\)/,'Preview must replay crop drafts on iframe reload');
-assert.match(legacy,/openPhotoCropEditor\(/,'Legacy image uploads must have crop editor');
-assert.match(legacy,/image_crop:f\.elements\.image_crop\.value/,'Event form must persist its crop');
-assert.match(legacy,/pendingCrops\.set\(key,value\)/,'Legacy page photo crop must be saved');
+assert.match(pages,/openPhotoCropEditor\(/,'Visual page editor must offer crop controls');
+assert.match(pages,/remember\(cropField,changed,'ru'\)/,'Page photo crop must remain publishable');
+assert.match(eventsAdmin,/openPhotoCropEditor\(/,'Event poster upload needs the visual crop editor');
+assert.match(eventsAdmin,/image_crop:f\.elements\.image_crop\.value/,'Event form must persist its crop');
 assert.match(adminHTML,/id="event-crop-open"/,'Event crop button must be visible');
 assert.match(adminCSS,/\.nova-crop-frame\{[^}]*touch-action:none/,'Drag crop tool must support touch pointer events');
 assert.match(ui,/frame\.setPointerCapture\(event\.pointerId\)/,'Cropping must allow drag to reposition');
