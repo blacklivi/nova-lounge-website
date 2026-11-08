@@ -5,7 +5,7 @@ const venues={zyb:'HÓF / Зыбицкая',pob:'Победителей',east:'�
 const statuses={new:'Новая',confirmed:'Подтверждена',cancelled:'Отменена',completed:'Завершена',no_show:'Не пришли'};
 const roles={owner:'Владелец',manager:'Администратор',viewer:'Наблюдатель'};
 const auth=$('#login-panel'),dashboard=$('#dashboard'),staff=$('#staff-actions'),listing=$('#reservations');
-let page=0,busy=false,initialized=false,identity=null,usersOpen=false;
+let page=0,busy=false,initialized=false,identity=null,usersOpen=false,loadSerial=0;
 function message(el,text='',error=false){if(!el)return;el.textContent=text;el.classList.toggle('error',error)}
 function element(tag,cls,value){
  const el=document.createElement(tag);if(cls)el.className=cls;
@@ -35,6 +35,7 @@ async function api(url,method='GET',body){
  return data;
 }
 function showLogin(){
+ loadSerial++;busy=false;
  identity=null;initialized=false;usersOpen=false;
  auth.hidden=false;dashboard.hidden=true;staff.hidden=true;
  $('#users-panel').hidden=true;$('#users-toggle').hidden=true;
@@ -43,6 +44,7 @@ function showLogin(){
 }
 function showDashboard(user){
  if(!user||!['owner','manager','viewer'].includes(user.role))return showLogin();
+ loadSerial++;busy=false;listing.replaceChildren();
  identity=user;initialized=true;usersOpen=false;
  auth.hidden=true;dashboard.hidden=false;staff.hidden=false;
  const isOwner=user.role==='owner';
@@ -97,6 +99,7 @@ function renderCard(r){
 }
 async function load(){
  if(!initialized||busy)return;
+ const serial=++loadSerial;
  busy=true;$('#refresh').disabled=true;
  message($('#dashboard-status'),'Загружаем бронирования...');
  const qs=new URLSearchParams({
@@ -105,6 +108,7 @@ async function load(){
  if($('#filter-date').value)qs.set('date',$('#filter-date').value);
  try{
   const data=await api('/api/reserved/reservations?'+qs);
+  if(serial!==loadSerial||!initialized)return; // stale account data cannot appear after logout / role switch
   listing.replaceChildren();
   for(const reservation of data.reservations||[])listing.append(renderCard(reservation));
   if(!data.reservations?.length)listing.append(element('div','empty-state','Заявок по выбранным фильтрам нет.'));
@@ -113,8 +117,8 @@ async function load(){
   $('#previous').disabled=page<=0;
   $('#next').disabled=(page+1)*100>=data.total;
   message($('#dashboard-status'),'');
- }catch(e){message($('#dashboard-status'),e.message,true)}
- finally{busy=false;$('#refresh').disabled=false}
+ }catch(e){if(serial===loadSerial&&initialized)message($('#dashboard-status'),e.message,true)}
+ finally{if(serial===loadSerial){busy=false;$('#refresh').disabled=false}}
 }
 function choice(values,selected){
  const select=element('select');
@@ -162,6 +166,7 @@ async function loadUsers(){
  message($('#users-status'),'Загружаем список...');
  try{
   const data=await api('/api/reserved/users');
+  if(identity?.role!=='owner'||!usersOpen)return;
   const list=$('#users-list');list.replaceChildren();
   if(!data.users?.length)list.append(element('div','empty-state','Пока нет сотрудников. Создайте учётную запись для каждого заведения.'));
   for(const user of data.users||[])list.append(userRow(user));
