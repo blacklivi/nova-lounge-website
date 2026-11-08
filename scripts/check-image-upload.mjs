@@ -39,7 +39,7 @@ assert.match(admin,/await upload\(file,'event'\)/,'Event poster uploader uses co
 assert.match(pages,/import \{preparePhoto,uploadPhoto/,'Page editor must import shared compressor');
 assert.match(pages,/await preparePhoto\(file,field\.key\)/,'Page editor previews optimized WebP');
 assert.match(pages,/await upload\(file,key\)/,'Page editor uploads optimized WebP');
-assert.match(html,/<script type="module" src="\/admin\.js">/,'Legacy editor must be a module');
+assert.match(html,/<script type="module" src="\/admin\.js">/,'Event administration script must remain a module');
 assert.match(api,/if\(bytes\.byteLength>8\*1024\*1024/,'Backend still has safe upload size limit');
 assert.match(api,/cacheControl:type==='image\/webp'\?'public, max-age=31536000, immutable'/,'Unique WebP assets get long-lived browser caching');
 
