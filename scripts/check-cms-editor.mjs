@@ -87,7 +87,9 @@ assert.equal(EDITOR_BY_KEY.menu_east.en,'https://menu.nova-vostok.by/menu','Vost
 assert.match(app,/data-modal="menu-location" data-venue="\$\{id\}"/,'Venue page menu uses shared action');
 assert.match(app,/data-modal="menu-location" data-venue="\$\{i\}"/,'Home menu picker uses shared action');
 assert.match(app,/const url=hrefFor\('menu_'\+id,''\)/,'All menu actions must use editable, validated CMS URLs');
-assert.match(app,/if\(id==='east'\)window\.location\.assign\(url\)/,'Vostok menu must navigate immediately in the current tab');
-assert.match(app,/else window\.open\(url,'_blank','noopener,noreferrer'\)/,'Other venue menu behavior must remain unchanged');
+assert.equal(EDITOR_BY_KEY.menu_pob.ru,'https://qr.myata-lounge.by/miata-pobeditelei','Pobediteley RU menu link must be configured');
+assert.equal(EDITOR_BY_KEY.menu_pob.en,'https://qr.myata-lounge.by/miata-pobeditelei','Pobediteley EN menu link must be configured');
+assert.match(app,/if\(id==='east'\|\|id==='pob'\)window\.location\.assign\(url\)/,'Both Vostok and Pobediteley menus must navigate immediately in the current tab');
+assert.match(app,/else window\.open\(url,'_blank','noopener,noreferrer'\)/,'HÓF menu must retain its separate navigation behaviour');
 
 console.log('NOVA page CMS registry, link security and editor smoke guards passed');
