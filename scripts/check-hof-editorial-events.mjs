@@ -9,7 +9,9 @@ assert.match(app,/new Date\(Date.UTC\(Number\(year\),Number\(month\)-1,Number\(d
 assert.match(app,/function hofEventRow\(e\)/,'HÓF lineups must use custom event rows');
 assert.match(app,/upcoming\.map\(hofEventRow\)/,'HÓF lineup should not reuse boxed NOVA event cards');
 assert.match(app,/class="hof-event-poster"/,'Poster must be a proper standalone image element');
-assert.match(app,/class="hof-event-arrow" aria-hidden="true"/,'Events should have a distinct clickable indicator');
+assert.match(app,/class="hof-event-arrow" aria-hidden="true">\$\{arrow\}<\/span>/,'Event arrows must use the existing site SVG, not a Unicode emoji');
+assert.doesNotMatch(app,/class="hof-event-arrow" aria-hidden="true">↗/,'iOS emoji arrows must not reappear in event rows');
+assert.match(css,/\.hof-page \.hof-event-arrow \.arrow\{/,'HÓF event arrow SVG needs a consistent dedicated size');
 assert.match(app,/href="\/events\/hof#event-\$\{esc\(e\.id\)\}"/,'Events must link to the specific HÓF calendar entry');
 assert.match(hofStyles,/grid-template-columns:64px minmax\(0,1fr\) 22px/,'Poster and title must align in a single row');
 assert.match(hofStyles,/padding:20px 0/,'Event rows should have 20px vertical padding and no horizontal padding');
