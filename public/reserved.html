@@ -43,7 +43,7 @@
     <form id="user-create-form" class="user-create-form">
      <h3>Добавить сотрудника</h3>
      <div class="user-form-grid">
-      <label>Логин <input name="username" pattern="[a-z][a-z0-9._-]{2,31}" placeholder="hof_manager" autocomplete="off" minlength="3" maxlength="32" required></label>
+      <label>Логин <input name="username" pattern="[A-Za-z][A-Za-z0-9._-]{2,31}" placeholder="hof_manager" autocomplete="off" autocapitalize="none" spellcheck="false" minlength="3" maxlength="32" required></label>
       <label>Имя сотрудника <input name="display_name" placeholder="Имя и фамилия" maxlength="80" required></label>
       <label>Заведение <select name="venue" required><option value="zyb">HÓF / Зыбицкая</option><option value="pob">Победителей</option><option value="east">Восток</option></select></label>
       <label>Права <select name="role" required><option value="manager">Администратор — просмотр и изменение статусов</option><option value="viewer">Наблюдатель — только просмотр</option></select></label>
