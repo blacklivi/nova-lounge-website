@@ -89,7 +89,10 @@ assert.match(app,/data-modal="menu-location" data-venue="\$\{i\}"/,'Home menu pi
 assert.match(app,/const url=hrefFor\('menu_'\+id,''\)/,'All menu actions must use editable, validated CMS URLs');
 assert.equal(EDITOR_BY_KEY.menu_pob.ru,'https://qr.myata-lounge.by/miata-pobeditelei','Pobediteley RU menu link must be configured');
 assert.equal(EDITOR_BY_KEY.menu_pob.en,'https://qr.myata-lounge.by/miata-pobeditelei','Pobediteley EN menu link must be configured');
-assert.match(app,/if\(id==='east'\|\|id==='pob'\)window\.location\.assign\(url\)/,'Both Vostok and Pobediteley menus must navigate immediately in the current tab');
-assert.match(app,/else window\.open\(url,'_blank','noopener,noreferrer'\)/,'HÓF menu must retain its separate navigation behaviour');
+assert.equal(EDITOR_BY_KEY.menu_zyb.ru,'https://menu.myata-qr.by/menu','HÓF RU menu link must be configured');
+assert.equal(EDITOR_BY_KEY.menu_zyb.en,'https://menu.myata-qr.by/menu','HÓF EN menu link must be configured');
+assert.match(app,/data-modal="menu-location" data-venue="zyb"/,'HÓF kitchen and bar menu button must use the shared menu handler');
+assert.match(app,/window\.location\.assign\(url\)/,'All three venue menus must navigate immediately in the current tab');
+assert.doesNotMatch(app,/window\.open\(url,'_blank','noopener,noreferrer'\)/,'No venue menu should open an extra tab');
 
 console.log('NOVA page CMS registry, link security and editor smoke guards passed');
