@@ -103,11 +103,9 @@ assert.equal(defaultsJSON.content_en.instagram_zyb,hofInstagram,'EN Zybitskaya I
 assert.equal(EDITOR_BY_KEY.instagram_zyb.type,'link','HÓF Instagram must remain CMS-editable');
 assert.match(app,/instagram=safeURL\(value\('instagram_'\+id\)\)/,'Do not suppress HÓF Instagram in general footer');
 assert.doesNotMatch(app,/instagram=id==='zyb'\?'':/,'HÓF Instagram must not be hidden');
-assert.match(app,/function hofInstagramSocial\(\)/,'Orange HÓF contact section must render Instagram');
-assert.match(app,/\$\{hofInstagramSocial\(\)\}/,'HÓF orange footer must include Instagram icon');
-assert.match(app,/data-editor-key="instagram_zyb"/,'HÓF Instagram must be inspectable in CMS preview');
+assert.doesNotMatch(app,/function hofInstagramSocial\(\)|\$\{hofInstagramSocial\(\)\}/,'No duplicate Instagram icon in HÓF orange footer');
 assert.match(app,/instagram=hofInstagramURL\(\)/,'HÓF contact modal must resolve the same Instagram URL');
 assert.match(app,/instagram\?\x60<a class="hof-contact-action"/,'HÓF contact modal must link to Instagram');
-assert.match(siteCss,/\.hof-page \.hof-instagram-link\{/,'HÓF Instagram icon needs dedicated footer styling');
+assert.doesNotMatch(siteCss,/\.hof-page \.hof-instagram-link\{/,'Removed orange footer Instagram styles must not linger');
 
 console.log('NOVA page CMS registry, link security and editor smoke guards passed');
