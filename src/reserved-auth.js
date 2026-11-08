@@ -10,6 +10,9 @@ const DURATION=8*60*60*1000;
 const VENUES=new Set(['zyb','pob','east']);
 const ROLES=new Set(['manager','viewer']);
 const USERNAME=/^[a-z][a-z0-9._-]{2,31}$/;
+// Cloudflare Workers enforces a hard ceiling of 100,000 PBKDF2 iterations.
+// The original 160,000 caused HTTP 500 on staff creation and login in production.
+export const PBKDF2_ITERATIONS=100000;
 const b64=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
 const random=length=>b64(crypto.getRandomValues(new Uint8Array(length)));
 const hash=async input=>b64(await crypto.subtle.digest('SHA-256',enc.encode(input)));
@@ -38,7 +41,7 @@ async function bodyJSON(req){
 }
 async function passwordKey(password,salt,secret){
  const imported=await crypto.subtle.importKey('raw',enc.encode(password+':'+secret),'PBKDF2',false,['deriveBits']);
- const bits=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:enc.encode(salt),iterations:160000},imported,256);
+ const bits=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:enc.encode(salt),iterations:PBKDF2_ITERATIONS},imported,256);
  return b64(bits);
 }
 const pwValid=p=>typeof p==='string'&&p.length>=12&&p.length<=128&&!p.includes('\0');
