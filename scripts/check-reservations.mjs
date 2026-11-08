@@ -61,6 +61,8 @@ assert.match(app,/fetch\('\/api\/reservations'/,'Public form must call the persi
 assert.match(app,/consent:true/,'Guest consent must be recorded');
 assert.match(html,/id="login-form"/,'Password screen must exist');
 assert.match(html,/id="username"/,'Staff must use personal logins');
+assert.match(html,/name="username" pattern="\[A-Za-z\]\[A-Za-z0-9\._-\]\{2,31\}"/,'Staff usernames must accept iOS capitalized input before server normalization');
+assert.match(html,/name="username" pattern="[^\"]+"[^>]*autocapitalize="none"/,'Safari must not auto-capitalize new account names');
 assert.match(html,/id="users-panel"/,'Owner needs an interface to manage employees');
 assert.match(staff,/if\(identity\?\.role!=='viewer'\)/,'Status controls must only be drawn for users with edit rights');
 assert.match(staff,/if\(identity\?\.role!=='owner'\)return/,'Client account management must also be hidden from staff');
