@@ -1860,3 +1860,26 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
 @media(prefers-reduced-motion:reduce){
  .modal .booking-phone-action{transition:none}
 }
+
+/* Real NOVA booking requests. The existing editorial modal and HÓF themes are kept. */
+.modal .booking-consent{
+ display:flex;align-items:flex-start;gap:11px;
+ margin-top:20px;
+ font-size:12px;line-height:1.55;font-weight:400;color:var(--muted);
+}
+.modal .booking-consent input{
+ display:block;flex:none;width:18px;height:18px;min-height:18px;
+ margin:2px 0 0;accent-color:var(--olive);
+}
+.modal .booking-assurance{font-size:12px;line-height:1.55;margin-top:15px;color:var(--muted)}
+.modal .booking-error{font-size:13px;line-height:1.5;color:#a6312b;margin-top:12px}
+.modal .booking-error:empty{display:none}
+.modal .booking-confirmation{display:grid;gap:7px;background:#f3f6f0;border:1px solid var(--line);padding:20px;margin:22px 0;font-size:15px}
+.modal .booking-confirmation strong{font-weight:500}
+.modal .booking-honeypot{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important}
+.modal #booking-comment{display:block;width:100%;min-height:70px;resize:vertical;border:1px solid #aeb6a6;border-radius:0;background:#fff;padding:11px 13px;font:inherit}
+.modal .form-submit:disabled{cursor:wait;opacity:.68}
+.modal[data-theme="hof"] .booking-consent,.modal[data-theme="hof"] .booking-assurance{color:#d2cec6}
+.modal[data-theme="hof"] .booking-consent input{accent-color:#F04902}
+.modal[data-theme="hof"] .booking-confirmation{background:#25231f;color:#fff;border-color:#6b635b}
+@media(max-width:600px){.modal .booking-consent{font-size:12px}.modal #booking-comment{font-size:16px}}

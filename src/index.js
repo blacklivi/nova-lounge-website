@@ -1,4 +1,5 @@
 import {publicPage,seoRoute,isPublicPage} from './seo.js';
+import {reservationsApi} from './reservations.js';
 import {EDITOR_FIELDS,ICON_CHOICES} from '../public/editor-schema.js';
 // NOVA website — API for editorial content, events, media and protected admin.
 // Secrets ADMIN_PASSWORD and ADMIN_SIGNING_KEY are Cloudflare Worker secrets, never committed.
@@ -124,6 +125,16 @@ export default {async fetch(request,env){const url=new URL(request.url),p=url.pa
   // Generate crawlable landing pages and switch indexing on only for a future official domain.
   if(p==='/robots.txt'||p==='/sitemap.xml')return seoRoute(request);
   if(isPublicPage(p))return publicPage(request,env,p.replace(/\/$/,'')||'/');
+  if(p==='/reserved'||p==='/reserved/'){
+   const page=await env.ASSETS.fetch(new Request(new URL('/reserved.html',request.url),request));
+   const headers=new Headers(page.headers);
+   headers.set('X-Robots-Tag','noindex, nofollow, noarchive');
+   headers.set('Cache-Control','no-store, max-age=0');
+   headers.set('X-Frame-Options','DENY');
+   headers.set('Referrer-Policy','no-referrer');
+   headers.set('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
+   return new Response(page.body,{status:page.status,headers});
+  }
   if(p==='/admin'){
    const page=await env.ASSETS.fetch(new Request(new URL('/admin.html',request.url),request));
    const headers=new Headers(page.headers);headers.set('X-Robots-Tag','noindex, nofollow');
@@ -131,6 +142,7 @@ export default {async fetch(request,env){const url=new URL(request.url),p=url.pa
   }
   if(p.startsWith('/api/')){
     if(!env.DB)return error('database_not_connected',503);
+    if(p==='/api/reservations'||p.startsWith('/api/reserved/'))return await reservationsApi(request,env,url);
     return await api(request,env,url);
   }
   if(p.startsWith('/media/upload-')&&MEDIA_RE.test(p)){
