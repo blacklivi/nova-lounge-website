@@ -27,7 +27,7 @@ assert.match(worker,/reservationsApi\(request,env,url\)/,'Worker must route rese
 assert.match(worker,/p==='\/reserved'/,'Worker must serve protected route');
 assert.match(worker,/X-Frame-Options','Private staff app must not be embedded');
 assert.match(module,/env\.RESERVATIONS_PASSWORD/,'Staff login must use separate secret');
-assert.match(module,/HttpOnly; Secure; SameSite=Strict/,'Staff cookie must be secure');
+assert.match(module,/Secure; HttpOnly; SameSite=Strict/,'Staff cookie must be secure');
 assert.match(module,/x-nova-reserved/,'Staff writes must use custom CSRF header');
 assert.match(module,/SELECT id,venue,guest_name,phone/,'Staff list requires authenticated PII access');
 assert.match(module,/if\(!await loggedIn\(req,env\)\)return fail\('unauthorized',401\)/,'Staff APIs must require session');
