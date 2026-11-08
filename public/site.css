@@ -1984,3 +1984,58 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
   font-size:15px;
  }
 }
+
+/* Media-led event cards: the photograph defines its own height.
+   Previous img{height:100%;object-fit:contain} created gray letterboxes. */
+.event-card{align-items:start}
+.event-card .event-media{
+ display:block;
+ box-sizing:border-box;
+ width:100%;
+ min-width:0;
+ aspect-ratio:3/4;
+ height:auto;
+ align-self:start;
+ overflow:hidden;
+ background:transparent;
+}
+.event-card .event-media img.cms-photo{
+ display:block;
+ width:100%;
+ height:100%;
+ min-height:0;
+ max-height:none;
+ aspect-ratio:auto;
+ object-fit:cover;
+ background:transparent;
+}
+.home-events .event-card .event-media{aspect-ratio:2/3}
+.hof-event-list .event-card .event-media{
+ width:75px;
+ height:90px;
+ flex:0 0 75px;
+ aspect-ratio:5/6;
+ background:#24211f;
+}
+.venue-events-teaser-list .event-card .event-media{
+ width:85px;
+ height:110px;
+ aspect-ratio:85/110;
+}
+@media(max-width:600px){
+ .home-events .event-card .event-media{aspect-ratio:2/3}
+ .venue-events-page .event-card .event-media{aspect-ratio:3/4}
+ .venue-events-teaser-list .event-card .event-media{width:90px;height:120px;aspect-ratio:3/4}
+}
+/* Focal positions are saved separately from original media URLs; the photo
+   stays editable and responsive instead of being permanently cut. */
+img.cms-photo[data-image],
+.event-card img.cms-photo{
+ object-position:var(--photo-x,50%) var(--photo-y,50%);
+ transform-origin:var(--photo-x,50%) var(--photo-y,50%);
+ transform:scale(var(--photo-zoom,1));
+}
+.venue-card:hover img.cms-photo[data-image]{transform:scale(calc(var(--photo-zoom,1) * 1.025))}
+.story-photo,.detail-image{overflow:hidden}
+.cms-photo-clip{display:block;min-width:0;width:100%;overflow:hidden}
+.cms-photo-clip img{display:block;width:100%;height:auto}
