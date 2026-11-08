@@ -1767,3 +1767,20 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
 @media(prefers-reduced-motion:reduce){
  .nova-compact-cta{transition:none!important}
 }
+
+/* NOVA-only mobile CTA handoff. Hide the fixed booking dock while an
+   in-flow booking button is visible; existing HÓF dock behaviour is untouched. */
+@media(max-width:600px){
+ body:not(.hof-active) .mobile-cta{
+  transition:opacity .22s ease,transform .25s cubic-bezier(.22,.8,.3,1),visibility .25s;
+ }
+ body:not(.hof-active).nova-inline-booking-visible .mobile-cta{
+  visibility:hidden;
+  opacity:0;
+  transform:translate3d(0,110%,0);
+  pointer-events:none;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body:not(.hof-active) .mobile-cta{transition:none}
+}

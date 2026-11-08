@@ -671,6 +671,18 @@ function setupHofDockObserver(){
  hofDockObserver.observe(hero);
  hofDockObserver.observe(contact);
 }
+// The NOVA dock retreats only when the *in-flow booking control* is readable,
+// not merely when the tall green booking section starts to enter the screen.
+// Measure against the space above the fixed dock, so both buttons never compete.
+function novaInlineBookingVisible(dock,header){
+ if(!matchMedia('(max-width:600px)').matches)return false;
+ const visibleBottom=innerHeight-dock.offsetHeight;
+ return [...document.querySelectorAll('main .book-main .book-cta, main .detail-actions [data-modal="booking"]')].some(button=>{
+  if(!button.getClientRects().length)return false;
+  const rect=button.getBoundingClientRect();
+  return rect.bottom>header&&rect.top<visibleBottom;
+ });
+}
 function syncBookingDock(){
  const active=document.body.classList.contains('hof-active');
  const hero=active?document.querySelector('.hof-editorial-hero'):null;
@@ -683,8 +695,16 @@ function syncBookingDock(){
  const visible=Boolean(heroPassed&&!footerEntered);
  document.body.classList.toggle('hof-dock-visible',visible);
  if(dock){
-  if(active){dock.inert=!visible;dock.setAttribute('aria-hidden',String(!visible))}
-  else{dock.inert=false;dock.removeAttribute('aria-hidden')}
+  if(active){
+   document.body.classList.remove('nova-inline-booking-visible');
+   dock.inert=!visible;dock.setAttribute('aria-hidden',String(!visible));
+  }else{
+   const inlineVisible=novaInlineBookingVisible(dock,header);
+   document.body.classList.toggle('nova-inline-booking-visible',inlineVisible);
+   dock.inert=inlineVisible||document.body.classList.contains('lock');
+   if(inlineVisible)dock.setAttribute('aria-hidden','true');
+   else dock.removeAttribute('aria-hidden');
+  }
  }
 }
 function updateTop(){

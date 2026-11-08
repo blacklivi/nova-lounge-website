@@ -70,4 +70,19 @@ assert.match(venueTheme,/@media\(max-width:600px\)[\s\S]*?\.hof-page \.hof-hero-
 assert.match(venueTheme,/\.hof-page \.hof-hero-actions > \.hof-action,\s*\.hof-page \.hof-editorial-about \.hof-action,\s*\.hof-page \.hof-compact-events \.hof-action,\s*\.hof-page \.hof-compact-contact \.hof-bottom-actions > \.hof-action/,'Every CTA shares the same sizing rules');
 assert.match(venueTheme,/\.hof-editorial-grid\{grid-template-columns:minmax\(0,1fr\)\}/,'Narrow tablet event/contact panels stack to leave room for two horizontal buttons');
 
+
+/* The bottom NOVA booking dock must never compete with its in-flow booking
+   control on mobile. This applies to the home green section and both venues. */
+assert.match(app,/function novaInlineBookingVisible\(dock,header\)/,'Non-HÓF booking visibility must be computed independently');
+assert.match(app,/matchMedia\('\(max-width:600px\)'\)\.matches/,'Handoff is restricted to mobile');
+assert.match(app,/main \.book-main \.book-cta, main \.detail-actions \[data-modal="booking"\]/,'Observe in-page booking, not every link or whole booking panel');
+assert.match(app,/visibleBottom=innerHeight-dock\.offsetHeight/,'Visibility must exclude the dock overlay area');
+assert.match(app,/rect\.bottom>header&&rect\.top<visibleBottom/,'Hide only for booking CTA visible between header and dock');
+assert.match(app,/document\.body\.classList\.toggle\('nova-inline-booking-visible',inlineVisible\)/,'Mobile dock updates in both scroll directions');
+assert.match(app,/dock\.inert=inlineVisible\|\|document\.body\.classList\.contains\('lock'\)/,'Hidden dock must not receive keyboard focus');
+assert.match(css,/body:not\(\.hof-active\)\.nova-inline-booking-visible \.mobile-cta\{/,'Only NOVA mobile dock may be suppressed');
+assert.match(css,/visibility:hidden;\s*opacity:0;\s*transform:translate3d\(0,110%,0\);\s*pointer-events:none;/,'Hidden dock must be non-interactive and fully off screen');
+assert.match(app,/const visible=Boolean\(heroPassed&&!footerEntered\)/,'Keep HÓF hero/footer conditions unchanged');
+assert.match(app,/setupHofDockObserver\(\)/,'Keep HÓF dock observer wired');
+
 console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');
