@@ -24,6 +24,6 @@ assert.match(app,/function setupHofDockObserver\(\)/,'Sticky button must use an 
 assert.match(app,/new IntersectionObserver\(\(\)=>syncBookingDock\(\)/,'Observer must refresh the dock');
 assert.match(app,/hofDockObserver\.observe\(hero\);[\s\S]*?hofDockObserver\.observe\(contact\);/,'Observe hero and entire orange footer panel');
 assert.match(app,/const footerEntered=Boolean\(panelRect&&panelRect\.top<innerHeight&&panelRect\.bottom>header\)/,'Hide dock as soon as orange panel enters viewport');
-assert.match(app,/const visible=Boolean\(heroPassed&&!footerEntered\)/,'Sticky CTA only appears between hero and orange contact panel');
+assert.match(app,/const visible=Boolean\(heroPassed&&!footerEntered&&!eventActionVisible\)/,'Sticky CTA must also withdraw before covering the in-flow HÓF events link');
 assert.match(hofStyles,/background:linear-gradient\(to top,rgba\(0,0,0,.9\) 0%,rgba\(0,0,0,.58\) 55%,rgba\(0,0,0,0\) 100%\)/,'Soft fade instead of opaque mobile dock');
 console.log('HÓF editorial event rows and smart sticky CTA invariants passed');
