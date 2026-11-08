@@ -39,7 +39,8 @@ assert.match(auth,/currentReservedUser\(req,env\)/,'All sessions must be resolve
 assert.match(auth,/DELETE FROM reservation_sessions WHERE user_id=/,'Password changes and deactivations must revoke staff sessions');
 assert.match(auth,/PBKDF2/,'Staff passwords must have a slow salted key derivation');
 assert.match(auth,/actor\.role!=='owner'/,'Only owner can manage venue users');
-assert.match(auth,/active INTEGER|active\?1:0/,'Staff accounts have access state and can be deactivated');
+assert.match(staffMigration,/active INTEGER NOT NULL DEFAULT 1/,'Staff accounts have a persisted deactivation state');
+assert.match(auth,/b\.active===true\?1:b\.active===false\?0:null/,'Owner must be able to deactivate staff');
 assert.match(module,/x-nova-reserved/,'Staff writes must use custom CSRF header');
 assert.match(module,/SELECT id,venue,guest_name,phone/,'Reservation lists are fetched after authentication');
 assert.match(module,/const actor=await currentReservedUser\(req,env\)/,'Role and venue must be resolved from verified session');
