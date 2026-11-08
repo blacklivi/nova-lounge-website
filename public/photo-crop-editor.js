@@ -50,15 +50,20 @@ export async function openPhotoCropEditor({src,key='general',initial=DEFAULT_CRO
  for(const b of [cancel,reset,apply])b.type='button';
  buttons.append(cancel,reset,apply);
  shell.append(heading,info,toolbar,frameWrap,controls,hint,buttons);dialog.append(shell);document.body.append(dialog);
+ const controller=new AbortController();
  let crop=parseCrop(initial),drag=null,finished=false;
  function draw(){
   applyPhotoCrop(photo,serializeCrop(crop));
   zoom.value=String(crop.zoom);
   zoomOut.value=String(crop.zoom)+'%';
-  frame.style.aspectRatio=String(presets[Number(ratioSelect.value)||0].ratio);
+  const ratio=presets[Number(ratioSelect.value)||0].ratio;
+  frame.style.aspectRatio=String(ratio);
+  frame.style.width=Math.floor(Math.min(480,window.innerWidth-80,
+    window.innerHeight*.48*ratio))+'px';
  }
  zoom.addEventListener('input',()=>{crop.zoom=Number(zoom.value);draw()});
  ratioSelect.addEventListener('change',draw);
+ window.addEventListener('resize',draw,{signal:controller.signal});
  reset.addEventListener('click',()=>{crop=parseCrop(DEFAULT_CROP);draw()});
  frame.addEventListener('pointerdown',event=>{
   if(event.button!==0&&event.pointerType!=='touch')return;
@@ -86,6 +91,7 @@ export async function openPhotoCropEditor({src,key='general',initial=DEFAULT_CRO
    if(finished)return;
    finished=true;
    active=false;
+   controller.abort();
    dialog.close?.();
    dialog.remove();
    resolve(value);
