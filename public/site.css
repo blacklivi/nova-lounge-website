@@ -283,7 +283,7 @@ main.route-enter{animation:novaRouteEnter .3s ease-out both}
  hyphens:none;
 }
 .hof-page .hof-overline,.hof-page .hof-side-mark,.hof-page .hof-cover-top,
-.hof-page .hof-demo-notice,.hof-page .hof-poster-type>span{
+.hof-page .hof-poster-type>span{
  letter-spacing:.04em;
 }
 .hof-cover-brand h1{line-height:.93;max-width:100%}
@@ -1371,7 +1371,6 @@ body.hof-active .header-book{
 .nova-venue-events-page .venue-events-overline{color:var(--olive)}
 .nova-venue-events-page .venue-events-period{color:var(--olive)}
 .nova-venue-events-page .venue-events-all{color:var(--ink)}
-.venue-events-page .event-demo-tag,.venue-events-page 
 /* A venue listing link on Pobediteley/Vostok, with in-venue previews. */
 .venue-events-teaser{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(25px,4vw,60px);border-top:1px solid var(--line);padding:clamp(30px,5vw,75px) var(--gutter);background:#f7f8f5}
 .venue-events-teaser h2{font-size:clamp(32px,5vw,72px);font-weight:400;letter-spacing:-.04em;margin:20px 0 15px}
