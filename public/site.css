@@ -24,10 +24,31 @@ body{margin:0}body.lock{overflow:hidden}button,input,select,textarea{font:inheri
 
 
 
-.events-list 
-.events-list 
-.events-list 
-.book-strip{display:grid;grid-template-columns:1fr 2fr;min-height:380px}.book-image{overflow:hidden}.book-image img{height:100%;max-height:520px}
+/* NOVA home reservation — independent two-column layout (not nested in events). */
+.book-strip{
+ display:grid;
+ grid-template-columns:minmax(0,44fr) minmax(0,56fr);
+ width:100%;
+ height:clamp(390px,32vw,560px);
+ min-height:390px;
+ overflow:hidden;
+}
+.book-image{
+ position:relative;
+ min-width:0;
+ min-height:0;
+ height:100%;
+ overflow:hidden;
+}
+.book-image img{
+ position:absolute;
+ inset:0;
+ display:block;
+ width:100%;
+ height:100%;
+ max-height:none;
+ object-fit:cover;
+}
 .book-main{background:var(--olive);color:white;padding:clamp(36px,4.5vw,90px);text-align:left;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:clamp(26px,3vw,42px);min-width:0;cursor:pointer;transition:background-color .2s ease}
 .book-main:hover{background:var(--deep)}.book-main:focus-visible{outline-offset:-8px;outline-color:#fff}
 .book-welcome{display:block;max-width:24ch;font-size:clamp(32px,3.25vw,70px);font-weight:400;line-height:1.15;letter-spacing:-.025em;text-wrap:balance;overflow-wrap:break-word}
@@ -2039,3 +2060,50 @@ img.cms-photo[data-image],
 .story-photo,.detail-image{overflow:hidden}
 .cms-photo-clip{display:block;min-width:0;width:100%;overflow:hidden}
 .cms-photo-clip img{display:block;width:100%;height:auto}
+
+/* Scoped to the NOVA homepage: balanced columns and a lightweight CTA. */
+@media(min-width:601px){
+ .book-strip .book-main{
+  box-sizing:border-box;
+  width:100%;
+  height:100%;
+  min-width:0;
+  padding:clamp(36px,4vw,84px);
+  gap:clamp(24px,2.6vw,40px);
+  justify-content:center;
+  align-items:flex-start;
+ }
+ .book-strip .book-welcome{
+  max-width:24ch;
+  font-size:clamp(30px,3.15vw,64px);
+  line-height:1.14;
+ }
+ .book-strip .book-main .book-cta.nova-compact-cta.nova-compact-cta--inverse{
+  display:inline-flex;
+  box-sizing:border-box;
+  width:max-content;
+  max-width:100%;
+  height:auto;
+  min-height:0;
+  max-height:none;
+  padding:0 0 10px;
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.8);
+  border-radius:0;
+  background:transparent;
+  color:#fff;
+  font-size:clamp(15px,1.1vw,18px);
+  gap:16px;
+ }
+ .book-strip .book-main:hover .book-cta.nova-compact-cta,
+ .book-strip .book-main:focus-visible .book-cta.nova-compact-cta{
+  color:#fff;
+  background:transparent;
+  border-color:#fff;
+ }
+}
+@media(max-width:600px){
+ .book-strip{display:block;height:auto;min-height:0;overflow:visible}
+ .book-strip .book-image{display:none}
+ .book-strip .book-main{width:100%}
+}
