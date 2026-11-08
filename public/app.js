@@ -455,13 +455,25 @@ function patchEventSections(){
  }
  if(!selected){
   const section=app.querySelector('.home-events');
-  if(section)section.style.display=shown('home_events_visible')&&splitEvents(displayEvents()).upcoming.length?'':'none';
-  const oldList=app.querySelector('.home-events > div');
+  if(!section)return;
+  const visible=shown('home_events_visible')&&splitEvents(displayEvents()).upcoming.length>0;
+  const wasHidden=section.style.display==='none';
+  const oldList=section.querySelector(':scope > div');
   if(oldList){
    const template=document.createElement('template');
    template.innerHTML=home();
    const nextList=template.content.querySelector('.home-events > div');
    if(nextList)oldList.replaceChildren(...nextList.childNodes);
+  }
+  section.style.display=visible?'':'none';
+  // An initially hidden home lineup can have reveal elements left unobserved.
+  // When fresh data makes it visible, guarantee that its live cards can be read.
+  if(visible&&wasHidden){
+   section.querySelectorAll('.section-link,.event-card').forEach(el=>{
+    motionObserver?.unobserve(el);
+    el.classList.remove('nova-reveal');
+    el.classList.add('is-visible');
+   });
   }
  }
 }
@@ -924,3 +936,10 @@ if(typeof BroadcastChannel!=='undefined'){
   if(event.data==='changed')void refreshPublishedEvents(true);
  });
 }
+// Cross-device publication is not guaranteed to send a BroadcastChannel signal.
+// Check for new events while the tab remains open; pause polling when hidden.
+const EVENTS_POLL_INTERVAL=30000;
+window.setInterval(()=>{
+ if(!document.hidden)void refreshPublishedEvents();
+},EVENTS_POLL_INTERVAL);
+window.addEventListener('online',()=>void refreshPublishedEvents(true));
