@@ -16,7 +16,7 @@ const shared=[
  g('footer','Общий подвал',[
   f('footer_tagline','Описание NOVA','textarea'),
   f('footer_left','Нижняя подпись слева','text','NOVA · MINSK','NOVA · MINSK'),
-  f('footer_right','Нижняя подпись справа','textarea','Демонстрационная версия · заявки не отправляются','Demo website · booking requests are not sent'),
+  f('footer_right','Нижняя подпись справа','textarea','Три пространства. Один ритм.','Three spaces. One rhythm.'),
   f('footer_logo_text','Текст логотипа в подвале','text','NOVA','NOVA'),
   f('global_instagram_icon','Иконка Instagram','icon','instagram'),f('global_map_icon','Иконка карты','icon','map-pin'),
  ])
@@ -43,8 +43,7 @@ const home=[
   f('story_kicker','Подпись над блоком','text'),f('story_title','Основной заголовок','textarea'),
   f('story_description','Описание','textarea'),f('story_image','Фотография','image'),
   f('home_story_menu_text','Кнопка меню','text','Посмотреть меню','View the menu'),
-  f('home_story_menu_icon','Иконка кнопки меню','icon','arrow-right'),
-  f('media_note','Примечание к фотографии','textarea')
+  f('home_story_menu_icon','Иконка кнопки меню','icon','arrow-right')
  ]),
  g('events','Афиша главной',[
   f('home_events_visible','Показывать раздел событий','toggle','yes'),
@@ -85,7 +84,7 @@ const hof=[
  g('hof-events','События HÓF',[
   f('hof_events_kicker','Малая подпись','text','HÓF / AFTER DARK','HÓF / AFTER DARK'),
   f('hof_events_title','Заголовок афиши','text','Афиша','Events'),
-  f('hof_events_empty','Подпись при отсутствии событий','textarea','Новые события скоро появятся здесь.','New events will appear here soon.'),
+  f('hof_events_empty','Подпись при отсутствии событий','textarea','Следите за новыми вечеринками в афише HÓF.','Follow the HÓF events calendar for upcoming nights.'),
   f('hof_events_more_text','Кнопка перехода на события только HÓF','text','События HÓF','HÓF events'),
   f('hof_events_more_url','Адрес афиши HÓF','link','/events/hof'),
  ]),
