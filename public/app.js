@@ -742,7 +742,12 @@ function syncBookingDock(){
  const panelRect=panel?.getBoundingClientRect();
  const footerEntered=Boolean(panelRect&&panelRect.top<innerHeight&&panelRect.bottom>header);
  const heroPassed=Boolean(hero&&hero.getBoundingClientRect().bottom<=header+4);
- const visible=Boolean(heroPassed&&!footerEntered);
+ // The inline "HÓF events" link must not be blocked by the fixed booking dock.
+ const eventAction=active?document.querySelector('.hof-events-footer .hof-event-more'):null;
+ const eventActionRect=eventAction?.getBoundingClientRect();
+ const eventActionVisible=Boolean(eventActionRect&&eventActionRect.bottom>header&&
+  eventActionRect.top<innerHeight-(dock?.offsetHeight||0));
+ const visible=Boolean(heroPassed&&!footerEntered&&!eventActionVisible);
  document.body.classList.toggle('hof-dock-visible',visible);
  if(dock){
   if(active){
