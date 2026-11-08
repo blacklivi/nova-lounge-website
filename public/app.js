@@ -84,10 +84,15 @@ const languages = () => `<div class="language" role="group" aria-label="${t('Я�
 const nav = () => `<a href="${H('nav_spaces_url','/#venues')}" ${hrefFor('nav_spaces_url','/#venues')==='/#venues'?'data-home="venues"':''} data-editor-key="nav_spaces_url">${E('nav_spaces_text')}</a><a href="${H('nav_events_url','/events')}" ${isEvents?'aria-current="page"':''} data-editor-key="nav_events_url">${E('nav_events_text')}</a><a href="${H('nav_about_url','/#about')}" ${hrefFor('nav_about_url','/#about')==='/#about'?'data-home="about"':''} data-editor-key="nav_about_url">${E('nav_about_text')}</a><a href="${H('nav_contacts_url','#contacts')}" data-editor-key="nav_contacts_url">${E('nav_contacts_text')}</a>`;
 function header(){return `<a class="skip" href="#main">${t('К содержимому','Skip to content')}</a><header class="site-header"><a class="brand" href="${H('global_logo_url','/')}" data-editor-key="global_logo_url" aria-label="${t('NOVA — на главную','NOVA — home')}">${editorValue('global_logo_image')?'<img data-editor-key="global_logo_image" src="'+imageFor('global_logo_image')+'" alt="NOVA">':'NOVA'}</a><nav class="main-nav" aria-label="${t('Основная навигация','Main navigation')}">${nav()}</nav><div class="header-side">${languages()}<button type="button" class="button header-book" data-modal="booking">${bookingLabel()}</button><button type="button" class="menu-toggle" data-drawer aria-controls="drawer" aria-expanded="false" aria-label="${t('Открыть меню','Open menu')}"><span></span><span></span></button></div></header>`;}
 const instagramMark=()=>I('global_instagram_icon','instagram').replace('class="arrow"','class="footer-icon"');
+const hofInstagramURL=()=>safeURL(value('instagram_zyb'));
+function hofInstagramSocial(){
+ const url=hofInstagramURL();
+ return url?`<div class="hof-contact-socials"><a class="hof-instagram-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" data-editor-key="instagram_zyb" aria-label="${t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya')}" title="Instagram HÓF by NOVA">${instagramMark()}<span class="sr-only">Instagram</span></a></div>`:'';
+}
 const locationMark=()=>I('global_map_icon','map-pin').replace('class="arrow"','class="footer-icon"');
 function contactLinks(id){
- const phone=value('phone_'+id), instagram=id==='zyb'?'':safeURL(value('instagram_'+id)), telegram=safeURL(value('telegram_'+id)), route=safeURL(value('map_'+id));
- return `${phone&&validPhone(phone)?`<a class="footer-phone" href="tel:${esc(phone.replace(/[^+\d]/g,''))}">${text(phone)}</a>`:''}${instagram||telegram||route?`<div class="footer-socials">${instagram?`<a class="footer-social-icon" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="Instagram NOVA ${name(id)}" title="Instagram">${instagramMark()}<span class="sr-only">Instagram</span></a>`:''}${telegram?`<a class="footer-social-text" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer">Telegram</a>`:''}${route?`<a class="footer-route footer-social-icon" href="${esc(route)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Показать NOVA на карте','View NOVA on map')} ${name(id)}" title="${t('На карте','View on map')}">${locationMark()}</a>`:''}</div>`:''}`;
+ const phone=value('phone_'+id), instagram=safeURL(value('instagram_'+id)), telegram=safeURL(value('telegram_'+id)), route=safeURL(value('map_'+id));
+ return `${phone&&validPhone(phone)?`<a class="footer-phone" href="tel:${esc(phone.replace(/[^+\d]/g,''))}">${text(phone)}</a>`:''}${instagram||telegram||route?`<div class="footer-socials">${instagram?`<a class="footer-social-icon" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="${id==='zyb'?t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya'):'Instagram NOVA '+name(id)}" title="Instagram">${instagramMark()}<span class="sr-only">Instagram</span></a>`:''}${telegram?`<a class="footer-social-text" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer">Telegram</a>`:''}${route?`<a class="footer-route footer-social-icon" href="${esc(route)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Показать NOVA на карте','View NOVA on map')} ${name(id)}" title="${t('На карте','View on map')}">${locationMark()}</a>`:''}</div>`:''}`;
 }
 function footer(){return `<footer class="site-footer" id="contacts"><div class="footer-top"><div><a class="brand" href="${H('global_logo_url','/')}" data-editor-key="global_logo_url">${E('footer_logo_text')}</a><p data-content="footer_tagline">${content('footer_tagline')}</p></div></div><div class="footer-locations">${ids.map(id=>`<div class="footer-location"><h3><a href="${venueURL(id)}" data-place="${id}">${brandName(id)}</a></h3>${value('address_'+id)?`<p class="venue-address">${content('address_'+id)}</p>`:''}${value('hours_'+id)?`<p class="venue-hours">${content('hours_'+id)}</p>`:''}${contactLinks(id)}${!['address_','phone_','instagram_','telegram_','hours_','map_'].some(k=>value(k+id))?`<p class="muted">${t('Контакты уточняются','Contact details coming soon')}</p>`:''}</div>`).join('')}</div><div class="footer-bottom"><span data-editor-key="footer_left">${E('footer_left')}</span><span data-editor-key="footer_right">${E('footer_right')}</span></div></footer>`;}
 function layers(){return `<aside id="drawer" class="drawer" inert aria-hidden="true" aria-label="${t('Мобильная навигация','Mobile navigation')}"><nav>${nav()}</nav><button type="button" class="button" data-modal="booking">${bookingLabel()}</button><p>MINSK · LOUNGE CAFÉ</p></aside><div class="mobile-cta"><button class="button" data-modal="booking">${bookingLabel()}</button></div><button class="to-top" data-top hidden aria-label="${t('Наверх','Back to top')}">${arrow}</button><dialog class="modal" aria-labelledby="modal-title"><div class="modal-shell"><div class="modal-top"><span class="eyebrow">NOVA / <span id="modal-caption">MINSK</span></span><button class="close" data-close aria-label="${t('Закрыть окно','Close dialog')}">×</button></div><div id="modal-body"></div></div></dialog>`;}
@@ -221,6 +226,7 @@ function hofDetail(){
      <button class="hof-outline hof-primary-cta hof-action" type="button" data-editor-key="hof_book_button_text" data-modal="booking" data-venue="zyb">${E('hof_book_button_text')} ${arrow}</button>
      <button class="hof-text-button hof-action" data-editor-key="hof_contacts_button_text" type="button" data-modal="contacts" data-venue="zyb">${E('hof_contacts_button_text')} ${arrow}</button>
     </div>
+    ${hofInstagramSocial()}
    </section>
   </div>
  </article>`;
@@ -590,7 +596,7 @@ function closeModal(instant=false){
 function contactPanel(id){
  const address=value('address_'+id),hours=value('hours_'+id);
  if(id==='zyb'){
-  const phone=value('phone_zyb'),route=safeURL(value('map_zyb')),telegram=safeURL(value('telegram_zyb'));
+  const phone=value('phone_zyb'),route=safeURL(value('map_zyb')),telegram=safeURL(value('telegram_zyb')),instagram=hofInstagramURL();
   const items=[
    address?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Адрес','Address')}</span><p>${text(address)}</p></div>`:'',
    hours?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Часы работы','Opening hours')}</span><p class="venue-hours">${text(hours)}</p></div>`:''
@@ -598,7 +604,8 @@ function contactPanel(id){
   const actions=[
    phone&&validPhone(phone)?`<a class="hof-contact-action" href="tel:${esc(phone.replace(/[^+\d]/g,''))}"><span>${text(phone)}</span>${arrow}</a>`:'',
    route?`<a class="hof-contact-action" href="${esc(route)}" target="_blank" rel="noopener noreferrer"><span>${t('Построить маршрут','Get directions')}</span>${arrow}</a>`:'',
-   telegram?`<a class="hof-contact-action" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer"><span>Telegram</span>${arrow}</a>`:''
+   telegram?`<a class="hof-contact-action" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer"><span>Telegram</span>${arrow}</a>`:'',
+   instagram?`<a class="hof-contact-action" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya')}"><span>Instagram</span>${arrow}</a>`:''
   ].filter(Boolean).join('');
   if(!items&&!actions)return `<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`;
   return `<div class="hof-contact-details">${items}${actions?`<div class="hof-contact-modal-actions">${actions}</div>`:''}</div>`;
