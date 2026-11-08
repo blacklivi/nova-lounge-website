@@ -1,16 +1,18 @@
 import {publicPage,seoRoute,isPublicPage} from './seo.js';
 import {reservationsApi} from './reservations.js';
-import {EDITOR_FIELDS,ICON_CHOICES} from '../public/editor-schema.js';
+import {EDITOR_FIELDS,PHOTO_CROP_FIELDS,ICON_CHOICES} from '../public/editor-schema.js';
+import {cropPattern,DEFAULT_CROP} from '../public/photo-crop.js';
 // NOVA website — API for editorial content, events, media and protected admin.
 // Secrets ADMIN_PASSWORD and ADMIN_SIGNING_KEY are Cloudflare Worker secrets, never committed.
 const EDITABLE = new Set(['hero_tagline','hero_kicker','hero_image','story_title','story_description','story_kicker','story_image','booking_title','booking_image','venue_zyb_image','venue_pob_image','venue_east_image','venue_zyb_subtitle','venue_pob_subtitle','venue_east_subtitle','venue_zyb_desc','venue_pob_desc','venue_east_desc','venue_zyb_second','venue_pob_second','venue_east_second','venue_zyb_features','venue_pob_features','venue_east_features','gallery_zyb_1_image','gallery_zyb_2_image','gallery_pob_1_image','gallery_pob_2_image','gallery_east_1_image','gallery_east_2_image','instagram_zyb','instagram_pob','instagram_east','telegram_zyb','telegram_pob','telegram_east','menu_zyb','menu_pob','menu_east','address_zyb','address_pob','address_east','phone_zyb','phone_pob','phone_east','footer_tagline','media_note','hours_zyb','hours_pob','hours_east','map_zyb','map_pob','map_east']);
-for(const f of EDITOR_FIELDS)EDITABLE.add(f.key);
+for(const f of [...EDITOR_FIELDS,...PHOTO_CROP_FIELDS])EDITABLE.add(f.key);
 const IMAGE_KEYS = new Set([...EDITABLE].filter(k=>k.endsWith('_image')||k.startsWith('gallery_')));
 for(const f of EDITOR_FIELDS)if(f.type==='image')IMAGE_KEYS.add(f.key);
 const LINK_KEYS = new Set(EDITOR_FIELDS.filter(f=>f.type==='link').map(f=>f.key));
 const ICON_KEYS = new Set(EDITOR_FIELDS.filter(f=>f.type==='icon').map(f=>f.key));
 const TOGGLE_KEYS = new Set(EDITOR_FIELDS.filter(f=>f.type==='toggle').map(f=>f.key));
 const ICON_SET = new Set(ICON_CHOICES);
+const CROP_KEYS=new Set(PHOTO_CROP_FIELDS.map(f=>f.key));
 function validLink(v){
  if(!v)return true;
  if(v.length>1600 || /[\\\u0000-\u001f\u007f]/.test(v))return false;
@@ -38,7 +40,7 @@ function jsonSecurity(req){return originAllowed(req) && req.headers.get('x-nova-
 const venueIDs=new Set(['zyb','pob','east']);
 const CYR=/[А-Яа-яЁё]/;
 function shouldTranslate(key,value){
- return Boolean(value&&CYR.test(value)&&!IMAGE_KEYS.has(key)&&!LINK_KEYS.has(key)&&!ICON_KEYS.has(key)&&!key.startsWith('phone_'));
+ return Boolean(value&&CYR.test(value)&&!IMAGE_KEYS.has(key)&&!LINK_KEYS.has(key)&&!ICON_KEYS.has(key)&&!CROP_KEYS.has(key)&&!key.startsWith('phone_'));
 }
 async function translateToEnglish(env,source){
  if(!source||!CYR.test(source))return source;
@@ -52,8 +54,9 @@ async function translateEvent(env,b){
  return {title_en:t[0].status==='fulfilled'?t[0].value:'',description_en:t[1].status==='fulfilled'?t[1].value:'',translation_pending:t.some(x=>x.status==='rejected')};
 }
 function validateEvent(b){const title=short(b.title,110),description=short(b.description,1300),date=short(b.starts_at,16),venue=short(b.venue,8),image_url=short(b.image_url,220);
- if(!title||!/^20\d\d-(0[1-9]|1[0-2])-([0-2]\d|3[01])T([01]\d|2[0-3]):[0-5]\d$/.test(date)||!venueIDs.has(venue)||!validImage(image_url))throw Error('invalid_event');return {title,description,starts_at:date,venue,image_url,published:b.published===false||b.published===0?0:1}}
-async function eventList(db,admin=false){const q=admin?'SELECT * FROM events ORDER BY starts_at DESC,created_at DESC':'SELECT id,title,description,title_en,description_en,starts_at,venue,image_url FROM events WHERE published = 1 ORDER BY starts_at ASC';return (await db.prepare(q).all()).results||[]}
+ const image_crop=b.image_crop===undefined?DEFAULT_CROP:b.image_crop;
+ if(!title||!/^20\d\d-(0[1-9]|1[0-2])-([0-2]\d|3[01])T([01]\d|2[0-3]):[0-5]\d$/.test(date)||!venueIDs.has(venue)||!validImage(image_url)||typeof image_crop!=='string'||!cropPattern.test(image_crop))throw Error('invalid_event');return {title,description,starts_at:date,venue,image_url,image_crop,published:b.published===false||b.published===0?0:1}}
+async function eventList(db,admin=false){const q=admin?'SELECT * FROM events ORDER BY starts_at DESC,created_at DESC':'SELECT id,title,description,title_en,description_en,starts_at,venue,image_url,image_crop FROM events WHERE published = 1 ORDER BY starts_at ASC';return (await db.prepare(q).all()).results||[]}
 async function api(request,env,url){const path=url.pathname;
  if(path==='/api/content'&&request.method==='GET'){const [ru,en]=await Promise.all([env.DB.prepare('SELECT key,value FROM site_content').all(),env.DB.prepare('SELECT key,value FROM site_content_en').all()]);return respond({content:Object.fromEntries((ru.results||[]).map(r=>[r.key,r.value])),content_en:Object.fromEntries((en.results||[]).map(r=>[r.key,r.value]))})}
  if(path==='/api/events'&&request.method==='GET'){return respond({events:await eventList(env.DB)})}
@@ -79,9 +82,9 @@ async function api(request,env,url){const path=url.pathname;
   if(request.method==='GET')return api(new Request(new URL('/api/content',request.url)),env,new URL('/api/content',request.url));
   if(request.method!=='PUT')return error('method_not_allowed',405);
   const b=await payload(request),entries=Object.entries(b.content||{}),english=Object.entries(b.content_en||{});
-  const valid=(k,v)=>EDITABLE.has(k)&&typeof v==='string'&&v.length<=1600&&(!IMAGE_KEYS.has(k)||validImage(v))&&(!LINK_KEYS.has(k)||validLink(v))&&(!ICON_KEYS.has(k)||ICON_SET.has(v))&&(!TOGGLE_KEYS.has(k)||v==='yes'||v==='no');
+  const valid=(k,v)=>EDITABLE.has(k)&&typeof v==='string'&&v.length<=1600&&(!IMAGE_KEYS.has(k)||validImage(v))&&(!CROP_KEYS.has(k)||cropPattern.test(v))&&(!LINK_KEYS.has(k)||validLink(v))&&(!ICON_KEYS.has(k)||ICON_SET.has(v))&&(!TOGGLE_KEYS.has(k)||v==='yes'||v==='no');
   if((!entries.length&&!english.length)||entries.length>32||english.length>32||entries.some(([k,v])=>!valid(k,v))||
-     english.some(([k,v])=>!valid(k,v)||IMAGE_KEYS.has(k)||LINK_KEYS.has(k)||ICON_KEYS.has(k)))return error('invalid_content');
+     english.some(([k,v])=>!valid(k,v)||IMAGE_KEYS.has(k)||CROP_KEYS.has(k)||LINK_KEYS.has(k)||ICON_KEYS.has(k)))return error('invalid_content');
   await env.DB.batch([
    ...entries.map(([k,v])=>env.DB.prepare('INSERT INTO site_content(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP').bind(k,v)),
    ...english.map(([k,v])=>env.DB.prepare('INSERT INTO site_content_en(key,value,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=CURRENT_TIMESTAMP').bind(k,v))
@@ -100,13 +103,13 @@ async function api(request,env,url){const path=url.pathname;
  }
  if(path==='/api/admin/events'){
   if(request.method==='GET')return respond({events:await eventList(env.DB,true)});
-  if(request.method==='POST'){const b=validateEvent(await payload(request)),id=crypto.randomUUID();const en=await translateEvent(env,b);await env.DB.prepare('INSERT INTO events(id,title,description,title_en,description_en,starts_at,venue,image_url,published) VALUES(?,?,?,?,?,?,?,?,?)').bind(id,b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.published).run();return respond({ok:true,id,translation_pending:en.translation_pending},201)}
+  if(request.method==='POST'){const b=validateEvent(await payload(request)),id=crypto.randomUUID();const en=await translateEvent(env,b);await env.DB.prepare('INSERT INTO events(id,title,description,title_en,description_en,starts_at,venue,image_url,image_crop,published) VALUES(?,?,?,?,?,?,?,?,?,?)').bind(id,b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.image_crop,b.published).run();return respond({ok:true,id,translation_pending:en.translation_pending},201)}
  }
  if(path.startsWith('/api/admin/events/')){
   const id=path.slice('/api/admin/events/'.length);
   if(!/^[0-9a-f-]{36}$/.test(id))return error('invalid_id');
   if(request.method==='DELETE'){await env.DB.prepare('DELETE FROM events WHERE id=?').bind(id).run();return respond({ok:true})}
-  if(request.method==='PUT'){const b=validateEvent(await payload(request));const en=await translateEvent(env,b);const r=await env.DB.prepare('UPDATE events SET title=?,description=?,title_en=?,description_en=?,starts_at=?,venue=?,image_url=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.published,id).run();return respond({ok:true,changed:r.meta?.changes||0,translation_pending:en.translation_pending})}
+  if(request.method==='PUT'){const b=validateEvent(await payload(request));const en=await translateEvent(env,b);const r=await env.DB.prepare('UPDATE events SET title=?,description=?,title_en=?,description_en=?,starts_at=?,venue=?,image_url=?,image_crop=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.image_crop,b.published,id).run();return respond({ok:true,changed:r.meta?.changes||0,translation_pending:en.translation_pending})}
  }
  if(path==='/api/admin/upload'&&request.method==='POST'){
   const type=request.headers.get('content-type')||'';if(!['image/jpeg','image/png','image/webp'].includes(type))return error('unsupported_image_type');
