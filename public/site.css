@@ -215,18 +215,53 @@ main.route-enter{animation:novaRouteEnter .3s ease-out both}
 }
 
 
-/* HÓF identity on the NOVA spaces grid. */
-.venue-card-hof .venue-img{position:relative;background:#000}
-.venue-card-hof .venue-img img{filter:brightness(.78) saturate(.85)}
-.venue-hof-image-label{position:absolute;left:16px;top:15px;color:#fff;font-size:10px;letter-spacing:.05em}
-.venue-card-hof .venue-title{display:flex;align-items:center;gap:12px}
-.venue-card-hof .venue-hof-logo{display:block;width:clamp(78px,7vw,102px);height:auto;flex:none}
-.venue-card-hof .venue-by{font-size:clamp(13px,1.15vw,17px);font-weight:400;letter-spacing:0}
+/* HÓF card: persistent white brand overlay on top of an independently editable photo.
+   Variant 02 — wordmark and BY NOVA along the lower part of the image. */
+.venue-card-hof .venue-img{position:relative;isolation:isolate;background:#000}
+.venue-card-hof .venue-img > img[data-image]{filter:brightness(.78) saturate(.85)}
+.venue-card-hof .venue-img::after{
+ content:'';
+ position:absolute;
+ inset:40% 0 0;
+ z-index:1;
+ background:linear-gradient(to bottom,transparent,rgba(0,0,0,.38));
+ pointer-events:none;
+}
+.venue-card-hof .venue-hof-overlay{
+ position:absolute;
+ z-index:2;
+ inset:auto 5% 11%;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:clamp(4px,.6vw,8px);
+}
+.venue-card-hof .venue-img .venue-hof-overlay-logo{
+ position:static;
+ display:block;
+ flex:0 1 auto;
+ width:60%;
+ max-width:180px;
+ height:auto;
+ max-height:none;
+ object-fit:contain;
+ filter:brightness(0) invert(1)!important;
+ opacity:1!important;
+ transform:none!important;
+ transition:none!important;
+}
+.venue-card-hof .venue-hof-overlay-by{
+ flex:0 0 auto;
+ font:500 clamp(8px,1vw,13px)/1.2 Manrope,Arial,sans-serif;
+ color:#fff;
+ text-transform:uppercase;
+ white-space:nowrap;
+}
 .venue-hof-location{display:block;margin-top:8px;color:#363636;font-size:10px;letter-spacing:.04em}
 @media(max-width:600px){
- .venue-hof-image-label{left:12px;top:12px;font-size:9px}
- .venue-card-hof .venue-hof-logo{width:82px}
- .venue-card-hof .venue-by{font-size:14px}
+ .venue-card-hof .venue-hof-overlay{inset:auto 5% 11%;gap:4px}
+ .venue-card-hof .venue-img .venue-hof-overlay-logo{width:60%;max-width:none}
+ .venue-card-hof .venue-hof-overlay-by{font-size:clamp(7px,2vw,9px)}
 }
 
 /* Typography standards from NOVA's Hallmark design audit:
@@ -541,7 +576,7 @@ body.hof-active .site-footer .footer-bottom{border-top:0;color:#aaa;margin:0;pad
 .text-link{display:inline-flex;align-items:center;gap:13px;min-height:44px}
 .text-link .arrow{width:18px;height:18px}
 .venue-description,.footer-location p,.footer-location a{font-size:14px;line-height:1.6}
-.venue-hof-location,.venue-hof-image-label{font-size:12px}
+.venue-hof-location{font-size:12px}
 .venue-foot .venue-description{max-width:35ch}
 .detail-copy .subtitle{font-size:15px}
 .detail-copy p,.detail-bottom p{font-size:16px;line-height:1.65}
