@@ -1,5 +1,7 @@
 import {EDITOR_PAGES,EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js';
 import {preparePhoto,uploadPhoto,validatePhoto,formatBytes,IMAGE_ACCEPT} from './image-upload.js';
+import {isPhotoKey,cropKey,DEFAULT_CROP,applyPhotoCrop,cropPresets} from './photo-crop.js';
+import {openPhotoCropEditor} from './photo-crop-editor.js';
 
 const $=s=>document.querySelector(s);
 const getPage=()=>EDITOR_PAGES.find(p=>p.id===$('#page-editor-select').value)||EDITOR_PAGES[1];
@@ -18,7 +20,7 @@ const status=(message,error=false)=>{
  el.textContent=message;
  el.style.color=error?'#9c3e31':'#46553e';
 };
-const editableLanguage=field=>!['link','icon','image','toggle'].includes(field.type);
+const editableLanguage=field=>!['link','icon','image','toggle','crop'].includes(field.type);
 const lang=()=>$('#page-editor-language').value;
 function fallback(field,l){
  const standard=defaults[l==='en'?'content_en':'content']||{};
@@ -51,6 +53,9 @@ function replayPreview(){
   if(images.has(field.key))continue; // The original uploaded photo remains visible until the file is published.
   const l=editableLanguage(field)?lang():'ru';
   if(drafts[l].has(field.key))sendPreview(field,drafts[l].get(field.key));
+ }
+ for(const [key,value] of drafts.ru){
+  if(key.endsWith('_crop')&&EDITOR_BY_KEY[key])sendPreview(EDITOR_BY_KEY[key],value);
  }
 }
 $('#page-editor-frame').addEventListener('load',replayPreview);
@@ -120,6 +125,8 @@ function buildField(field){
    const photo=previewImageValue(field,input.value.trim());
    preview.src=photo;
    preview.hidden=!photo;
+   const button=box.querySelector('.editor-crop-open');
+   if(button)button.disabled=!photo;
    sendPreview(field,photo);
   }
  });
@@ -131,7 +138,34 @@ function buildField(field){
   const existing=previewImageValue(field,input.value.trim());
   preview.src=existing;
   preview.hidden=!existing;
-  box.append(preview);
+  const croppable=isPhotoKey(field.key);
+  const cropField=croppable?EDITOR_BY_KEY[cropKey(field.key)]:null;
+  const cropValue=()=>cropField?String(current(cropField,'ru')||DEFAULT_CROP):DEFAULT_CROP;
+  const photoFrame=croppable?create('div','editor-photo-frame'):null;
+  if(photoFrame){
+   photoFrame.style.aspectRatio=String(cropPresets(field.key)[0].ratio);
+   photoFrame.append(preview);
+   box.append(photoFrame);
+   applyPhotoCrop(preview,cropValue());
+  }else box.append(preview);
+  const cropButton=croppable?create('button','editor-crop-open','Настроить кадр / масштаб'):null;
+  if(cropButton){
+   cropButton.type='button';
+   cropButton.disabled=!existing;
+   cropButton.addEventListener('click',async()=>{
+    if(!preview.src)return;
+    const changed=await openPhotoCropEditor({
+     src:preview.src,key:field.key,initial:cropValue(),title:'Кадрирование · '+field.label
+    });
+    if(changed!==null){
+     applyPhotoCrop(preview,changed);
+     remember(cropField,changed,'ru');
+     status('Кадр изменён в предпросмотре. Нажмите «Опубликовать изменения», чтобы сохранить его на сайте.');
+    }
+   });
+   box.append(cropButton);
+   box.append(create('small','editor-crop-hint','Перетащите фотографию, выберите масштаб и формат кадра. Оригинал не изменяется.'));
+  }
   if(inheritedCardImage(field)&&!input.value.trim()){
    box.append(create('small','editor-inherited-note','Пока используется заглавная фотография страницы. Загрузите отдельную фотографию для карточки — заглавная при этом не изменится.'));
   }
@@ -154,9 +188,21 @@ function buildField(field){
     if(previewBlobURL)URL.revokeObjectURL(previewBlobURL);
     previewBlobURL=URL.createObjectURL(optimized.file);
     preview.src=previewBlobURL;preview.hidden=false;
+    if(cropButton)cropButton.disabled=false;
     sendPreview(field,previewBlobURL);
+    if(cropField){
+     remember(cropField,DEFAULT_CROP,'ru');
+     applyPhotoCrop(preview,DEFAULT_CROP);
+     const changed=await openPhotoCropEditor({
+      src:previewBlobURL,key:field.key,initial:DEFAULT_CROP,title:'Кадрирование · '+field.label
+     });
+     if(changed!==null){
+      remember(cropField,changed,'ru');
+      applyPhotoCrop(preview,changed);
+     }
+    }
     status('WebP готов: '+optimized.originalWidth+'×'+optimized.originalHeight+' → '+optimized.width+'×'+optimized.height+
-      ', '+formatBytes(optimized.originalBytes)+' → '+formatBytes(optimized.bytes)+'. Нажмите «Опубликовать изменения».');
+      ', '+formatBytes(optimized.originalBytes)+' → '+formatBytes(optimized.bytes)+'. Проверьте кадр и нажмите «Опубликовать изменения».');
    }catch(err){
     if(images.get(field.key)===file)images.delete(field.key);
     uploadInput.value='';
