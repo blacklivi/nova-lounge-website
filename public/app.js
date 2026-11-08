@@ -608,7 +608,14 @@ function contactPanel(id){
 }
 function openModal(kind,id=selected){
  if(drawerOpen)setDrawer(false);
- if(kind==='menu-location'){const url=hrefFor('menu_'+id,'');if(url){window.open(url,'_blank','noopener,noreferrer');return;}}
+ if(kind==='menu-location'){
+  const url=hrefFor('menu_'+id,'');
+  if(url){
+   if(id==='east')window.location.assign(url);
+   else window.open(url,'_blank','noopener,noreferrer');
+   return;
+  }
+ }
  const dialog=document.querySelector('dialog');if(!dialog.open)lastFocus=document.activeElement;
  modalKind=kind;modalVenue=id||'';
  dialog.dataset.kind=kind;
