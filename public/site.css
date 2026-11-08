@@ -1640,3 +1640,95 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
 @media(prefers-reduced-motion:reduce){
  .hof-page .hof-event-row,.hof-page .hof-event-arrow{transition:none!important}
 }
+
+/* NOVA small CTA — only the three marked spots and the existing venue action pairs.
+   HÓF, the global header, and the fixed bottom booking button are unchanged. */
+:root{--nova-compact-cta-height:56px}
+.story-copy .nova-compact-cta,
+.detail-bottom .nova-compact-cta,
+.detail-actions .nova-compact-cta,
+.book-cta.nova-compact-cta{
+ box-sizing:border-box;
+ display:inline-flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:16px;
+ height:var(--nova-compact-cta-height);
+ min-height:var(--nova-compact-cta-height);
+ max-height:var(--nova-compact-cta-height);
+ padding:8px 16px;
+ border:1px solid currentColor;
+ border-radius:0;
+ font:500 15px/1.3 Manrope,Arial,sans-serif;
+ text-align:left;
+ text-decoration:none;
+ vertical-align:middle;
+ white-space:normal;
+ transition:color .2s ease,background-color .2s ease,border-color .2s ease;
+}
+.story-copy .nova-compact-cta,
+.detail-bottom .nova-compact-cta{
+ width:max-content;
+ max-width:100%;
+ color:var(--olive);
+ background:transparent;
+ border-color:var(--olive);
+}
+.story-copy .nova-compact-cta:hover,
+.detail-bottom .nova-compact-cta:hover{
+ color:#fff;
+ background:var(--olive);
+ border-color:var(--olive);
+}
+.nova-compact-cta .arrow{
+ width:18px;
+ height:18px;
+ flex:0 0 18px;
+ stroke-width:1.6;
+}
+.detail-actions .button.nova-compact-cta{
+ width:100%;
+ min-width:0;
+ justify-content:center;
+ gap:10px;
+ padding:8px 12px;
+ text-align:center;
+}
+.detail-actions .button.nova-compact-cta:not(.secondary){
+ color:#fff;
+ background:var(--olive);
+ border-color:var(--olive);
+}
+.detail-actions .button.secondary.nova-compact-cta{
+ color:var(--olive);
+ background:transparent;
+ border-color:var(--olive);
+}
+.detail-actions .button.secondary.nova-compact-cta:hover{
+ color:#fff;
+ background:var(--olive);
+ border-color:var(--olive);
+}
+.book-cta.nova-compact-cta.nova-compact-cta--inverse{
+ width:max-content;
+ max-width:100%;
+ color:#fff;
+ background:transparent;
+ border:1px solid rgba(255,255,255,.82);
+}
+.book-main:hover .book-cta.nova-compact-cta,
+.book-main:focus-visible .book-cta.nova-compact-cta{
+ color:var(--olive);
+ background:#fff;
+ border-color:#fff;
+}
+@media(max-width:380px){
+ .detail-actions .button.nova-compact-cta{
+  font-size:13px;
+  line-height:1.25;
+  padding-inline:9px;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .nova-compact-cta{transition:none!important}
+}
