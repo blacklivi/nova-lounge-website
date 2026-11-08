@@ -1599,17 +1599,26 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
  overflow-wrap:anywhere;
 }
 .hof-page .hof-event-arrow{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
  justify-self:end;
  align-self:center;
- font-size:22px;
- line-height:1;
- color:rgba(255,255,255,.4);
+ width:22px;
+ height:22px;
+ color:#fff;
  transition:color .2s ease,transform .2s ease;
+}
+.hof-page .hof-event-arrow .arrow{
+ display:block;
+ width:22px;
+ height:22px;
+ stroke-width:1.6;
 }
 .hof-page .hof-event-row:hover .hof-event-arrow,
 .hof-page .hof-event-row:focus-visible .hof-event-arrow{
  color:#F04902;
- transform:translate(2px,-2px);
+ transform:translateX(3px);
 }
 .hof-page .hof-event-row:focus-visible{outline:2px solid #F04902;outline-offset:3px}
 .hof-page .hof-events-footer{margin-top:32px}

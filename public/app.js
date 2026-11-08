@@ -163,7 +163,7 @@ function hofEventRow(e){
    <time datetime="${esc(e.starts_at)}:00+03:00">${text(hofEventDate(e.starts_at))}</time>
    <span class="hof-event-title">${text(title)}</span>
   </span>
-  <span class="hof-event-arrow" aria-hidden="true">↗</span>
+  <span class="hof-event-arrow" aria-hidden="true">${arrow}</span>
  </a>`;
 }
 function hofLineup(){
