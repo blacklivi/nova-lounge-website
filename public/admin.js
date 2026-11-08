@@ -3,7 +3,6 @@ import {DEFAULT_CROP,applyPhotoCrop} from './photo-crop.js';
 import {openPhotoCropEditor} from './photo-crop-editor.js';
 import {minskNow} from './core.js';
 const $=q=>document.querySelector(q),$$=q=>[...document.querySelectorAll(q)];
-const $=q=>document.querySelector(q),$$=q=>[...document.querySelectorAll(q)];
 let currentEvents=[];
 function status(el,msg,err=false){if(!el)return;el.textContent=msg;el.style.color=err?'#a44c43':'#414a36'}
 async function request(path,method='GET',body){const opts={method,credentials:'same-origin',headers:{'X-Nova-Admin':'1'}};if(body!==undefined){opts.headers['Content-Type']='application/json';opts.body=JSON.stringify(body)}const r=await fetch(path,opts),b=await r.json().catch(()=>({error:'invalid_response'}));if(!r.ok)throw Error(b.error||('HTTP '+r.status));return b}
