@@ -145,6 +145,15 @@ async function create(username,role,venue,password){
  assert.ok(saved?.salt&&saved?.password_hash&&saved.password_hash!==password,'Credentials must be hashed and salted in D1');
  return response.body.user;
 }
+// Reproduce the exact admin-form shape that failed in production:
+// uppercase "Hof" login, "Admin" label, and a long password.
+const fromScreenshot=await call('/api/reserved/users',{
+ method:'POST',cookie:owner,
+ json:{username:'Hof',display_name:'Admin',venue:'zyb',role:'manager',password:'synthetic-HOF-safety-test-2026'}
+});
+assert.equal(fromScreenshot.status,201,'Creating the HÓF admin account must succeed');
+assert.equal(fromScreenshot.body.user.username,'hof','Username is normalized case-insensitively');
+assert.equal(DB.users.size,1,'The initial user creation must write one record');
 const zybUser=await create('hof_staff','manager','zyb','complex-hof-password-2026');
 const pobUser=await create('pob_staff','manager','pob','complex-pob-password-2026');
 const viewerUser=await create('east_reader','viewer','east','complex-east-password-2026');
