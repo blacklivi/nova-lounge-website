@@ -80,7 +80,7 @@ const hof=[
   f('hof_about_description','Описание заведения','textarea','HÓF — новое направление NOVA на Зыбицкой. Здесь больше музыки, DJ-сетов и вечеринок. Кухня и бар остаются частью вечера.','HÓF is NOVA’s nightlife-led space on Zybitskaya. More music, DJ sets and parties, with food and drinks throughout the night.'),
   f('hof_menu_button_text','Кнопка меню','text','Кухня и бар','Food & bar'),
   f('hof_menu_button_icon','Иконка кнопки','icon','arrow-right'),
-  f('menu_zyb','Адрес меню HÓF','link'),
+  f('menu_zyb','Адрес меню HÓF','link','https://menu.myata-qr.by/menu','https://menu.myata-qr.by/menu'),
  ]),
  g('hof-events','События HÓF',[
   f('hof_events_kicker','Малая подпись','text','HÓF / AFTER DARK','HÓF / AFTER DARK'),
