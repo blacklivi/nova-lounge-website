@@ -16,7 +16,8 @@ for(const [slug,id] of [['hof','zyb'],['pobediteley','pob'],['vostok','east']]){
 }
 assert.ok(seo.includes('export const isPublicPage=p=>')&&seo.includes('hof|pobediteley|vostok'),'Scoped event routes must be valid at the Worker edge');
 assert.match(app,/function venueEventsPage\(id\)/,'One themed listing component for all venues');
-assert.match(app,/events\.filter\(e=>e\.venue===id&&!e\.demo\)/,'Scoped venue calendars must exclude all other venues and demos');
+assert.match(app,/events\.filter\(e=>e\.venue===id\)/,'Scoped venue calendars must include only published events at the selected location');
+assert.doesNotMatch(app,/function demoEvents\(/,'Public pages must never generate fictional events');
 assert.match(app,/if\(scopedEventVenue\)return venueEventsPage\(scopedEventVenue\)/,'Global and venue pages must share same event source');
 assert.match(app,/function hofLineupLink\(\)/,'HOF lineup needs a venue-aware link');
 assert.match(app,/url==='\/events'\?'\/events\/hof':url/,'Legacy HOF /events CMS links must redirect to HOF');
