@@ -112,7 +112,7 @@ function venueGroups(id){
    f('venue_'+id+'_back_url','Адрес кнопки назад','link','/#venues'),
    f('venue_'+id+'_booking_text','Бронирование — надпись кнопки','text','Забронировать стол','Reserve a table'),
    f('venue_'+id+'_menu_text','Меню — надпись кнопки','text','Посмотреть меню','View the menu'),
-   f('menu_'+id,'Адрес QR-меню (выбранного заведения)','link'),
+   f('menu_'+id,'Адрес QR-меню (выбранного заведения)','link',id==='east'?'https://menu.nova-vostok.by/menu':'',id==='east'?'https://menu.nova-vostok.by/menu':''),
    f('venue_'+id+'_events_button_text','Кнопка событий именно этого заведения','text','Афиша заведения','Venue events'),
    f('venue_'+id+'_events_button_url','Ссылка на события этого заведения','link','/events/'+(id==='pob'?'pobediteley':'vostok')),
   ]),
