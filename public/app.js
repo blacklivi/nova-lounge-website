@@ -1,4 +1,6 @@
-import {escapeHTML as esc, typography, validPhone, minskNow, splitEvents, safeURL, localImage, localizedValue} from './core.js';
+import {escapeHTML as esc, typography, cleanPhone, validPhone, minskNow, splitEvents, safeURL, localImage, localizedValue} from './core.js';
+import {enhanceBookingSelects} from './booking-selects.js';
+import {enhanceBookingDate} from './booking-date.js';
 import {EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js';
 const app = document.querySelector('#app');
 const isEvents = document.body.dataset.page === 'events';
@@ -594,16 +596,56 @@ function contactPanel(id){
  const links=contactLinks(id);
  return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p>${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;
 }
-// A working contact path is preferable to a form that only simulates booking.
-function bookingPhonePanel(requestedVenue){
- const venues=ids.includes(requestedVenue)?[requestedVenue]:ids;
- const actions=venues.map(id=>{
-  const raw=value('phone_'+id);
-  if(!validPhone(raw))return '';
-  const number=raw.replace(/[^+\d]/g,'');
-  return `<a class="booking-phone-action" href="tel:${esc(number)}" aria-label="${t('Позвонить в','Call')} ${venueLabel(id)}"><span class="booking-phone-name">${venueLabel(id)}</span><span class="booking-phone-number">${text(raw)}</span><span class="booking-phone-label">${t('Позвонить','Call')} ${arrow}</span></a>`;
- }).filter(Boolean);
- return actions.length?`<div class="booking-phone-list">${actions.join('')}</div>`:`<p class="intro">${t('Актуальный телефон заведения указан в контактах.','Find the venue phone number in our contacts.')}</p>`;
+// Booking requests are stored in the NOVA D1 database before showing success.
+function bookingFormHTML(requestedVenue){
+ const day=minskNow().slice(0,10),fixed=ids.includes(requestedVenue);
+ return `<h2 id="modal-title">${bookingLabel()}</h2>
+ <p class="intro">${t('Оставьте заявку. Администратор свяжется с вами для подтверждения бронирования.','Send a request. The venue will contact you to confirm your reservation.')}</p>
+ <form id="book-form">
+  <div class="form-fields">
+   <div class="field full"><label for="venue">${t('Заведение','Venue')}</label>
+    ${fixed?`<div class="venue-context">${venueLabel(requestedVenue)}</div><input type="hidden" id="venue" name="venue" value="${requestedVenue}">`:
+    `<select id="venue" name="venue" required><option value="">${t('Выберите заведение','Choose a venue')}</option>${ids.map(id=>`<option value="${id}">${venueLabel(id)}</option>`).join('')}</select>`}</div>
+   <div class="field"><label for="date">${t('Дата','Date')}</label><input id="date" name="date" type="date" min="${day}" value="${day}" required></div>
+   <div class="field"><label for="time">${t('Время · Минск','Time · Minsk')}</label><select id="time" name="time" required>${Array.from({length:96},(_,i)=>{const hour=String(Math.floor(i/4)).padStart(2,'0'),mins=String(i%4*15).padStart(2,'0');const value=hour+':'+mins;return `<option value="${value}" ${value==='19:00'?'selected':''}>${value}</option>`}).join('')}</select></div>
+   <div class="field"><label for="guests">${t('Количество гостей','Guests')}</label><select id="guests" name="guests">${Array.from({length:16},(_,i)=>`<option value="${i+1}" ${i===1?'selected':''}>${i+1}</option>`).join('')}</select></div>
+   <div class="field"><label for="guest-name">${t('Ваше имя','Your name')}</label><input id="guest-name" name="name" autocomplete="name" maxlength="80" required></div>
+   <div class="field full"><label for="phone">${t('Номер телефона','Phone number')}</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" placeholder="+375 29 123-45-67" required></div>
+   <div class="field full"><label for="booking-comment">${t('Комментарий (необязательно)','Comment (optional)')}</label><textarea id="booking-comment" name="comment" maxlength="500" rows="2" placeholder="${t('Пожелания к столику','Table preferences')}"></textarea></div>
+  </div>
+  <div class="booking-honeypot" aria-hidden="true"><label for="booking-website">Website</label><input id="booking-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+  <label class="booking-consent"><input name="consent" type="checkbox" required><span>${t('Согласен(на) на использование имени, телефона и деталей заявки для организации бронирования.','I agree to my name, phone number and reservation details being used to process this request.')}</span></label>
+  <p id="booking-error" class="booking-error" role="alert" aria-live="polite"></p>
+  <button class="button form-submit" type="submit">${t('Отправить заявку','Send request')}</button>
+  <p class="booking-assurance">${t('Заявка не означает подтверждённую бронь. При необходимости срочного ответа свяжитесь с заведением по телефону.','A request is not a confirmed reservation. For an urgent reply, call the venue directly.')}</p>
+ </form>`;
+}
+async function sendBooking(e){
+ e.preventDefault();
+ const form=e.currentTarget, fd=new FormData(form);
+ const venue=String(fd.get('venue')||''),phone=cleanPhone(fd.get('phone')||'');
+ const output=form.querySelector('#booking-error');
+ const showError=message=>{output.textContent=message};
+ showError('');
+ if(!ids.includes(venue)){showError(t('Выберите заведение.','Choose a venue.'));return}
+ if(!validPhone(phone)){showError(t('Введите корректный номер телефона.','Enter a valid phone number.'));form.elements.phone.focus();return}
+ if(!form.elements.consent.checked){showError(t('Подтвердите согласие на обработку заявки.','Please consent to the use of your reservation details.'));return}
+ const date=String(fd.get('date')||''),time=String(fd.get('time')||'');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^([01]\d|2[0-3]):(00|15|30|45)$/.test(time)||date+'T'+time<=minskNow()){
+  showError(t('Выберите дату и время в будущем по Минску.','Choose a future date and time in Minsk.'));return;
+ }
+ const button=form.querySelector('[type="submit"]');
+ button.disabled=true;button.textContent=t('Отправляем…','Sending…');
+ try{
+  const response=await fetch('/api/reservations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+   venue,name:String(fd.get('name')||'').trim(),phone,date,time,guests:Number(fd.get('guests')),comment:String(fd.get('comment')||'').trim(),consent:true,website:fd.get('website')||''
+  }),credentials:'same-origin',cache:'no-store'});
+  const answer=await response.json();
+  if(!response.ok||!answer.ok)throw new Error(response.status===429?t('Слишком много запросов. Свяжитесь с заведением по телефону.','Too many requests. Please call the venue.'):response.status===400?t('Проверьте данные и выберите время не раньше чем через 5 минут.','Check the details and choose a time at least 5 minutes ahead.'):t('Не удалось отправить заявку. Попробуйте ещё раз или позвоните.','Could not send your request. Try again or call.'));
+  const body=document.getElementById('modal-body');
+  body.innerHTML=`<h2 id="modal-title" tabindex="-1">${t('Заявка получена','Request received')}</h2><p class="intro">${t('Заявка сохранена и передана администратору заведения. Бронь будет действовать после подтверждения.','Your request has been saved for the venue team. Your reservation is valid only once confirmed.')}</p><div class="booking-confirmation"><strong>${venueLabel(venue)}</strong><span>${text(date)} · ${text(time)} · ${text(String(fd.get('guests')))} ${t('гостей','guests')}</span></div><button type="button" class="button form-submit" data-close>${t('Закрыть','Close')}</button>`;
+  body.querySelector('#modal-title')?.focus();
+ }catch(error){showError(error.message||t('Ошибка соединения. Попробуйте снова.','Network error. Please retry.'));button.disabled=false;button.textContent=t('Отправить заявку','Send request')}
 }
 function openModal(kind,id=selected){
  if(drawerOpen)setDrawer(false);
@@ -623,9 +665,11 @@ function openModal(kind,id=selected){
  document.getElementById('modal-caption').textContent=id?(id==='zyb'?'HOF':name(id)):'MINSK';
  const body=document.getElementById('modal-body');
  if(kind==='booking'){
-  // Until a verified server-side reservation workflow is connected, route guests
-  // to each venue's published phone. Never collect details without sending them.
-  body.innerHTML=`<h2 id="modal-title">${bookingLabel()}</h2><p class="intro">${id?t('Для бронирования свяжитесь с заведением по телефону.','To reserve a table, call the venue directly.'):t('Выберите заведение и позвоните администратору для бронирования.','Choose a venue and call to reserve a table.')}</p>${bookingPhonePanel(id)}`;
+  body.innerHTML=bookingFormHTML(id);
+  const form=body.querySelector('#book-form');
+  enhanceBookingSelects(form,language,{forceCustom:id==='zyb'});
+  enhanceBookingDate(form,language);
+  form.addEventListener('submit',sendBooking);
  }else if(kind==='menu'){
  body.innerHTML=`<h2 id="modal-title">${t('Меню NOVA','NOVA menus')}</h2><p class="intro">${t('У каждого пространства своё меню.','Each space has its own menu.')}</p><div class="modal-list">${ids.map(i=>`<button class="button secondary" data-modal="menu-location" data-venue="${i}">${name(i)}</button>`).join('')}</div>`;
  }else if(kind==='menu-location'){
