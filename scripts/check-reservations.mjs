@@ -25,7 +25,7 @@ assert.match(migration,/reservation_rate_limits/,'Public booking requests need d
 assert.match(migration,/reservation_audit/,'Staff status changes need audit trail');
 assert.match(worker,/reservationsApi\(request,env,url\)/,'Worker must route reservation APIs');
 assert.match(worker,/p==='\/reserved'/,'Worker must serve protected route');
-assert.match(worker,/X-Frame-Options','Private staff app must not be embedded');
+assert.match(worker,/X-Frame-Options/,'Private staff app must not be embedded');
 assert.match(module,/env\.RESERVATIONS_PASSWORD/,'Staff login must use separate secret');
 assert.match(module,/Secure; HttpOnly; SameSite=Strict/,'Staff cookie must be secure');
 assert.match(module,/x-nova-reserved/,'Staff writes must use custom CSRF header');
