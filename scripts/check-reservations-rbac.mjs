@@ -152,6 +152,7 @@ list=await call('/api/reserved/reservations?venue=zyb',{cookie:viewer});
 assert.equal(list.status,403,'Viewer cannot request other location');
 list=await call('/api/reserved/reservations?venue=all',{cookie:viewer});
 assert.equal(list.status,200);
+console.log('VIEWER DEBUG',JSON.stringify({body:list.body,user:DB.users.get(viewerUser.id),restrictedSQL:DB.restrictedSQL}));
 assert.deepEqual(list.body.reservations.map(r=>r.venue),['east'],'Viewer may only read assigned location');
 assert.equal((await call('/api/reserved/users',{cookie:zyb})).status,403,'Staff must not enumerate users');
 assert.equal((await call('/api/reserved/users',{method:'POST',cookie:zyb,json:{username:'evil',role:'owner'}})).status,403,'Staff must not create users');
