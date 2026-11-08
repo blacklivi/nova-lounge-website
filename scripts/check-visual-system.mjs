@@ -64,7 +64,7 @@ assert.ok(system.startsWith('/* HÓF ACTION DESIGN SYSTEM v2'),'Shared action-sy
 assert.match(system,/--hof-action-width:234px;\s*--hof-action-height:56px/,'Desktop sizes are shared 234×56');
 const venueTheme=css.slice(css.indexOf('/* Venue-scoped event calendars'));
 assert.match(venueTheme,/--hof-action-width:calc\(50vw - var\(--gutter\) - 4px\)/,'Mobile sizes must adapt to half-width button pairs');
-assert.match(venueTheme,/--hof-action-height:64px/,'Mobile buttons must share 64px height');
+assert.match(venueTheme,/@media\(max-width:600px\)\{\s*body\.hof-active\{\s*--hof-action-width:calc\(50vw - var\(--gutter\) - 4px\);\s*--hof-action-height:56px/,'Mobile HÓF CTAs must retain the desktop 56px height');
 assert.match(venueTheme,/\.hof-page \.hof-hero-actions,\s*\.hof-page \.hof-compact-contact \.hof-bottom-actions\{\s*display:grid;\s*grid-template-columns:repeat\(2,minmax\(0,var\(--hof-action-width\)\)\)/,'Desktop hero and contacts use two equal columns');
 assert.match(venueTheme,/@media\(max-width:600px\)[\s\S]*?\.hof-page \.hof-hero-actions,\s*\.hof-page \.hof-compact-contact \.hof-bottom-actions\{\s*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/,'Mobile hero/contact pairs never stack');
 assert.match(venueTheme,/\.hof-page \.hof-hero-actions > \.hof-action,\s*\.hof-page \.hof-editorial-about \.hof-action,\s*\.hof-page \.hof-compact-events \.hof-action,\s*\.hof-page \.hof-compact-contact \.hof-bottom-actions > \.hof-action/,'Every CTA shares the same sizing rules');
@@ -96,5 +96,11 @@ assert.match(menuLinkStyle,/background:transparent;/,'Kitchen/menu action must r
 assert.match(menuLinkStyle,/height:auto;\s*min-height:46px;\s*max-height:none;/,'Kitchen/menu height must no longer be forced into a card');
 assert.match(menuLinkStyle,/@media\(max-width:600px\)/,'Restoration must work on mobile too');
 assert.match(app,/class="hof-text-button hof-action" data-editor-key="menu_zyb" type="button" data-modal="menu-location" data-venue="zyb"/,'Kitchen/menu link must keep its original menu route');
+
+
+// Prevent regressions that make the HÓF action buttons taller on small screens.
+assert.match(css,/@media\(max-width:600px\) and \(max-height:690px\)\{[\s\S]*?\.hof-page \.hof-hero-actions > \.hof-action\{height:var\(--hof-action-height\);min-height:var\(--hof-action-height\);max-height:var\(--hof-action-height\)/,'Short screens must use the same height token rather than 64px');
+assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions > \.hof-action\{\s*height:var\(--hof-action-height\);\s*min-height:var\(--hof-action-height\);\s*max-height:var\(--hof-action-height\)/,'HÓF orange-panel buttons must not grow taller on mobile');
+assert.doesNotMatch(css,/--hof-action-height:64px|\.hof-page \.hof-hero-actions > \.hof-action\{height:64px|min-height:64px;\s*max-height:64px;/,'No HÓF action may force an extra-tall 64px mobile button');
 
 console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');
