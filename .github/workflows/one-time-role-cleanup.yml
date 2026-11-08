@@ -1,0 +1,40 @@
+name: One-time NOVA temporary branch cleanup
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  pull-requests: read
+jobs:
+  tidy:
+    if: startsWith(github.event.head_commit.message, 'Run one-time NOVA role branch cleanup')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Keep only current main and verified recovery backup
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKUP_BRANCH: backup/nova-release-20261108
+          EXPECTED_BACKUP_SHA: 9befbfb9f1f34657847f5055f5442fbdb2ab8de0
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY}"
+          backup="$(gh api "repos/${repo}/git/ref/heads/${BACKUP_BRANCH}" --jq '.object.sha')"
+          if [[ "${backup}" != "${EXPECTED_BACKUP_SHA}" ]]; then
+            echo "::error::Unexpected backup reference; refusing deletion."
+            exit 1
+          fi
+          open_prs="$(gh api "repos/${repo}/pulls?state=open&per_page=100" --jq 'length')"
+          if [[ "${open_prs}" != 0 ]]; then
+            echo "::error::Open PRs exist; refusing deletion."
+            exit 1
+          fi
+          mapfile -t branches < <(gh api --paginate "repos/${repo}/branches?per_page=100" --jq '.[].name')
+          for name in "${branches[@]}"; do
+            if [[ "${name}" == "main" || "${name}" == "${BACKUP_BRANCH}" ]]; then
+              echo "KEEP: ${name}"
+              continue
+            fi
+            gh api -X DELETE "repos/${repo}/git/refs/heads/${name}"
+            echo "DELETED: ${name}"
+          done
