@@ -1,0 +1,34 @@
+name: Cleanup merged staff-password fix branch once
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  pull-requests: read
+jobs:
+  tidy:
+    if: startsWith(github.event.head_commit.message, 'Run one-time NOVA post-fix branch cleanup')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Keep main and recovery backup; delete only the merged fix branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY}"
+          backup="backup/nova-release-20261108"
+          branch="fix/reserved-pbkdf2-workers-limit-20261109"
+          sha="$(gh api "repos/${repo}/git/ref/heads/${backup}" --jq '.object.sha')"
+          if [[ "${sha}" != "9befbfb9f1f34657847f5055f5442fbdb2ab8de0" ]]; then
+            echo "::error::Backup not verified; no deletion performed."
+            exit 1
+          fi
+          merged="$(gh api "repos/${repo}/pulls/63" --jq '.merged')"
+          if [[ "${merged}" != "true" ]]; then
+            echo "::error::PR #63 is not merged; refusing branch cleanup."
+            exit 1
+          fi
+          gh api -X DELETE "repos/${repo}/git/refs/heads/${branch}"
+          echo "Deleted only: ${branch}" >> "${GITHUB_STEP_SUMMARY"
+          echo "Preserved main and ${backup}" >> "${GITHUB_STEP_SUMMARY"
