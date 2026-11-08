@@ -611,8 +611,7 @@ function openModal(kind,id=selected){
  if(kind==='menu-location'){
   const url=hrefFor('menu_'+id,'');
   if(url){
-   if(id==='east'||id==='pob')window.location.assign(url);
-   else window.open(url,'_blank','noopener,noreferrer');
+   window.location.assign(url);
    return;
   }
  }
