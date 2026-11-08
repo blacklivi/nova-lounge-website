@@ -18,11 +18,20 @@ class MemoryDB{
   function filtered(p){
    let records=[...db.reservations.values()];
    const where=sql.split(' WHERE ')[1]?.split(' ORDER BY ')[0]||'';
-   if(p[0]==='east')console.log('FILTER DEBUG',JSON.stringify({sql,params:p,where,records:[...db.reservations.values()].map(x=>({id:x.id,venue:x.venue}))}));
    let index=0;
-   if(where.includes('venue=?')){db.restrictedSQL++;records=records.filter(x=>x.venue===p[index++])}
-   if(where.includes('status=?'))records=records.filter(x=>x.status===p[index++]);
-   if(where.includes('booking_date=?'))records=records.filter(x=>x.booking_date===p[index++]);
+   if(where.includes('venue=?')){
+    db.restrictedSQL++;
+    const venue=p[index++];
+    records=records.filter(x=>x.venue===venue);
+   }
+   if(where.includes('status=?')){
+    const status=p[index++];
+    records=records.filter(x=>x.status===status);
+   }
+   if(where.includes('booking_date=?')){
+    const day=p[index++];
+    records=records.filter(x=>x.booking_date===day);
+   }
    return records;
   }
   const q=p=>({
@@ -153,7 +162,6 @@ list=await call('/api/reserved/reservations?venue=zyb',{cookie:viewer});
 assert.equal(list.status,403,'Viewer cannot request other location');
 list=await call('/api/reserved/reservations?venue=all',{cookie:viewer});
 assert.equal(list.status,200);
-console.log('VIEWER DEBUG',JSON.stringify({body:list.body,user:DB.users.get(viewerUser.id),restrictedSQL:DB.restrictedSQL}));
 assert.deepEqual(list.body.reservations.map(r=>r.venue),['east'],'Viewer may only read assigned location');
 assert.equal((await call('/api/reserved/users',{cookie:zyb})).status,403,'Staff must not enumerate users');
 assert.equal((await call('/api/reserved/users',{method:'POST',cookie:zyb,json:{username:'evil',role:'owner'}})).status,403,'Staff must not create users');
