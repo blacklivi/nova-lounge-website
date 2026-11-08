@@ -1,4 +1,5 @@
 import {preparePhoto,uploadPhoto,validatePhoto,formatBytes,IMAGE_ACCEPT} from './image-upload.js';
+import {minskNow} from './core.js';
 const $=q=>document.querySelector(q),$$=q=>[...document.querySelectorAll(q)];
 const keySpecs=[
  ['hero_kicker','Первый экран · верхняя подпись','textarea'],['hero_tagline','Первый экран · слоган','textarea'],['hero_image','Первый экран · фотография','image'],
@@ -56,16 +57,21 @@ function renderEventList(){
   const row=document.createElement('div');row.className='item';
   const div=document.createElement('div');
   const label=document.createElement('span');
-  label.textContent=ev.starts_at.replace('T',' ')+' · '+(adminVenueNames[ev.venue]||ev.venue)+' · '+(ev.published?'ОПУБЛИКОВАНО':'ЧЕРНОВИК');
+  const isPast=ev.starts_at<minskNow();
+  const publication=ev.published?(isPast?'ОПУБЛИКОВАНО · АРХИВ':'ОПУБЛИКОВАНО · БЛИЖАЙШИЕ'):'ЧЕРНОВИК · НЕ ВИДНО НА САЙТЕ';
+  label.textContent=ev.starts_at.replace('T',' ')+' · '+(adminVenueNames[ev.venue]||ev.venue)+' · '+publication;
   const title=document.createElement('strong');title.textContent=ev.title;
   div.append(label,title);
   const actions=document.createElement('div');actions.className='event-row-actions';
-  const preview=document.createElement('a');
-  preview.href=(venueEventPaths[ev.venue]||'/events')+'#event-'+encodeURIComponent(ev.id);
-  preview.textContent='На сайте ↗';preview.target='_blank';preview.rel='noopener noreferrer';
+  if(ev.published){
+   const preview=document.createElement('a');
+   preview.href=(venueEventPaths[ev.venue]||'/events')+'#event-'+encodeURIComponent(ev.id);
+   preview.textContent='На сайте ↗';preview.target='_blank';preview.rel='noopener noreferrer';
+   actions.append(preview);
+  }
   const button=document.createElement('button');button.type='button';button.textContent='Изменить';
   button.addEventListener('click',()=>editEvent(ev.id));
-  actions.append(preview,button);row.append(div,actions);box.append(row);
+  actions.append(button);row.append(div,actions);box.append(row);
  }
  if(!items.length){
   const p=document.createElement('p');p.className='muted';
@@ -102,7 +108,58 @@ $('#event-image').addEventListener('change',async e=>{
   status($('#event-status'),'WebP готов: '+result.width+'×'+result.height+', '+formatBytes(result.originalBytes)+' → '+formatBytes(result.bytes));
  }catch(err){status($('#event-status'),'Ошибка обработки афиши: '+err.message,true);e.target.value=''}
 });
-$('#event-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget,btn=f.querySelector('button[type=submit]');btn.disabled=true;status($('#event-status'),'Сохраняем…');try{let image_url=f.elements.image_url.value;const file=$('#event-image').files[0];if(file){status($('#event-status'),'Сжимаем афишу в WebP…');image_url=await upload(file,'event')}const event={title:f.elements.title.value,description:f.elements.description.value,starts_at:f.elements.starts_at.value,venue:f.elements.venue.value,image_url,published:f.elements.published.checked};const id=f.elements.id.value;const saved=await request(id?'/api/admin/events/'+id:'/api/admin/events',id?'PUT':'POST',event);notifyEventChanged();resetEvent();await loadEvents();status($('#event-status'),saved.translation_pending?'Событие сохранено на русском. Английский перевод не удался — повторите сохранение.':'Событие опубликовано на русском и английском.',Boolean(saved.translation_pending))}catch(err){status($('#event-status'),'Ошибка: '+err.message,true)}finally{btn.disabled=false}});
+$('#event-form').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const f=e.currentTarget,btn=f.querySelector('button[type=submit]');
+ btn.disabled=true;
+ status($('#event-status'),'Сохраняем…');
+ try{
+  let image_url=f.elements.image_url.value;
+  const file=$('#event-image').files[0];
+  if(file){
+   status($('#event-status'),'Сжимаем афишу в WebP…');
+   image_url=await upload(file,'event');
+  }
+  const event={
+   title:f.elements.title.value,
+   description:f.elements.description.value,
+   starts_at:f.elements.starts_at.value,
+   venue:f.elements.venue.value,
+   image_url,
+   published:f.elements.published.checked
+  };
+  const id=f.elements.id.value;
+  const saved=await request(id?'/api/admin/events/'+id:'/api/admin/events',id?'PUT':'POST',event);
+  notifyEventChanged();
+  resetEvent();
+  try{await loadEvents()}catch(err){status($('#event-status'),'Событие сохранено, но не удалось обновить список в админке: '+err.message,true);return}
+  if(!event.published){
+   status($('#event-status'),'Событие сохранено как черновик. На сайте оно не отображается, пока вы не включите «Опубликовать на сайте».');
+   return;
+  }
+  let live;
+  try{
+   live=await request('/api/events');
+  }catch(err){
+   status($('#event-status'),'Событие сохранено. Не удалось проверить публичную афишу: '+err.message,true);
+   return;
+  }
+  const exists=Array.isArray(live.events)&&live.events.some(e=>e.id===(saved.id||id));
+  if(!exists){
+   status($('#event-status'),'Событие сохранено в админке, но пока не найдено в публичной афише. Проверьте публикацию и повторите обновление.',true);
+   return;
+  }
+  if(event.starts_at<minskNow()){
+   status($('#event-status'),'Событие опубликовано и проверено на сайте. Его дата уже прошла — ищите афишу в архиве.');
+  }else if(saved.translation_pending){
+   status($('#event-status'),'Событие опубликовано и проверено на сайте. Английский перевод пока недоступен — используется русский текст.');
+  }else{
+   status($('#event-status'),'Событие опубликовано и проверено на сайте. На главной отображается ближайшее событие, все остальные — в полной афише.');
+  }
+ }catch(err){
+  status($('#event-status'),'Ошибка: '+err.message,true);
+ }finally{btn.disabled=false}
+});
 $('#event-form').elements.venue.addEventListener('change',updateVenueEventPreview);
 $('#events-venue-filter').addEventListener('change',renderEventList);
 updateVenueEventPreview();

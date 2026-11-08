@@ -44,6 +44,17 @@ assert.match(admin,/notifyEventChanged\(\);resetEvent\(\);await loadEvents\(\)/,
 assert.match(admin,/channel\.postMessage\('changed'\)/,'Admin publishes only an invalidation signal');
 assert.match(app,/if\(changed\)patchEventSections\(\)/,'Skip UI replacements for unchanged API data');
 assert.match(app,/if\(selected==='pob'\|\|selected==='east'\)/,'Pobediteley and Vostok previews must update too');
+
+assert.match(app,/const EVENTS_POLL_INTERVAL=30000/,'Event updates must be checked automatically across devices');
+assert.match(app,/window\.setInterval\(\(\)=>\{[\s\S]*?refreshPublishedEvents\(\)/,'An open visible tab must not rely exclusively on admin notifications');
+assert.match(app,/window\.addEventListener\('online',\(\)=>void refreshPublishedEvents\(true\)\)/,'Event refresh must recover after network reconnection');
+assert.match(app,/const wasHidden=section\.style\.display==='none'/,'Homepage lineup must detect a previously hidden empty section');
+assert.match(app,/section\.style\.display=visible\?'':'none'/,'Homepage must reveal the section when upcoming events arrive');
+assert.match(app,/if\(visible&&wasHidden\)\{[\s\S]*?el\.classList\.remove\('nova-reveal'\)/,'Async event cards must not remain invisible due to scroll animation');
+assert.match(admin,/live=await request\('\/api\/events'\)/,'Admin must verify publication using public API');
+assert.match(admin,/Событие сохранено как черновик/,'Drafts must not be falsely reported as published');
+assert.match(admin,/ОПУБЛИКОВАНО · АРХИВ/,'Already-finished events need an archive label');
+
 assert.match(app,/const current=app\.querySelector\('\.venue-events-teaser'\)/,'Venue preview must be patched without full page rerender');
 assert.match(app,/if\(isEvents\)\{[\s\S]*?template\.innerHTML=eventsPage\(\)/,'Venue and global event pages must update their cards and counters');
 assert.match(app,/eventsFailed&&!eventsLoaded\?t\('Не удалось загрузить афишу/,'Load failures must not masquerade as an empty venue calendar');
