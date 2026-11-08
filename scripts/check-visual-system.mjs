@@ -85,4 +85,16 @@ assert.match(css,/visibility:hidden;\s*opacity:0;\s*transform:translate3d\(0,110
 assert.match(app,/eventActionRect\.top<innerHeight-\(dock\?\.offsetHeight\|\|0\)/,'HÓF inline event action must remain clickable without the booking dock covering it');
 assert.match(app,/setupHofDockObserver\(\)/,'Keep HÓF dock observer wired');
 
+
+// The kitchen/menu action matches the original text-link design, not the
+// equal-size rectangular event and booking CTAs.
+const menuLinkStyle=css.slice(css.indexOf('/* HÓF kitchen/menu link: restore the original underlined text action.'));
+assert.ok(menuLinkStyle.startsWith('/* HÓF kitchen/menu link:'),'HÓF kitchen link override must be last in the cascade');
+assert.match(menuLinkStyle,/\.hof-page \.hof-editorial-about \.hof-text-button\.hof-action\{/,'Only the white HÓF kitchen/menu action is restored');
+assert.match(menuLinkStyle,/border:0;\s*border-bottom:1px solid #111;/,'Kitchen/menu action must have just a bottom border');
+assert.match(menuLinkStyle,/background:transparent;/,'Kitchen/menu action must remain transparent');
+assert.match(menuLinkStyle,/height:auto;\s*min-height:46px;\s*max-height:none;/,'Kitchen/menu height must no longer be forced into a card');
+assert.match(menuLinkStyle,/@media\(max-width:600px\)/,'Restoration must work on mobile too');
+assert.match(app,/class="hof-text-button hof-action" data-editor-key="menu_zyb" type="button" data-modal="menu-location" data-venue="zyb"/,'Kitchen/menu link must keep its original menu route');
+
 console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');
