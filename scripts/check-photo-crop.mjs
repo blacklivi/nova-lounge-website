@@ -28,6 +28,7 @@ for(const f of PHOTO_CROP_FIELDS){
  assert.equal(f.type,'crop');assert.ok(EDITOR_BY_KEY[f.key]);assert.equal(f.ru,'50,50,100');
 }
 assert.match(api,/const CROP_KEYS=new Set\(PHOTO_CROP_FIELDS\.map/,'Server needs a strict allowlist for crop fields');
+assert.match(api,/!k\.endsWith\('_crop'\)/,'Gallery crop settings must never be validated as image URLs');
 assert.match(api,/cropPattern\.test\(v\)/,'Server must validate image crops');
 assert.match(api,/image_crop=b\.image_crop===undefined/,'Event crop must default safely');
 assert.match(api,/image_url,image_crop,published/,'Events must persist crop metadata');
