@@ -14,6 +14,8 @@
       "/api/*",
       "/media/upload-*",
       "/admin",
+      "/reserved",
+      "/reserved/",
       "/events",
       "/events/*",
       "/spaces/*",
