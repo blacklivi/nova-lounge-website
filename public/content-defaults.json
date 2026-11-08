@@ -2,7 +2,7 @@
   "content": {
     "venue_zyb_subtitle": "Вечеринки / DJ / Городская энергия",
     "venue_zyb_desc": "Здесь встречаются музыка и город. Днём — ланчи и кухня, вечером — DJ-сеты, вечеринки и люди, которые собираются вместе.",
-    "venue_zyb_second": "Актуальные вечеринки и DJ-сеты публикуются отдельно. Точные даты появятся после подключения афиши.",
+    "venue_zyb_second": "За обновлениями о вечеринках и DJ-сетах следите в нашей афише.",
     "venue_zyb_features": "Вечеринки · DJ-сеты · Ланчи · Вечернее меню",
     "venue_zyb_image": "/media/clean-e333e88f87b3e9.jpg",
     "gallery_zyb_1_image": "/media/base-f9215c6e206697.jpg",
@@ -31,7 +31,6 @@
     "booking_title": "Забронировать\nстол",
     "booking_image": "/media/clean-10ba4a5fc7477c.jpg",
     "footer_tagline": "Три пространства для встреч в Минске.",
-    "media_note": "Демонстрационные изображения. Реальные фотографии NOVA готовятся.",
     "address_zyb": "ул. Зыбицкая, 2",
     "phone_zyb": "+375 25 722-33-33",
     "hours_zyb": "Пн–чт, вс: 12:00–02:00\nПт–сб: 12:00–05:00",
@@ -51,7 +50,7 @@
   "content_en": {
     "venue_zyb_subtitle": "Parties / DJ sets / City energy",
     "venue_zyb_desc": "By day, settle in for lunch. After dark, Zybitskaya comes alive with DJ sets, parties and the buzz of the city.",
-    "venue_zyb_second": "Find upcoming parties and DJ sets in our events calendar. Dates and line-ups will appear as they're announced.",
+    "venue_zyb_second": "For updates on parties and DJ sets, see our events calendar.",
     "venue_zyb_features": "DJ sets · Parties · Lunch · Evening menu",
     "venue_zyb_image": "/media/clean-e333e88f87b3e9.jpg",
     "gallery_zyb_1_image": "/media/base-f9215c6e206697.jpg",
@@ -80,7 +79,6 @@
     "booking_title": "Reserve\na table",
     "booking_image": "/media/clean-10ba4a5fc7477c.jpg",
     "footer_tagline": "Three spaces to meet, unwind and stay awhile in Minsk.",
-    "media_note": "Concept photography. Original images of NOVA will be added soon.",
     "address_zyb": "2 Zybitskaya St.",
     "phone_zyb": "+375 25 722-33-33",
     "hours_zyb": "Mon–Thu, Sun: 12 PM–2 AM\nFri–Sat: 12 PM–5 AM",
