@@ -77,7 +77,7 @@ export function seoRoute(request){
  const u=new URL(request.url),demo=noindexHost(u.hostname),p=u.pathname;
  if(p==='/robots.txt')return new Response(demo?'User-agent: *\nDisallow: /\n':'User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: '+u.origin+'/sitemap.xml\n',{headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'public, max-age=300'}});
  if(p==='/sitemap.xml'){
-  if(demo)return new Response('Demo domain is not indexable',{status:404,headers:{'X-Robots-Tag':'noindex'}});
+  if(demo)return new Response('Not found',{status:404,headers:{'X-Robots-Tag':'noindex'}});
   const paths=['/','/events',...Object.keys(EVENT_ROUTES).map(x=>'/events/'+x),...Object.keys(VENUES).map(x=>'/spaces/'+x)];
   const xml='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+paths.map(x=>'<url><loc>'+htmlEscape(u.origin+x)+'</loc></url>').join('')+'</urlset>';
   return new Response(xml,{headers:{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'public, max-age=300'}});
