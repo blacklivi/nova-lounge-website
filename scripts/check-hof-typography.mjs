@@ -39,7 +39,8 @@ assert.match(detail,/data-editor-key="hof_contact_mark_image"/,'Official HOF con
 assert.match(detail,/hof-mark-black\.svg/,'Default contact symbol remains black');
 assert.match(app,/data-editor-key="home_card_hof_logo_image"/,'Homepage HOF identity must be editable');
 assert.match(app,/hof-wordmark-black\.svg/,'Official black HOF wordmark remains the default');
-assert.match(events,/!e\.demo/,'Do not display fictional event posters');
+assert.match(events,/events\.filter\(e=>e\.venue==='zyb'\)/,'HÓF must show only its own published events');
+assert.doesNotMatch(app,/function demoEvents\(/,'No fictional event posters may be generated');
 assert.match(events,/\.upcoming\.slice\(0,2\)/,'Keep event list compact');
 assert.doesNotMatch(detail,/01 \/ HOUSE OF FLOW|02 \/ AFTER DARK|03 \/ /,'Avoid arbitrary decorative section numbers');
 assert.match(css,/\.hof-page \.hof-compact-contact \.hof-outline,\.hof-page \.hof-compact-contact \.hof-primary-cta\{background:#000!important/,'Black CTA must contrast against orange contact section');
