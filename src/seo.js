@@ -45,10 +45,27 @@ function fallback(route,v,origin,over,def){
  if(route==='/events')return '<main id="seo-fallback"><h1>События NOVA в Минске</h1><p>Афиша вечеринок и DJ-сетов NOVA.</p><a href="/">Все пространства</a></main>';
  return '<main id="seo-fallback"><h1>NOVA — три лаунж-кафе в Минске</h1><p>Зыбицкая, Победителей и Восток: кухня, встречи, вечеринки и ланчи.</p><ul>'+Object.entries(VENUES).map(([slug,item])=>'<li><a href="/spaces/'+slug+'">'+(item.id==='zyb'?'':'NOVA ')+htmlEscape(item.name)+' — '+htmlEscape(item.street)+'</a></li>').join('')+'</ul></main>';
 }
+async function publishedEventsForPage(env){
+ if(!env.DB)return null;
+ try{
+  const result=await env.DB.prepare(
+   'SELECT id,title,description,title_en,description_en,starts_at,venue,image_url FROM events WHERE published = 1 ORDER BY starts_at ASC'
+  ).all();
+  return result.results||[];
+ }catch(error){
+  console.error('NOVA public event snapshot unavailable',String(error));
+  return null;
+ }
+}
 export async function publicPage(request,env,route){
  const url=new URL(request.url),v=route.startsWith('/spaces/')?VENUES[route.split('/')[2]]:null,eventVenue=route.startsWith('/events/')?EVENT_ROUTES[route.split('/')[2]]:null,origin=url.origin;
  const asset=route.startsWith('/events')?'/events.html':'/index.html';
- const [page,def,over]=await Promise.all([env.ASSETS.fetch(new Request(new URL(asset,request.url),request)),defaultsFor(env,request.url),overrides(env)]);
+ const [page,def,over,initialEvents]=await Promise.all([
+  env.ASSETS.fetch(new Request(new URL(asset,request.url),request)),
+  defaultsFor(env,request.url),
+  overrides(env),
+  publishedEventsForPage(env)
+ ]);
  if(!page.ok)return page;
  const title=v?v.title:eventVenue?'События '+eventVenue.name+' — афиша Минска':route==='/events'?'События NOVA — афиша Минска':'NOVA — три лаунж-кафе в Минске';
  const desc=v?v.description:eventVenue?eventVenue.description:route==='/events'?'Афиша NOVA в Минске: DJ-сеты, вечеринки и ближайшие события.':'NOVA — три лаунж-кафе в Минске: Зыбицкая, Победителей, Восток. Кухня, ланчи и вечерние встречи.';
@@ -61,14 +78,18 @@ export async function publicPage(request,env,route){
  '<meta property="og:description" content="'+htmlEscape(desc)+'">'+
  '<meta property="og:url" content="'+htmlEscape(canonical)+'">'+
  (v?'<meta property="og:image" content="'+htmlEscape(origin+(over['venue_'+v.id+'_image']||def.content?.['venue_'+v.id+'_image']||v.image))+'">':'')+
- '<script type="application/ld+json">'+scriptJson(ld)+'</script>';
+ '<script type="application/ld+json">'+scriptJson(ld)+'</script>'+
+ // Embedded event JSON is inert. It renders even when an independent API fetch
+ // fails in a guest browser. Only published events are exposed.
+ (initialEvents!==null?'<script type="application/json" id="nova-events-bootstrap">'+scriptJson(initialEvents)+'</script>':'');
  let content=await page.text();
  content=content.replace(/<title>[^<]*<\/title>/,'<title>'+htmlEscape(title)+'</title>')
   .replace(/<meta name="description" content="[^"]*">/,'<meta name="description" content="'+htmlEscape(desc)+'">')
   .replace('</head>',head+'</head>')
   .replace('<div id="app"><p class="loading">NOVA</p></div>','<div id="app">'+fallback(route,v,origin,over,def)+'</div>');
  const headers=new Headers(page.headers);headers.set('Content-Type','text/html; charset=utf-8');
- headers.set('Cache-Control','public, max-age=120, must-revalidate');
+ // Pages now contain the newest published events: do not cache stale lineups.
+ headers.set('Cache-Control','no-store, max-age=0');
  headers.set('X-Content-Type-Options','nosniff');
  if(noindexHost(url.hostname))headers.set('X-Robots-Tag','noindex, nofollow');
  return new Response(content,{status:200,headers});

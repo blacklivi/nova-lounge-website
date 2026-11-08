@@ -35,6 +35,17 @@ assert.match(css,/\.hof-events-page \.event-location\{color:#F04902/,'HOF event 
 assert.match(css,/\.venue-events-page \.events-list/,'Scoped listings must have own event card layout');
 // After publishing, refresh public lineups instead of preserving a stale empty state.
 assert.match(app,/getJSON\('\/api\/events',\{cache:'no-store'\}\)/,'Initial event fetch must bypass browser caching');
+
+assert.match(seo,/async function publishedEventsForPage\(env\)/,'Public HTML must embed the event snapshot directly from D1');
+assert.match(seo,/WHERE published = 1 ORDER BY starts_at ASC/,'Only published records may enter HTML');
+assert.match(seo,/id="nova-events-bootstrap"/,'Public pages must ship event JSON independent of extra network requests');
+assert.match(seo,/scriptJson\(initialEvents\)/,'Event JSON must be escaped before embedding in HTML');
+assert.match(seo,/no-store, max-age=0/,'Server-rendered pages should not cache outdated lineups');
+assert.match(app,/document\.getElementById\('nova-events-bootstrap'\)/,'Client must read server-provided event snapshot');
+assert.match(app,/events = serverEvents\|\|\[\]/,'Client must render with snapshot on first paint');
+assert.match(app,/eventsLoaded = serverEvents!==null/,'Bootstrapped event state must count as successfully loaded');
+assert.match(app,/if\(!eventsLoaded\)eventsFailed=true/,'A failed secondary request must not blank server-rendered lineup');
+
 assert.match(app,/async function refreshPublishedEvents\(force=false\)/,'Published events must be refreshable in an open tab');
 assert.match(app,/window\.addEventListener\('focus',/,'Switching back from the admin must refresh events');
 assert.match(app,/document\.addEventListener\('visibilitychange',/,'Returning to the tab must refresh events');

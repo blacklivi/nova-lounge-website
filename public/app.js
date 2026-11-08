@@ -18,7 +18,17 @@ const editorParams=new URLSearchParams(location.search);
 const isEditorPreview=editorParams.has('cms_preview')&&window.parent!==window;
 if(isEditorPreview && ['ru','en'].includes(editorParams.get('editor_lang')))language=editorParams.get('editor_lang');
 if(isEditorPreview)document.body.classList.add('cms-preview');
-let defaults = {content:{},content_en:{}}, source = {}, events = [], contentFailed = false, eventsFailed = false, eventsLoaded = false;
+// The Worker embeds a snapshot of *published* D1 events in public HTML.
+ // This keeps the actual lineup available even if an extra browser fetch fails.
+let serverEvents=null;
+try{
+ const snapshot=document.getElementById('nova-events-bootstrap');
+ if(snapshot){
+  const parsed=JSON.parse(snapshot.textContent||'null');
+  if(Array.isArray(parsed))serverEvents=parsed;
+ }
+}catch(error){console.warn('NOVA embedded events unavailable',error)}
+let defaults = {content:{},content_en:{}}, source = {}, events = serverEvents||[], contentFailed = false, eventsFailed = false, eventsLoaded = serverEvents!==null;
 let selected = null, lastFocus = null, modalKind = '', modalVenue = '', drawerOpen = false;
 // Keep keyboard focus restoration accessible without leaving a focus ring after touch taps.
 let keyboardModalInteraction = false;
@@ -85,10 +95,6 @@ const nav = () => `<a href="${H('nav_spaces_url','/#venues')}" ${hrefFor('nav_sp
 function header(){return `<a class="skip" href="#main">${t('К содержимому','Skip to content')}</a><header class="site-header"><a class="brand" href="${H('global_logo_url','/')}" data-editor-key="global_logo_url" aria-label="${t('NOVA — на главную','NOVA — home')}">${editorValue('global_logo_image')?'<img data-editor-key="global_logo_image" src="'+imageFor('global_logo_image')+'" alt="NOVA">':'NOVA'}</a><nav class="main-nav" aria-label="${t('Основная навигация','Main navigation')}">${nav()}</nav><div class="header-side">${languages()}<button type="button" class="button header-book" data-modal="booking">${bookingLabel()}</button><button type="button" class="menu-toggle" data-drawer aria-controls="drawer" aria-expanded="false" aria-label="${t('Открыть меню','Open menu')}"><span></span><span></span></button></div></header>`;}
 const instagramMark=()=>I('global_instagram_icon','instagram').replace('class="arrow"','class="footer-icon"');
 const hofInstagramURL=()=>safeURL(value('instagram_zyb'));
-function hofInstagramSocial(){
- const url=hofInstagramURL();
- return url?`<div class="hof-contact-socials"><a class="hof-instagram-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" data-editor-key="instagram_zyb" aria-label="${t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya')}" title="Instagram HÓF by NOVA">${instagramMark()}<span class="sr-only">Instagram</span></a></div>`:'';
-}
 const locationMark=()=>I('global_map_icon','map-pin').replace('class="arrow"','class="footer-icon"');
 function contactLinks(id){
  const phone=value('phone_'+id), instagram=safeURL(value('instagram_'+id)), telegram=safeURL(value('telegram_'+id)), route=safeURL(value('map_'+id));
@@ -202,7 +208,7 @@ function hofDetail(){
      <button class="hof-outline hof-primary-cta hof-action" type="button" data-editor-key="hof_book_button_text" data-modal="booking" data-venue="zyb">${E('hof_book_button_text')} ${arrow}</button>
      <button class="hof-text-button hof-action" data-editor-key="hof_contacts_button_text" type="button" data-modal="contacts" data-venue="zyb">${E('hof_contacts_button_text')} ${arrow}</button>
     </div>
-    ${hofInstagramSocial()}
+    
    </section>
   </div>
  </article>`;
@@ -879,7 +885,14 @@ try {
 let cmsSettled=false;
 const cms=Promise.allSettled([
  getJSON('/api/content').then(data=>{source=data;}).catch(()=>{contentFailed=true;}),
- getJSON('/api/events',{cache:'no-store'}).then(data=>{if(!Array.isArray(data.events))throw Error('Invalid events response');events=data.events;eventsLoaded=true;eventsFailed=false;}).catch(()=>{eventsFailed=true;})
+ getJSON('/api/events',{cache:'no-store'}).then(data=>{
+  if(!Array.isArray(data.events))throw Error('Invalid events response');
+  events=data.events;eventsLoaded=true;eventsFailed=false;
+ }).catch(error=>{
+  // Never discard the server-rendered published events due to a client network failure.
+  if(!eventsLoaded)eventsFailed=true;
+  console.warn('NOVA events API unavailable; keeping HTML event snapshot',error);
+ })
 ]).then(()=>{cmsSettled=true;});
 await Promise.race([cms,pause(700)]);
 render();

@@ -1784,28 +1784,6 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
  body:not(.hof-active) .mobile-cta{transition:none}
 }
 
-/* HÓF Instagram — small social icon in the orange contact footer.
-   The shared homepage footer uses the existing NOVA social icon component. */
-.hof-page .hof-contact-socials{display:flex;align-items:center;margin-top:8px}
-.hof-page .hof-instagram-link{
- box-sizing:border-box;
- display:inline-flex;
- align-items:center;
- justify-content:center;
- width:42px;
- height:42px;
- border:1px solid #000;
- border-radius:0;
- color:#000;
- text-decoration:none;
- transition:background-color .2s ease,color .2s ease;
-}
-.hof-page .hof-instagram-link .footer-icon{width:20px;height:20px}
-.hof-page .hof-instagram-link:hover{background:#000;color:#fff}
-.hof-page .hof-instagram-link:focus-visible{outline:2px solid #000;outline-offset:3px}
-@media(prefers-reduced-motion:reduce){
- .hof-page .hof-instagram-link{transition:none}
-}
 /* Phone reservations remain usable for guests while online intake is not connected. */
 .modal .booking-phone-list{display:grid;gap:10px;margin-top:18px}
 .modal .booking-phone-action{
