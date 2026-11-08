@@ -24,7 +24,7 @@ assert.match(design,/height:calc\(100svh - var\(--header\)\)/,'First-screen HOF 
 assert.match(design,/body\.hof-active\.hof-dock-visible \.mobile-cta/,'Mobile booking dock appears only when triggered');
 assert.match(design,/@media\(prefers-reduced-motion:reduce\)/,'Animations respect reduced-motion preference');
 assert.match(app,/dialog\.dataset\.theme=\(kind==='booking'\|\|kind==='contacts'\)&&id==='zyb'\?'hof':'nova'/,'Venue theme must not alter booking data');
-assert.match(app,/const visible=Boolean\(heroPassed&&!footerEntered\)/,'Dock must stay hidden during the hero and when the entire orange footer enters view');
+assert.match(app,/const visible=Boolean\(heroPassed&&!footerEntered&&!eventActionVisible\)/,'HÓF dock must not overlap the event link or orange footer');
 assert.match(app,/hofDockObserver\.observe\(hero\);[\s\S]*?hofDockObserver\.observe\(contact\);/,'Dock must observe both the hero and orange contact section');
 assert.match(app,/dock\.inert=!visible/,'Hidden dock must be removed from keyboard order');
 assert.match(app,/window\.addEventListener\('scroll',updateTop,\{passive:true\}\)/,'Mobile dock updates on scroll');
@@ -34,9 +34,9 @@ assert.match(app,/function bookingFormHTML\(requestedVenue\)/,'Guests need a res
 assert.match(app,/fetch\('\/api\/reservations'/,'Guest form must submit to Worker API');
 assert.match(app,/if\(!response\.ok\|\|!answer\.ok\)throw new Error/,'Client cannot mark unsaved requests successful');
 
-assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions\s*\{\s*display:grid;\s*grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/,'HOF contact buttons must use equal-width grid tracks');
-assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions > button\s*\{[^}]*height:100%/s,'Both HOF contact buttons must share a common row height');
-assert.match(css,/@media\(max-width:380px\)\s*\{\s*\.hof-page \.hof-compact-contact \.hof-bottom-actions\s*\{\s*grid-template-columns:minmax\(0,1fr\)/,'Narrow phones must stack equal-width buttons');
+assert.match(css,/\/\* HÓF — restore the original asymmetrical contact actions and full-width/,'Contact actions restore the black primary and underlined secondary styling');
+assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions > \.hof-text-button\{\s*color:#000!important;\s*background:transparent!important;\s*border:0!important;\s*border-bottom:1px solid #000!important/,'Contacts must be a text link with an underline, not a boxed button');
+assert.match(css,/body\.hof-active \.mobile-cta \.button\{\s*box-sizing:border-box;\s*flex:1 1 100%;\s*width:100%;\s*max-width:none/,'HÓF mobile booking must use full available width');
 assert.match(css,/@media\(min-width:601px\) and \(max-width:900px\)/,'Narrow split panels on tablets must stack contact buttons');
 assert.match(app,/data-editor-key="hof_contacts_button_text".*data-modal="contacts"/,'Contacts button remains wired and editable');
 assert.match(app,/data-editor-key="hof_book_button_text".*data-modal="booking"/,'Booking button remains wired and editable');
@@ -82,7 +82,7 @@ assert.match(app,/document\.body\.classList\.toggle\('nova-inline-booking-visibl
 assert.match(app,/dock\.inert=inlineVisible\|\|document\.body\.classList\.contains\('lock'\)/,'Hidden dock must not receive keyboard focus');
 assert.match(css,/body:not\(\.hof-active\)\.nova-inline-booking-visible \.mobile-cta\{/,'Only NOVA mobile dock may be suppressed');
 assert.match(css,/visibility:hidden;\s*opacity:0;\s*transform:translate3d\(0,110%,0\);\s*pointer-events:none;/,'Hidden dock must be non-interactive and fully off screen');
-assert.match(app,/const visible=Boolean\(heroPassed&&!footerEntered\)/,'Keep HÓF hero/footer conditions unchanged');
+assert.match(app,/eventActionRect\.top<innerHeight-\(dock\?\.offsetHeight\|\|0\)/,'HÓF inline event action must remain clickable without the booking dock covering it');
 assert.match(app,/setupHofDockObserver\(\)/,'Keep HÓF dock observer wired');
 
 console.log('NOVA visual system, HOF theme and mobile booking behaviour checks passed');
