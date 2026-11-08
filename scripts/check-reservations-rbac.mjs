@@ -18,6 +18,7 @@ class MemoryDB{
   function filtered(p){
    let records=[...db.reservations.values()];
    const where=sql.split(' WHERE ')[1]?.split(' ORDER BY ')[0]||'';
+   if(p[0]==='east')console.log('FILTER DEBUG',JSON.stringify({sql,params:p,where,records:[...db.reservations.values()].map(x=>({id:x.id,venue:x.venue}))}));
    let index=0;
    if(where.includes('venue=?')){db.restrictedSQL++;records=records.filter(x=>x.venue===p[index++])}
    if(where.includes('status=?'))records=records.filter(x=>x.status===p[index++]);
