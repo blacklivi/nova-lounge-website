@@ -49,9 +49,9 @@ assert.doesNotMatch(app,/class="text-link" data-editor-key=/,'Action-only underl
 assert.match(app,/data-editor-key="home_events_title"/,'The heading remains separately CMS-editable');
 assert.match(app,/data-editor-key="home_events_url"/,'The event link destination remains CMS-editable');
 assert.match(app,/data-modal="booking" data-venue="zyb"/,'HÓF booking remains venue-scoped');
-assert.match(app,/data-modal="booking" data-venue="${id}"/,'Other venue booking remains venue-scoped');
-assert.match(app,/data-modal="contacts" data-venue="${id}"/,'Venue contact action remains interactive');
-assert.match(app,/data-modal="menu-location" data-venue="${id}"/,'Venue menu action remains interactive');
+assert.ok(app.includes('data-modal="booking" data-venue="${id}"'),'Other venue booking remains venue-scoped');
+assert.ok(app.includes('data-modal="contacts" data-venue="${id}"'),'Venue contact action remains interactive');
+assert.ok(app.includes('data-modal="menu-location" data-venue="${id}"'),'Venue menu action remains interactive');
 assert.match(app,/href="\/events"/,'Calendar navigation remains a link');
 
 console.log('NOVA/HÓF shared action geometry and route handlers passed');
