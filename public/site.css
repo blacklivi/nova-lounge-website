@@ -1941,3 +1941,46 @@ body.hof-active #drawer nav a:focus-visible{color:#F04902}
   padding-inline:clamp(10px,3vw,14px);
  }
 }
+
+/* HÓF kitchen/menu link: restore the original underlined text action.
+   Overrides shared boxed CTA sizing only in the white editorial-about panel. */
+.hof-page .hof-editorial-about .hof-text-button.hof-action{
+ box-sizing:border-box;
+ display:inline-flex;
+ align-items:center;
+ justify-content:space-between;
+ width:min(100%,260px);
+ max-width:100%;
+ height:auto;
+ min-height:46px;
+ max-height:none;
+ margin:0;
+ padding:8px 0 10px;
+ gap:20px;
+ border:0;
+ border-bottom:1px solid #111;
+ border-radius:0;
+ background:transparent;
+ box-shadow:none;
+ color:#111;
+ font-size:15px;
+ font-weight:500;
+ line-height:1.35;
+ text-decoration:none;
+}
+.hof-page .hof-editorial-about .hof-text-button.hof-action:hover,
+.hof-page .hof-editorial-about .hof-text-button.hof-action:focus-visible{
+ color:#d94400;
+ border-bottom-color:#d94400;
+ background:transparent;
+}
+@media(max-width:600px){
+ .hof-page .hof-editorial-about .hof-text-button.hof-action{
+  width:min(100%,260px);
+  min-height:46px;
+  height:auto;
+  max-height:none;
+  padding:8px 0 10px;
+  font-size:15px;
+ }
+}
