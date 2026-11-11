@@ -144,5 +144,5 @@ export const EDITOR_FIELDS=EDITOR_PAGES.flatMap(p=>p.sections.flatMap(s=>s.field
 // Crop positions are independent language-neutral content values; they are never
 // presented as raw text fields, but are saved by the visual photo editor.
 export const PHOTO_CROP_FIELDS=EDITOR_FIELDS.filter(f=>f.type==='image'&&isPhotoKey(f.key))
- .map(f=>({key:cropKey(f.key),label:f.label+' · положение кадра',type:'crop',ru:DEFAULT_CROP,en:DEFAULT_CROP}));
+ .map(f=>({key:cropKey(f.key),label:f.label+' · положение кадра',type:'crop',ru:f.key==='story_image'?'50,85,100':DEFAULT_CROP,en:f.key==='story_image'?'50,85,100':DEFAULT_CROP}));
 export const EDITOR_BY_KEY=Object.fromEntries([...EDITOR_FIELDS,...PHOTO_CROP_FIELDS].map(f=>[f.key,f]));
