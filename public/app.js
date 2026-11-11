@@ -5,6 +5,15 @@ import {EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js';
 import {cropCSS,applyPhotoCrop,parseCrop,cropPattern,isPhotoKey,DEFAULT_CROP} from './photo-crop.js';
 const app = document.querySelector('#app');
 const isEvents = document.body.dataset.page === 'events';
+// A previous visit to the Spaces section leaves /#venues in the address bar.
+// On an explicit reload, treat it as reopening the homepage, not as a fresh
+// request to jump past the NOVA cover. Internal links and intentional deep
+// links on new navigations still go to the requested anchor.
+const homeReloadNavigation=performance.getEntriesByType('navigation')[0]?.type==='reload';
+if(!isEvents && location.pathname==='/' && location.hash==='#venues' && homeReloadNavigation){
+ history.replaceState(history.state,'',location.pathname+location.search);
+ window.scrollTo({top:0,behavior:'instant'});
+}
 const eventVenueSlugs={hof:'zyb',pobediteley:'pob',vostok:'east'};
 const scopedEventVenue=isEvents?(eventVenueSlugs[location.pathname.split('/')[2]]||null):null;
 const venueEventURLs={zyb:'/events/hof',pob:'/events/pobediteley',east:'/events/vostok'};
