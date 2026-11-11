@@ -12,7 +12,9 @@ assert.match(homepage,/<section class="hero" id="top">[\s\S]*?<\/section><sectio
 assert.match(homepage,/<h1 class="hero-title" aria-label="NOVA"/,'First screen must retain NOVA title and staggered letter animation');
 assert.match(scoped,/@media\(min-width:601px\)\{\s*\.hero\{[\s\S]*?height:clamp\(560px,45\.5vw,940px\);\s*min-height:560px;\s*max-height:calc\(100svh - var\(--header\)\);/,'Desktop cover must be only slightly taller than original, never forced fullscreen');
 assert.doesNotMatch(scoped,/\.hero\{height:calc\(100svh - 80px\)\}/,'No oversized full-height desktop override');
-assert.match(app,/location\.hash==='#venues' && homeReloadNavigation/,'Reloading a stale venues URL must not skip the first cover');
+assert.match(app,/const resetStaleVenueAnchor=!isEvents&&location\.pathname==='\/'&&location\.hash==='#venues'&&homeReloadNavigation/,'Only stale reloads of #venues are reset; clicked links and new deep links retain normal navigation');
+assert.match(app,/if\(resetStaleVenueAnchor\)\{[\s\S]*?history\.scrollRestoration='manual'/,'Browser scroll restoration must not override the homepage at reload');
+assert.match(app,/if\(resetStaleVenueAnchor\)scrollToPosition\(0,true\);\s*else scrollToHash\(true\)/,'First load starts from the hero only when clearing a stale reload anchor');
 assert.match(app,/history\.replaceState\(history\.state,'',location\.pathname\+location\.search\)/,'Clear stale venues hash without adding a navigation history entry');
 assert.match(app,/if\(!place&&!selected\)\{scrollToSection\(id\);return;\}/,'In-app menu anchor scrolling must still work');
 assert.match(scoped,/\.hero \.hero-copy>\.eyebrow,\s*\.hero \.hero-tagline,\s*\.hero \.photo-side\{\s*display:none;/,'Cover must be logo-led, without secondary captions competing with NOVA');
