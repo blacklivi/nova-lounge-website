@@ -260,16 +260,23 @@ let heroIntroPending = !isEvents && location.pathname === '/' && !reducedMotion.
 let motionObserver = null;
 const revealedSections = new Set();
 let venuesRevealObserver = null;
-let venuesRevealScrollHandler = null;
 let venuesHeadingRevealed = false;
 let venuesCardsRevealed = false;
 const venuesMobileRevealed = new Set();
 
+// Keep anything already visible on the first screen visible from the first paint.
+// This is based on actual element geometry, not device type or hard-coded iPad heights.
+// Below-the-fold headings/cards still reveal as they enter the viewport on scroll.
+function elementInViewport(el){
+ const rect=el.getBoundingClientRect();
+ const headerBottom=app.querySelector('.site-header')?.getBoundingClientRect().bottom||0;
+ return rect.width>0 && rect.height>0 && rect.top<window.innerHeight && rect.bottom>Math.max(0,headerBottom);
+}
+
 // Reveal desktop cards together with a subtle left-to-right stagger.
-// On mobile each stacked card appears only when it enters the viewport.
+// On mobile each stacked card appears only when it first enters the viewport.
 function setupVenuesReveal(){
  venuesRevealObserver?.disconnect();
- if(venuesRevealScrollHandler){window.removeEventListener('scroll',venuesRevealScrollHandler);venuesRevealScrollHandler=null;}
  const section=app.querySelector('.venues');
  if(!section || reducedMotion.matches || !('IntersectionObserver' in window))return;
  const heading=section.querySelector('.venues-heading');
@@ -277,11 +284,26 @@ function setupVenuesReveal(){
  if(!heading || !cards.length)return;
  const mobile=matchMedia('(max-width:600px)').matches;
  const first=cards[0];
+
+ // Measure BEFORE adding venues-motion, which otherwise hides elements.
+ // Once content has been visible it must never disappear on rerender/resize.
+ if(elementInViewport(heading))venuesHeadingRevealed=true;
+ if(mobile){
+  cards.forEach(card=>{
+   if(elementInViewport(card))venuesMobileRevealed.add(card.dataset.place);
+   if(venuesMobileRevealed.has(card.dataset.place))card.classList.add('venue-card-entered');
+  });
+ }else if(cards.some(elementInViewport)){
+  venuesCardsRevealed=true;
+ }
+ if(venuesHeadingRevealed)section.classList.add('venues-heading-entered');
+ if(venuesCardsRevealed)section.classList.add('venues-cards-entered');
+
+ // All state classes above are set BEFORE the hiding rules take effect.
  section.classList.add('venues-motion');
  section.classList.toggle('venues-mobile-motion',mobile);
  cards.forEach((card,i)=>{
   card.style.setProperty('--venue-stagger',mobile?'0ms':i*130+'ms');
-  // A lazy-loaded photograph must not pop in half-way through its card reveal.
   const image=card.querySelector('.venue-img img');
   if(!image)return;
   const showImage=()=>image.classList.add('venue-image-loaded');
@@ -291,22 +313,7 @@ function setupVenuesReveal(){
    image.addEventListener('error',showImage,{once:true});
   }
  });
- // Already-visible content is shown immediately, including after history restoration.
- if(scrollY>20 || heading.getBoundingClientRect().top < innerHeight)venuesHeadingRevealed=true;
- if(venuesHeadingRevealed)section.classList.add('venues-heading-entered');
- if(mobile){
-  cards.forEach(card=>{
-   if(venuesMobileRevealed.has(card.dataset.place) ||
-      (scrollY>20 && card.getBoundingClientRect().top<innerHeight-12)){
-    card.classList.add('venue-card-entered');
-    venuesMobileRevealed.add(card.dataset.place);
-   }
-  });
- }else{
-  // On first visit the font can reflow the cards while loading: do not auto-reveal at scrollY=0.
-  if(scrollY>20 || (innerHeight>1150 && first.getBoundingClientRect().top < innerHeight-180))venuesCardsRevealed=true;
-  if(venuesCardsRevealed)section.classList.add('venues-cards-entered');
- }
+
  if(venuesHeadingRevealed && (mobile?cards.every(c=>c.classList.contains('venue-card-entered')):venuesCardsRevealed))return;
  venuesRevealObserver=new IntersectionObserver(entries=>{
   for(const entry of entries){
@@ -326,25 +333,9 @@ function setupVenuesReveal(){
   }
  },{threshold:0,rootMargin:'0px'});
  if(!venuesHeadingRevealed)venuesRevealObserver.observe(heading);
- // At page load the first card can peek only 2-10px into the viewport.
- // Defer its observer until actual scrolling to avoid finishing the fade early.
- const observeFirst=()=>{
-  if(scrollY<8){
-   venuesRevealScrollHandler=()=>{
-    if(scrollY<8)return;
-    window.removeEventListener('scroll',venuesRevealScrollHandler);
-    venuesRevealScrollHandler=null;
-    venuesRevealObserver?.observe(first);
-   };
-   window.addEventListener('scroll',venuesRevealScrollHandler,{passive:true});
-  }else venuesRevealObserver.observe(first);
- };
  if(mobile){
-  cards.filter(card=>!card.classList.contains('venue-card-entered')).forEach(card=>{
-   if(card===first)observeFirst();
-   else venuesRevealObserver.observe(card);
-  });
- }else if(!venuesCardsRevealed)observeFirst();
+  cards.filter(card=>!card.classList.contains('venue-card-entered')).forEach(card=>venuesRevealObserver.observe(card));
+ }else if(!venuesCardsRevealed)venuesRevealObserver.observe(first);
 }
 
 // The split follows the visual centre of the provided V SVG, not font metrics.
