@@ -150,20 +150,6 @@ html.nova-js #app{transition:opacity .34s ease}
  from{opacity:0;clip-path:inset(-10% 116% -10% -16%)}
  to{opacity:1;clip-path:inset(-10% -16% -10% -16%)}
 }
-/* iOS Safari can retain a partial clip-path layer on the last external SVG (A).
-   On mobile reveal each complete SVG with a small slide instead of clipping it.
-   The desktop letter wipe remains unchanged. */
-@media(max-width:600px){
- .hero-intro .hero-letter{clip-path:none!important}
- .hero-intro.hero-play .hero-letter{
-  animation:novaMobileLetterIn .48s cubic-bezier(.22,1,.36,1) both;
-  animation-delay:calc(100ms + var(--letter-order)*145ms);
- }
-}
-@keyframes novaMobileLetterIn{
- from{opacity:0;transform:translate3d(-10px,0,0)}
- to{opacity:1;transform:translate3d(0,0,0)}
-}
 /* The photograph remains in its final position from the first visible frame. */
 .hero-photo,.hero-intro .hero-photo,.hero-intro.hero-play .hero-photo{
  opacity:1;transform:none;animation:none
