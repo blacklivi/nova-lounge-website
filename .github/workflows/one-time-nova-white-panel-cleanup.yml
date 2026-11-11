@@ -1,0 +1,28 @@
+name: One-time NOVA homepage branch cleanup
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  pull-requests: read
+jobs:
+  tidy:
+    if: startsWith(github.event.head_commit.message, 'Run NOVA one-time white-panel branch cleanup')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preserve main and backup, delete merged white-panel branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY}"
+          branch="fix/hero-white-panel-and-venues-fold-20261111"
+          backup="backup/nova-release-20261108"
+          sha="$(gh api "repos/${repo}/git/ref/heads/${backup}" --jq '.object.sha')"
+          [[ "${sha}" == "9befbfb9f1f34657847f5055f5442fbdb2ab8de0" ]] || { echo "Unexpected backup SHA"; exit 1; }
+          merged="$(gh api "repos/${repo}/pulls/66" --jq '.merged')"
+          [[ "${merged}" == "true" ]] || { echo "PR 66 not merged"; exit 1; }
+          gh api -X DELETE "repos/${repo}/git/refs/heads/${branch}" >/dev/null
+          echo "Deleted merged branch: ${branch}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "Preserved main and ${backup}" >> "${GITHUB_STEP_SUMMARY}"
