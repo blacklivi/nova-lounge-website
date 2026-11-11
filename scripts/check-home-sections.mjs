@@ -10,6 +10,17 @@ const scoped=css.slice(css.indexOf('/* NOVA cover: restore nearly original propo
 assert.ok(scoped.startsWith('/* NOVA cover: restore nearly original proportions'),'Isolated NOVA homepage cover sizing must remain in the final CSS override');
 assert.match(homepage,/<section class="hero" id="top">[\s\S]*?<\/section><section class="venues" id="venues"/,'Hero and location chooser must remain separate semantic sections');
 assert.match(homepage,/<h1 class="hero-title" aria-label="NOVA"/,'First screen must retain NOVA title and staggered letter animation');
+
+// The venue reveal must depend on actual viewport geometry, not tablet height or
+// a mandatory first scroll. An initially visible venue must never flash and hide.
+const venueReveal=app.slice(app.indexOf('function elementInViewport(el){'),app.indexOf('// The split follows the visual centre'));
+assert.match(venueReveal,/rect\.top<window\.innerHeight && rect\.bottom>Math\.max\(0,headerBottom\)/,'Venue visibility must use the real viewport and fixed header');
+assert.match(venueReveal,/if\(elementInViewport\(heading\)\)venuesHeadingRevealed=true/,'Immediately show a heading that is already in the viewport');
+assert.match(venueReveal,/cards\.some\(elementInViewport\)/,'Immediately show tablet/desktop cards already visible in the viewport');
+assert.match(venueReveal,/if\(elementInViewport\(card\)\)venuesMobileRevealed\.add/,'Immediately show individually visible mobile cards');
+assert.ok(venueReveal.indexOf('if(elementInViewport(heading))') < venueReveal.indexOf("section.classList.add('venues-motion')"),'Visible classes must be set before hidden animation classes to prevent a flash');
+assert.doesNotMatch(venueReveal,/innerHeight>1150|if\(scrollY<8\)|venuesRevealScrollHandler/,'No viewport-height heuristics or mandatory first scroll for cards');
+
 assert.match(scoped,/@media\(min-width:601px\)\{\s*\.hero\{[\s\S]*?height:clamp\(560px,45\.5vw,940px\);\s*min-height:560px;\s*max-height:calc\(100svh - var\(--header\)\);/,'Desktop cover must be only slightly taller than original, never forced fullscreen');
 assert.doesNotMatch(scoped,/\.hero\{height:calc\(100svh - 80px\)\}/,'No oversized full-height desktop override');
 assert.match(app,/const resetStaleVenueAnchor=!isEvents&&location\.pathname==='\/'&&location\.hash==='#venues'&&homeReloadNavigation/,'Only stale reloads of #venues are reset; clicked links and new deep links retain normal navigation');
