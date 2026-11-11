@@ -2215,3 +2215,52 @@ img.cms-photo[data-image],
  .site-header .brand-header-mark .brand-mark-icon{width:34px;height:34px}
  .site-header .brand-header-mark>img{width:34px;height:34px;max-height:34px}
 }
+
+
+/* NOVA first-screen reference: split the wordmark at the photo boundary.
+   On large screens the V is dark over white and cream over the photograph.
+   Keep the photo edge aligned to the V midpoint by alignHeroPhoto(). */
+@media(min-width:601px){
+ .hero .hero-letter-a{color:#F3E9DD}
+ .hero .hero-descriptor{
+  display:block;
+  position:absolute;
+  top:calc(50% + clamp(94px,9.5vw,158px));
+  left:var(--gutter);
+  margin:0;
+  color:#23351F;
+  font-size:clamp(17px,2.55vw,42px);
+  line-height:1.18;
+  font-weight:300;
+  letter-spacing:.13em;
+  white-space:nowrap;
+  z-index:3;
+  pointer-events:none;
+ }
+}
+/* On mobile the photograph is the entire background; all letters must be light. */
+@media(max-width:600px){
+ .hero .hero-letter-a{color:#F3E9DD}
+ .hero .hero-letter-v path{fill:currentColor}
+ .hero .hero-descriptor{
+  display:block;
+  position:absolute;
+  top:calc(50% + clamp(42px,9vw,62px));
+  left:var(--gutter);
+  right:var(--gutter);
+  margin:0;
+  color:#F3E9DD;
+  font-size:clamp(12px,3.05vw,16px);
+  font-weight:400;
+  letter-spacing:.14em;
+  line-height:1.35;
+  white-space:nowrap;
+  text-align:center;
+  pointer-events:none;
+ }
+}
+.hero-intro .hero-descriptor{opacity:0}
+.hero-intro.hero-play .hero-descriptor{animation:novaTaglineFade .55s .85s ease-out both}
+@media(prefers-reduced-motion:reduce){
+ .hero-intro .hero-descriptor{opacity:1!important;animation:none!important}
+}
