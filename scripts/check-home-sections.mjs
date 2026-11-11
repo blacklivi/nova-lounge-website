@@ -10,8 +10,11 @@ const scoped=css.slice(css.indexOf('/* NOVA homepage: one self-contained cover')
 assert.ok(scoped.startsWith('/* NOVA homepage: one self-contained cover'),'Isolated NOVA homepage layout block must remain the final CSS override');
 assert.match(homepage,/<section class="hero" id="top">[\s\S]*?<\/section><section class="venues" id="venues"/,'Hero and location chooser must remain separate semantic sections');
 assert.match(homepage,/<h1 class="hero-title" aria-label="NOVA"/,'First screen must retain NOVA title and staggered letter animation');
-assert.match(scoped,/@media\(min-width:601px\)\{\s*\.hero\{[\s\S]*?height:calc\(100svh - var\(--header\)\);[\s\S]*?min-height:560px/,'Desktop hero must fill available viewport instead of using 43vw');
-assert.match(scoped,/@media\(min-width:1800px\)\{[\s\S]*?\.hero\{height:calc\(100svh - 80px\)\}/,'Large screens must account for 80px sticky header');
+assert.match(scoped,/@media\(min-width:601px\)\{\s*\.hero\{[\s\S]*?height:clamp\(560px,45\.5vw,940px\);\s*min-height:560px;\s*max-height:calc\(100svh - var\(--header\)\);/,'Desktop cover must be only slightly taller than original, never forced fullscreen');
+assert.doesNotMatch(scoped,/\.hero\{height:calc\(100svh - 80px\)\}/,'No oversized full-height desktop override');
+assert.match(app,/location\.hash==='#venues' && homeReloadNavigation/,'Reloading a stale venues URL must not skip the first cover');
+assert.match(app,/history\.replaceState\(history\.state,'',location\.pathname\+location\.search\)/,'Clear stale venues hash without adding a navigation history entry');
+assert.match(app,/if\(!place&&!selected\)\{scrollToSection\(id\);return;\}/,'In-app menu anchor scrolling must still work');
 assert.match(scoped,/\.hero \.hero-copy>\.eyebrow,\s*\.hero \.hero-tagline,\s*\.hero \.photo-side\{\s*display:none;/,'Cover must be logo-led, without secondary captions competing with NOVA');
 assert.match(scoped,/\.hero \.hero-copy\{\s*justify-content:center;/,'NOVA mark must be centered in its own hero');
 assert.match(scoped,/@media\(max-width:600px\)\{[\s\S]*?\.hero \.hero-copy\{\s*justify-content:center;/,'Mobile hero also retains logo-only composition');
@@ -22,4 +25,4 @@ assert.equal(EDITOR_BY_KEY.story_image_crop.ru,'50,85,100','Default story crop s
 assert.deepEqual(cropPresets('story_image').map(x=>x.ratio),[1.5,1.55],'Crop editor must preview new image geometry');
 assert.match(app,/class="story-photo">\$\{image\('story_image'/,'Kitchen image remains editable through the CMS');
 assert.match(homepage,/data-modal="menu"/,'Kitchen/menu button must continue opening menu selector');
-console.log('NOVA full-height logo-only cover and compact kitchen photo regression checks passed');
+console.log('NOVA balanced logo-only cover, reload anchor and compact kitchen photo regression checks passed');
