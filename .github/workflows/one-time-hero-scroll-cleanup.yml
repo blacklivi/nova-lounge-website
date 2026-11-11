@@ -1,0 +1,27 @@
+name: Remove merged NOVA hero fix branch
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  pull-requests: read
+jobs:
+  tidy:
+    if: startsWith(github.event.head_commit.message, 'Run one-time NOVA hero branch cleanup')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preserve main and backup; delete merged patch branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY}"
+          branch="fix/home-cover-proportions-and-reload-scroll-20261111"
+          backup="backup/nova-release-20261108"
+          actual="$(gh api "repos/${repo}/git/ref/heads/${backup}" --jq '.object.sha')"
+          [[ "${actual}" == "9befbfb9f1f34657847f5055f5442fbdb2ab8de0" ]] || { echo "Backup changed; refusing cleanup"; exit 1; }
+          merged="$(gh api "repos/${repo}/pulls/65" --jq '.merged')"
+          [[ "${merged}" == "true" ]] || { echo "PR not merged; refusing cleanup"; exit 1; }
+          gh api -X DELETE "repos/${repo}/git/refs/heads/${branch}"
+          echo "Merged branch deleted; main and backup retained."
