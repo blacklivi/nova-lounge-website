@@ -129,13 +129,14 @@ html.nova-js #app{transition:opacity .34s ease}
  .hero{grid-template-columns:var(--hero-photo-start,37%) minmax(0,1fr)}
 }
 /* Keep the wordmark's overall footprint while preserving the artist's SVG proportions. */
-.hero h1.hero-title{--nova-cap-height:clamp(98px,12vw,320px);font-size:0;line-height:0;margin-left:0}
+/* The original SVG paths now use currentColor: one exact solid tone per breakpoint. */
+.hero h1.hero-title{--nova-cap-height:clamp(98px,12vw,320px);font-size:0;line-height:0;margin-left:0;color:#23351F}
 .hero-title{display:inline-flex;align-items:center;gap:clamp(2px,.35vw,8px);white-space:nowrap}
 .hero-letter{display:inline-flex;flex:none;align-items:center;justify-content:center;position:relative;transform:none}
 .hero-letter-image{display:block;width:auto;height:var(--nova-cap-height);max-width:none;object-fit:contain;pointer-events:none}
 .hero-letter-o .hero-letter-image{height:calc(var(--nova-cap-height) * 1.08)}
 @media(max-width:600px){
- .hero h1.hero-title{--nova-cap-height:18.3vw;margin-left:0}
+ .hero h1.hero-title{--nova-cap-height:18.3vw;margin-left:0;color:#F3E9DD}
  .hero-letter-image{filter:drop-shadow(0 1px 3px rgba(0,0,0,.28))}
 }
 @media(max-width:600px) and (max-height:520px){
