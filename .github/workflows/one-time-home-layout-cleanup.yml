@@ -1,0 +1,34 @@
+name: One-time NOVA homepage branch cleanup
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  pull-requests: read
+jobs:
+  tidy:
+    if: startsWith(github.event.head_commit.message, 'Run one-time NOVA homepage branch cleanup')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete only merged layout branch while preserving main and backup
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY}"
+          branch="fix/home-hero-full-screen-and-compact-story-20261111"
+          backup="backup/nova-release-20261108"
+          sha="$(gh api "repos/${repo}/git/ref/heads/${backup}" --jq '.object.sha')"
+          if [[ "${sha}" != "9befbfb9f1f34657847f5055f5442fbdb2ab8de0" ]]; then
+            echo "::error::Unexpected backup SHA. No deletion performed."
+            exit 1
+          fi
+          merged="$(gh api "repos/${repo}/pulls/64" --jq '.merged')"
+          if [[ "${merged}" != "true" ]]; then
+            echo "::error::Layout PR #64 not merged. No deletion performed."
+            exit 1
+          fi
+          gh api -X DELETE "repos/${repo}/git/refs/heads/${branch}" >/dev/null
+          echo "Deleted merged branch: ${branch}" >> "${GITHUB_STEP_SUMMARY}"
+          echo "Preserved: main and ${backup}" >> "${GITHUB_STEP_SUMMARY}"
