@@ -2264,3 +2264,6 @@ img.cms-photo[data-image],
 @media(prefers-reduced-motion:reduce){
  .hero-intro .hero-descriptor{opacity:1!important;animation:none!important}
 }
+@media(max-width:380px){
+ .hero .hero-descriptor{font-size:clamp(9.6px,2.85vw,11px);letter-spacing:.11em}
+}
