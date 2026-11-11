@@ -27,9 +27,13 @@ assert.equal(EDITOR_BY_KEY.story_image_crop.ru,'50,85,100','Default story crop s
 assert.deepEqual(cropPresets('story_image').map(x=>x.ratio),[1.5,1.55],'Crop editor must preview new image geometry');
 assert.match(app,/class="story-photo">\$\{image\('story_image'/,'Kitchen image remains editable through the CMS');
 assert.match(homepage,/data-modal="menu"/,'Kitchen/menu button must continue opening menu selector');
-// Preserve the established 45.5vw cover height; move only the image boundary
-// and the second section's heading, not the hero's photo height or mobile UI.
-assert.match(css,/@media\(min-width:901px\)\{\s*\.hero\{\s*grid-template-columns:calc\(var\(--hero-photo-start,37%\) \+ 3%\) minmax\(0,1fr\);/,'Desktop NOVA white panel must be 3 percentage points wider than the measured V boundary');
+// Preserve the established cover height and align the photo edge to the V centre.
+// Optical designer tracking should scale down on mobile without clipping the wordmark.
+assert.match(css,/@media\(min-width:901px\)\{\s*\.hero\{\s*grid-template-columns:var\(--hero-photo-start,37%\) minmax\(0,1fr\);/,'Desktop photo must start at the measured centre of V, without a 3% offset');
+assert.match(css,/\.hero-letter-o\{margin-left:calc\(var\(--nova-cap-height\) \* \.90\)\}/,'N–O gap must match designer tracking');
+assert.match(css,/\.hero-letter-v\{margin-left:calc\(var\(--nova-cap-height\) \* \.78\)\}/,'O–V gap must match designer tracking');
+assert.match(css,/\.hero-letter-a\{margin-left:calc\(var\(--nova-cap-height\) \* \.53\)\}/,'V–A gap must match designer tracking');
+assert.match(css,/@media\(max-width:600px\)\{\s*\.hero h1\.hero-title\{--nova-cap-height:13\.3vw/,'Mobile NOVA SVG wordmark must scale to fit the screen with wider tracking');
 assert.match(css,/\.hero \+ \.venues\{\s*padding-top:max\([\s\S]*?100svh - var\(--header\) - clamp\(560px,45\.5vw,940px\) \+ 32px/,'Venues heading must stay below the first desktop viewport without enlarging the cover');
 assert.match(css,/@media\(min-width:901px\)\{\s*\.hero\{[^}]*grid-template-columns:[^}]*\}\s*\/\* Keep/,'New white-panel treatment must not affect tablet or mobile widths');
 console.log('NOVA balanced logo-only cover, reload anchor and compact kitchen photo regression checks passed');
