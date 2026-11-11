@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {cropPresets} from '../public/photo-crop.js';
+import {EDITOR_BY_KEY} from '../public/editor-schema.js';
+
+const css=readFileSync('public/site.css','utf8');
+const app=readFileSync('public/app.js','utf8');
+const homepage=app.slice(app.indexOf('function home(){'),app.indexOf('function hofLineupLink(){'));
+const scoped=css.slice(css.indexOf('/* NOVA homepage: one self-contained cover'));
+assert.ok(scoped.startsWith('/* NOVA homepage: one self-contained cover'),'Isolated NOVA homepage layout block must remain the final CSS override');
+assert.match(homepage,/<section class="hero" id="top">[\s\S]*?<\/section><section class="venues" id="venues"/,'Hero and location chooser must remain separate semantic sections');
+assert.match(homepage,/<h1 class="hero-title" aria-label="NOVA"/,'First screen must retain NOVA title and staggered letter animation');
+assert.match(scoped,/@media\(min-width:601px\)\{\s*\.hero\{[\s\S]*?height:calc\(100svh - var\(--header\)\);[\s\S]*?min-height:560px/,'Desktop hero must fill available viewport instead of using 43vw');
+assert.match(scoped,/@media\(min-width:1800px\)\{[\s\S]*?\.hero\{height:calc\(100svh - 80px\)\}/,'Large screens must account for 80px sticky header');
+assert.match(scoped,/\.hero \.hero-copy>\.eyebrow,\s*\.hero \.hero-tagline,\s*\.hero \.photo-side\{\s*display:none;/,'Cover must be logo-led, without secondary captions competing with NOVA');
+assert.match(scoped,/\.hero \.hero-copy\{\s*justify-content:center;/,'NOVA mark must be centered in its own hero');
+assert.match(scoped,/@media\(max-width:600px\)\{[\s\S]*?\.hero \.hero-copy\{\s*justify-content:center;/,'Mobile hero also retains logo-only composition');
+assert.match(scoped,/\.story\{\s*align-items:center;\s*padding-block:clamp\(56px,5vw,88px\)/,'Story vertical spacing must be compact');
+assert.match(scoped,/\.story \.story-photo img\.cms-photo\{[\s\S]*?height:clamp\(238px,30vw,490px\);[\s\S]*?max-height:none;[\s\S]*?object-fit:cover;/,'Story photograph must not inherit HTML 900px height');
+assert.match(scoped,/@media\(max-width:600px\)\{[\s\S]*?\.story \.story-photo img\.cms-photo\{\s*height:clamp\(208px,55vw,310px\)/,'Mobile story image must remain compact');
+assert.equal(EDITOR_BY_KEY.story_image_crop.ru,'50,85,100','Default story crop should cut out the existing photo top band');
+assert.deepEqual(cropPresets('story_image').map(x=>x.ratio),[1.5,1.55],'Crop editor must preview new image geometry');
+assert.match(app,/class="story-photo">\$\{image\('story_image'/,'Kitchen image remains editable through the CMS');
+assert.match(homepage,/data-modal="menu"/,'Kitchen/menu button must continue opening menu selector');
+console.log('NOVA full-height logo-only cover and compact kitchen photo regression checks passed');

@@ -23,9 +23,10 @@ assert.equal(isPhotoKey('hof_contact_mark_image'),false,'Brand logos must never 
 assert.equal(isPhotoKey('global_logo_image'),false,'Brand logos must remain intact');
 assert.ok(cropPresets('event').length>=3,'Event preview should offer homepage, full listing and HÓF frame');
 assert.ok(cropPresets('hero_image').length>=2,'Hero should preview mobile and desktop ratios');
+assert.deepEqual(cropPresets('story_image').map(x=>x.ratio),[1.5,1.55],'Kitchen image editor must show the shorter desktop and mobile crops');
 assert.ok(PHOTO_CROP_FIELDS.length>=12,'Every photographic CMS field must have persisted crop metadata');
 for(const f of PHOTO_CROP_FIELDS){
- assert.equal(f.type,'crop');assert.ok(EDITOR_BY_KEY[f.key]);assert.equal(f.ru,'50,50,100');
+ assert.equal(f.type,'crop');assert.ok(EDITOR_BY_KEY[f.key]);assert.equal(f.ru,f.key==='story_image_crop'?'50,85,100':'50,50,100');
 }
 assert.match(api,/const CROP_KEYS=new Set\(PHOTO_CROP_FIELDS\.map/,'Server needs a strict allowlist for crop fields');
 assert.match(api,/!k\.endsWith\('_crop'\)/,'Gallery crop settings must never be validated as image URLs');

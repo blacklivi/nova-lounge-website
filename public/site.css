@@ -2107,3 +2107,75 @@ img.cms-photo[data-image],
  .book-strip .book-image{display:none}
  .book-strip .book-main{width:100%}
 }
+
+/* NOVA homepage: one self-contained cover, then a separate locations section.
+   Do not use a vw-based cover height: on tall desktop viewports it let the
+   "Choose a location" heading peek into the initial screen. */
+@media(min-width:601px){
+ .hero{
+  box-sizing:border-box;
+  height:calc(100svh - var(--header));
+  min-height:560px;
+  max-height:none;
+  isolation:isolate;
+  overflow:hidden;
+ }
+}
+@media(min-width:1800px){
+ /* The header becomes 80px above this breakpoint. */
+ .hero{height:calc(100svh - 80px)}
+}
+/* Keep the cover intentionally logo-led. Supporting editorial copy stays
+   in the CMS but does not compete with the central NOVA artwork. */
+.hero .hero-copy{
+ justify-content:center;
+}
+.hero .hero-copy>.eyebrow,
+.hero .hero-tagline,
+.hero .photo-side{
+ display:none;
+}
+.hero .hero-title{
+ margin:0 0 0 -.045em;
+}
+@media(max-width:600px){
+ .hero{
+  isolation:isolate;
+  overflow:hidden;
+ }
+ .hero .hero-copy{
+  justify-content:center;
+  padding-block:32px calc(70px + env(safe-area-inset-bottom,0px));
+ }
+ .hero .hero-title{
+  margin:0 0 0 -.035em;
+ }
+}
+/* NOVA kitchen & meetings: the 900px HTML image dimension must not force a
+   portrait-sized section. Keep a shorter image viewport with editable crop. */
+.story{
+ align-items:center;
+ padding-block:clamp(56px,5vw,88px);
+}
+.story .story-photo{
+ align-self:center;
+ overflow:hidden;
+}
+.story .story-photo img.cms-photo{
+ display:block;
+ width:100%;
+ height:clamp(238px,30vw,490px);
+ min-height:0;
+ max-height:none;
+ aspect-ratio:auto;
+ object-fit:cover;
+}
+@media(max-width:600px){
+ .story{
+  align-items:stretch;
+  padding-block:var(--space);
+ }
+ .story .story-photo img.cms-photo{
+  height:clamp(208px,55vw,310px);
+ }
+}
