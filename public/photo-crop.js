@@ -49,7 +49,10 @@ export function cropPresets(key){
   {label:'Галерея (5:6)',ratio:5/6},
   {label:'Квадрат (1:1)',ratio:1}
  ];
- if(key==='story_image')return [{label:'Фото о нас (10:11)',ratio:10/11}];
+ if(key==='story_image')return [
+  {label:'Кухня и встречи · компьютер (около 1.5:1)',ratio:1.5},
+  {label:'Кухня и встречи · телефон (около 1.55:1)',ratio:1.55}
+ ];
  if(key==='booking_image')return [{label:'Бронирование · широкий кадр (16:9)',ratio:16/9}];
  return [
   {label:'Мобильный экран (1:1)',ratio:1},
