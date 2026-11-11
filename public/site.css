@@ -128,19 +128,22 @@ html.nova-js #app{transition:opacity .34s ease}
  /* Initial split is static; before the hero becomes visible JS aligns to the SVG V centre. */
  .hero{grid-template-columns:var(--hero-photo-start,37%) minmax(0,1fr)}
 }
-/* Keep the wordmark's overall footprint while preserving the artist's SVG proportions. */
-/* The original SVG paths now use currentColor: one exact solid tone per breakpoint. */
-.hero h1.hero-title{--nova-cap-height:clamp(98px,12vw,320px);font-size:0;line-height:0;margin-left:0;color:#23351F}
-.hero-title{display:inline-flex;align-items:center;gap:clamp(2px,.35vw,8px);white-space:nowrap}
+/* NOVA designer tracking: spacious, optically unequal gaps N–O, O–V, V–A.
+   Keep the complete wordmark inside the phone viewport without distorting SVGs. */
+.hero h1.hero-title{--nova-cap-height:clamp(64px,10.25vw,238px);font-size:0;line-height:0;margin-left:0;color:#23351F}
+.hero-title{display:inline-flex;align-items:center;gap:0;white-space:nowrap}
 .hero-letter{display:inline-flex;flex:none;align-items:center;justify-content:center;position:relative;transform:none}
+.hero-letter-o{margin-left:calc(var(--nova-cap-height) * .90)}
+.hero-letter-v{margin-left:calc(var(--nova-cap-height) * .78)}
+.hero-letter-a{margin-left:calc(var(--nova-cap-height) * .53)}
 .hero-letter-image{display:block;width:auto;height:var(--nova-cap-height);max-width:none;object-fit:contain;pointer-events:none}
 .hero-letter-o .hero-letter-image{height:calc(var(--nova-cap-height) * 1.08)}
 @media(max-width:600px){
- .hero h1.hero-title{--nova-cap-height:18.3vw;margin-left:0;color:#F3E9DD}
+ .hero h1.hero-title{--nova-cap-height:13.3vw;margin-left:0;color:#F3E9DD}
  .hero-letter-image{filter:drop-shadow(0 1px 3px rgba(0,0,0,.28))}
 }
 @media(max-width:600px) and (max-height:520px){
- .hero h1.hero-title{--nova-cap-height:16vw}
+ .hero h1.hero-title{--nova-cap-height:min(13.3vw,18svh)}
 }
 .hero-intro .hero-letter{opacity:0;clip-path:inset(-10% 116% -10% -16%)}
 .hero-intro.hero-play .hero-letter{
@@ -2188,12 +2191,10 @@ img.cms-photo[data-image],
  }
 }
 
-/* NOVA homepage desktop finish: widen the white panel by 3 percentage points.
-   Preserve the previous cover height and the V-letter animation. Do not
-   change the tablet/mobile layout. */
+/* On desktop the split stays precisely at V's centre despite wider letter spacing. */
 @media(min-width:901px){
  .hero{
-  grid-template-columns:calc(var(--hero-photo-start,37%) + 3%) minmax(0,1fr);
+  grid-template-columns:var(--hero-photo-start,37%) minmax(0,1fr);
  }
  /* Keep "Выбрать заведение" beyond the initial viewport without making the
     hero photo taller. It still belongs to its own subsequent section. */
