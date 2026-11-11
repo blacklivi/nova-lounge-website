@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="259" height="262" viewBox="104 79 259 262" role="img" aria-labelledby="title desc">
+<title id="title">NOVA — N</title>
+<desc id="desc">Высокоточная векторная реконструкция буквы N по предоставленному PNG. Прозрачный фон, десять прямолинейных сегментов, восстановленный бежевый горизонтальный градиент.</desc>
+<defs><linearGradient id="nova-n-gradient" gradientUnits="userSpaceOnUse" x1="106.10" y1="0" x2="360.63" y2="0"><stop offset="0" stop-color="#D7CFC6"/><stop offset="1" stop-color="#D9CCBE"/></linearGradient></defs>
+<path id="nova-letter-n" d="M 106.10 81.90 L 132.88 81.90 L 342.88 305.63 L 342.88 81.90 L 360.63 81.90 L 360.63 338.88 L 344.13 338.13 L 127.70 105.12 L 127.70 338.63 L 106.10 338.38 Z" fill="url(#nova-n-gradient)"/>
+</svg>
