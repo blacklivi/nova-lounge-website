@@ -11,6 +11,12 @@ assert.ok(scoped.startsWith('/* NOVA cover: restore nearly original proportions'
 assert.match(homepage,/<section class="hero" id="top">[\s\S]*?<\/section><section class="venues" id="venues"/,'Hero and location chooser must remain separate semantic sections');
 assert.match(homepage,/<h1 class="hero-title" aria-label="NOVA"/,'First screen must retain NOVA title and staggered letter animation');
 
+assert.match(homepage,/id="nova-hero-v-split"/,'Official SVG V must split at the photo boundary');
+assert.match(homepage,/class="hero-descriptor"[^>]*>LOUNGE [\s\S]*?KITCHEN [\s\S]*?BAR<\/p>/,'Reference line LOUNGE • KITCHEN • BAR must appear under the NOVA logo');
+assert.match(css,/\.hero \.hero-letter-a\{color:#F3E9DD\}/,'Letter A must be warm ivory over the desktop photo');
+assert.match(css,/\.hero \.hero-letter-v path\{fill:currentColor\}/,'Mobile photo must use an all-ivory V rather than the desktop split');
+
+
 // The venue reveal must depend on actual viewport geometry, not tablet height or
 // a mandatory first scroll. An initially visible venue must never flash and hide.
 const venueReveal=app.slice(app.indexOf('function elementInViewport(el){'),app.indexOf('// The split follows the visual centre'));
