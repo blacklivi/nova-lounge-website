@@ -2205,3 +2205,13 @@ img.cms-photo[data-image],
   );
  }
 }
+
+/* NOVA brand mark in the site header (the same vector O used in the hero).
+   The 44px link remains keyboard/touch accessible; icon follows header text color. */
+.site-header .brand-header-mark{display:inline-flex;align-items:center;justify-content:center;width:44px;min-width:44px;height:44px;line-height:0;justify-self:start}
+.site-header .brand-header-mark .brand-mark-icon{display:block;width:36px;height:36px;flex:none;overflow:visible}
+.site-header .brand-header-mark>img{display:block;width:36px;height:36px;max-height:36px;object-fit:contain}
+@media(max-width:600px){
+ .site-header .brand-header-mark .brand-mark-icon{width:34px;height:34px}
+ .site-header .brand-header-mark>img{width:34px;height:34px;max-height:34px}
+}
