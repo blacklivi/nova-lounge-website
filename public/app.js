@@ -10,7 +10,10 @@ const isEvents = document.body.dataset.page === 'events';
 // request to jump past the NOVA cover. Internal links and intentional deep
 // links on new navigations still go to the requested anchor.
 const homeReloadNavigation=performance.getEntriesByType('navigation')[0]?.type==='reload';
-if(!isEvents && location.pathname==='/' && location.hash==='#venues' && homeReloadNavigation){
+const resetStaleVenueAnchor=!isEvents&&location.pathname==='/'&&location.hash==='#venues'&&homeReloadNavigation;
+if(resetStaleVenueAnchor){
+ // Keep the browser from overriding our scroll reset while scripts load.
+ history.scrollRestoration='manual';
  history.replaceState(history.state,'',location.pathname+location.search);
  window.scrollTo({top:0,behavior:'instant'});
 }
@@ -920,13 +923,18 @@ const cms=Promise.allSettled([
 ]).then(()=>{cmsSettled=true;});
 await Promise.race([cms,pause(700)]);
 render();
-scrollToHash(true);
+if(resetStaleVenueAnchor)scrollToPosition(0,true);
+else scrollToHash(true);
 const heroImage=app.querySelector('.hero-photo img');
 const imageDecoded=heroImage?.decode ? heroImage.decode().catch(()=>{}) : Promise.resolve();
 // One stable first paint; never move the image or title after they appear.
 await Promise.race([Promise.allSettled([document.fonts?.ready||Promise.resolve(),imageDecoded]),pause(1200)]);
 alignHeroPhoto();
 app.classList.add('nova-ready');
+if(resetStaleVenueAnchor){
+ scrollToPosition(0,true);
+ history.scrollRestoration='auto';
+}
 requestAnimationFrame(()=>{app.querySelector('.hero-intro')?.classList.add('hero-play');});
 heroIntroPending=false;
 if(!cmsSettled){
