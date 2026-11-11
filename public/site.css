@@ -2175,3 +2175,20 @@ img.cms-photo[data-image],
   height:clamp(208px,55vw,310px);
  }
 }
+
+/* NOVA homepage desktop finish: widen the white panel by 3 percentage points.
+   Preserve the previous cover height and the V-letter animation. Do not
+   change the tablet/mobile layout. */
+@media(min-width:901px){
+ .hero{
+  grid-template-columns:calc(var(--hero-photo-start,37%) + 3%) minmax(0,1fr);
+ }
+ /* Keep "Выбрать заведение" beyond the initial viewport without making the
+    hero photo taller. It still belongs to its own subsequent section. */
+ .hero + .venues{
+  padding-top:max(
+   var(--space),
+   calc(100svh - var(--header) - clamp(560px,45.5vw,940px) + 32px)
+  );
+ }
+}
