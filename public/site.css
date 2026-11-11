@@ -125,8 +125,8 @@ main.route-enter{animation:novaRouteEnter .23s cubic-bezier(.2,.7,.2,1) both}
 /* Refined NOVA motion: optically aligned composition, restrained movement. */
 html.nova-js #app{transition:opacity .34s ease}
 @media(min-width:601px){
- /* 37% matches the original cover before the font metrics are available. */
- .hero{grid-template-columns:var(--hero-photo-start,37%) minmax(0,1fr)}
+ /* Keep the photo edge fixed at the optical centre of V. Do not shift it after load. */
+ .hero{grid-template-columns:37% minmax(0,1fr)}
 }
 .hero-title{display:inline-flex;align-items:baseline;white-space:nowrap}
 .hero-letter{display:inline-block;position:relative;transform:none}
