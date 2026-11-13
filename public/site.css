@@ -2352,7 +2352,7 @@ body.hof-active:not(.hof-events-active) .site-header .hof-sketch-underline.is-dr
   margin:0;
   width:100%;
   max-width:100%;
-  height:min(760px,calc(100dvh - 10px));
+  height:min(680px,calc(100dvh - 10px));
   max-height:calc(100dvh - 10px);
   border:0;
   border-radius:18px 18px 0 0;
