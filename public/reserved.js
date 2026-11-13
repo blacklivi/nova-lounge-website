@@ -99,7 +99,7 @@ function openReservationDetails(r,card){
  $('#detail-guests').textContent=guestsLabel(r.guests);
  const phone=String(r.phone||'');
  $('#detail-phone-number').textContent=phone;
- $('#detail-phone').href='tel:'+phone.replace(/[^+\\d]/g,'');
+ $('#detail-phone').href='tel:'+phone.replace(/[^+\d]/g,'');
  const wrap=$('#detail-note-wrap');
  wrap.hidden=!r.comment;
  $('#detail-note').textContent=r.comment||'';
