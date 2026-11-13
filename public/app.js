@@ -494,7 +494,10 @@ function setupHofSketchNav(){
  const marker=nav.querySelector('.hof-sketch-underline');
  const links=[...nav.querySelectorAll(':scope > a')];
  if(!marker||!links.length)return;
- let active=location.hash==='#contacts'?links.at(-1):links[0];
+ // No default or persistent active link. Show only on pointer hover or
+ // keyboard-visible focus; a mouse click must not leave an underline behind.
+ let hoveredLink=null;
+ let focusedLink=null;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const position=(link,redraw=true)=>{
   if(!nav.isConnected||!link.offsetWidth)return;
@@ -507,24 +510,25 @@ function setupHofSketchNav(){
   void marker.getBoundingClientRect().width;
   marker.classList.add('is-drawn');
  };
+ const sync=(redraw=false)=>{
+  const current=hoveredLink||(focusedLink?.matches(':focus-visible')?focusedLink:null);
+  if(current)position(current,redraw);
+  else marker.style.opacity='0';
+ };
  for(const link of links){
-  link.addEventListener('mouseenter',()=>position(link));
-  link.addEventListener('focus',()=>position(link));
-  link.addEventListener('click',()=>{
-   if(link.getAttribute('href')==='#contacts'){active=link;position(link,false);}
-  });
+  link.addEventListener('mouseenter',()=>{hoveredLink=link;sync(true);});
+  link.addEventListener('mouseleave',()=>{if(hoveredLink===link)hoveredLink=null;sync(false);});
+  link.addEventListener('focus',()=>{focusedLink=link;sync(true);});
+  link.addEventListener('blur',()=>{if(focusedLink===link)focusedLink=null;sync(false);});
  }
- nav.addEventListener('mouseleave',()=>position(active,false));
- nav.addEventListener('focusout',event=>{
-  if(!nav.contains(event.relatedTarget))position(active,false);
- });
+ nav.addEventListener('mouseleave',()=>{hoveredLink=null;sync(false);});
  if('ResizeObserver' in window){
-  hofSketchResizeObserver=new ResizeObserver(()=>position(active,false));
+  hofSketchResizeObserver=new ResizeObserver(()=>sync(false));
   hofSketchResizeObserver.observe(nav);
   for(const link of links)hofSketchResizeObserver.observe(link);
  }
- position(active,false);
- document.fonts?.ready.then(()=>position(active,false));
+ sync(false);
+ document.fonts?.ready.then(()=>sync(false));
 }
 
 function render(){
