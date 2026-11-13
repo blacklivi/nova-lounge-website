@@ -1,4 +1,5 @@
-import {validPhone, minskNow} from '../public/core.js';
+import {minskNow} from '../public/core.js';
+import {normalizeBelarusPhone} from '../public/booking-phone.js';
 import {currentReservedUser,publicIdentity,reservedLogin,reservedLogout,reservedUsers,reservedUserUpdate} from './reserved-auth.js';
 
 const NO_STORE={'Cache-Control':'no-store, max-age=0','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};
@@ -32,19 +33,20 @@ export function validateReservation(input,now=Date.now()){
  const venue=cleanString(input.venue,8);
  const name=cleanString(input.name,80);
  const phone=cleanString(input.phone,30);
+ const canonicalPhone=normalizeBelarusPhone(phone);
  const date=cleanString(input.date,10);
  const time=cleanString(input.time,5);
  const guests=Number(input.guests);
  const comment=cleanString(input.comment||'',500);
  if(typeof input.comment!=='undefined'&&(typeof input.comment!=='string'||input.comment.length>500))return null;
  const consent=input.consent===true;
- if(!VENUES.has(venue)||name.length<2||name.length>80||!validPhone(phone)||
+ if(!VENUES.has(venue)||name.length<2||name.length>80||!canonicalPhone||
     !parseDate(date)||!/^([01]\d|2[0-3]):(00|15|30|45)$/.test(time)||
     !Number.isInteger(guests)||guests<1||guests>16||!consent||comment.length>500)return null;
  // Use the venue's Minsk timezone (UTC+03:00, year-round).
  const at=Date.parse(date+'T'+time+':00+03:00');
  if(!Number.isFinite(at)||at<=now+5*60*1000||at>now+90*24*3600*1000)return null;
- return {venue,name,phone:phone.replace(/[^+\d]/g,''),date,time,guests,comment};
+ return {venue,name,phone:canonicalPhone,date,time,guests,comment};
 }
 async function limitPublic(req,env){
  const ip=req.headers.get('cf-connecting-ip')||'unknown';

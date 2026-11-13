@@ -1,6 +1,7 @@
-import {escapeHTML as esc, typography, cleanPhone, validPhone, minskNow, splitEvents, safeURL, localImage, localizedValue} from './core.js';
+import {escapeHTML as esc, typography, validPhone, minskNow, splitEvents, safeURL, localImage, localizedValue} from './core.js';
 import {enhanceBookingSelects} from './booking-selects.js';
 import {enhanceBookingDate} from './booking-date.js';
+import {enhanceBelarusPhone,normalizeBelarusPhone} from './booking-phone.js';
 import {EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js?v=cms-preview-dialogs-20261113';
 import {cropCSS,applyPhotoCrop,parseCrop,cropPattern,isPhotoKey,DEFAULT_CROP} from './photo-crop.js';
 const app = document.querySelector('#app');
@@ -676,7 +677,7 @@ function bookingFormHTML(requestedVenue){
    <div class="field"><label for="time">${t('Время · Минск','Time · Minsk')}</label><select id="time" name="time" required>${Array.from({length:96},(_,i)=>{const hour=String(Math.floor(i/4)).padStart(2,'0'),mins=String(i%4*15).padStart(2,'0');const value=hour+':'+mins;return `<option value="${value}" ${value==='19:00'?'selected':''}>${value}</option>`}).join('')}</select></div>
    <div class="field"><label for="guests">${t('Количество гостей','Guests')}</label><select id="guests" name="guests">${Array.from({length:16},(_,i)=>`<option value="${i+1}" ${i===1?'selected':''}>${i+1}</option>`).join('')}</select></div>
    <div class="field"><label for="guest-name">${t('Ваше имя','Your name')}</label><input id="guest-name" name="name" autocomplete="name" maxlength="80" required></div>
-   <div class="field full"><label for="phone">${t('Номер телефона','Phone number')}</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" placeholder="+375 29 123-45-67" required></div>
+   <div class="field full"><label for="phone">${t('Номер телефона','Phone number')}</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="numeric" maxlength="19" placeholder="+375 (29) 123-45-67" aria-describedby="booking-phone-hint" required><small id="booking-phone-hint" class="booking-phone-hint">${t('Беларусь: +375, код 25 / 29 / 33 / 44','Belarus: +375, code 25 / 29 / 33 / 44')}</small></div>
    <div class="field full"><label for="booking-comment">${t('Комментарий (необязательно)','Comment (optional)')}</label><textarea id="booking-comment" name="comment" maxlength="500" rows="2" placeholder="${t('Пожелания к столику','Table preferences')}"></textarea></div>
   </div>
   <div class="booking-honeypot" aria-hidden="true"><label for="booking-website">Website</label><input id="booking-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
@@ -689,12 +690,12 @@ function bookingFormHTML(requestedVenue){
 async function sendBooking(e){
  e.preventDefault();
  const form=e.currentTarget, fd=new FormData(form);
- const venue=String(fd.get('venue')||''),phone=cleanPhone(fd.get('phone')||'');
+ const venue=String(fd.get('venue')||''),phone=normalizeBelarusPhone(fd.get('phone')||'');
  const output=form.querySelector('#booking-error');
  const showError=message=>{output.textContent=message};
  showError('');
  if(!ids.includes(venue)){showError(t('Выберите заведение.','Choose a venue.'));return}
- if(!validPhone(phone)){showError(t('Введите корректный номер телефона.','Enter a valid phone number.'));form.elements.phone.focus();return}
+ if(!phone){showError(t('Введите белорусский номер +375 с кодом 25, 29, 33 или 44.','Enter a Belarusian +375 number with code 25, 29, 33 or 44.'));form.elements.phone.focus();return}
  if(!form.elements.consent.checked){showError(t('Подтвердите согласие на обработку заявки.','Please consent to the use of your reservation details.'));return}
  const date=String(fd.get('date')||''),time=String(fd.get('time')||'');
  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^([01]\d|2[0-3]):(00|15|30|45)$/.test(time)||date+'T'+time<=minskNow()){
@@ -735,6 +736,7 @@ function openModal(kind,id=selected){
   const form=body.querySelector('#book-form');
   enhanceBookingSelects(form,language,{forceCustom:id==='zyb'});
   enhanceBookingDate(form,language);
+  enhanceBelarusPhone(form,language);
   form.addEventListener('submit',sendBooking);
  }else if(kind==='menu'){
  body.innerHTML=`<h2 id="modal-title" data-editor-key="home_menu_modal_title">${E('home_menu_modal_title')}</h2><p class="intro" data-editor-key="home_menu_modal_intro">${E('home_menu_modal_intro')}</p><div class="modal-list">${ids.map(i=>`<button class="button secondary" type="button" data-editor-key="menu_${i}" data-modal="menu-location" data-venue="${i}"><span data-editor-key="home_menu_modal_${i}_label">${E('home_menu_modal_'+i+'_label')}</span></button>`).join('')}</div>`;
