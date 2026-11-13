@@ -662,6 +662,89 @@ function contactPanel(id){
  const links=contactLinks(id);
  return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p data-content="address_${id}">${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours" data-content="hours_${id}">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;
 }
+// Native selects remain the source of truth for validation and FormData.
+// Mobile-only visible venue options and guest stepper replace generic controls.
+function enhanceMobileBooking(form,language){
+ if(!matchMedia('(max-width:600px)').matches)return;
+ const en=language==='en';
+ const venue=form.elements.venue;
+ if(venue?.tagName==='SELECT'){
+  const group=document.createElement('div');
+  group.className='booking-venue-options';
+  group.setAttribute('role','radiogroup');
+  group.setAttribute('aria-label',en?'Venue':'Заведение');
+  const labels={zyb:'HÓF',pob:en?'Pobediteley':'Победителей',east:en?'Vostok':'Восток'};
+  const buttons=ids.map(id=>{
+   const button=document.createElement('button');
+   button.type='button';
+   button.className='booking-venue-option';
+   button.setAttribute('role','radio');
+   button.setAttribute('aria-checked',String(venue.value===id));
+   button.textContent=labels[id];
+   button.addEventListener('click',()=>{
+    venue.value=id;
+    venue.dispatchEvent(new Event('change',{bubbles:true}));
+    sync();
+   });
+   group.append(button);
+   return button;
+  });
+  function sync(){
+   buttons.forEach((button,index)=>{
+    const selected=venue.value===ids[index];
+    button.setAttribute('aria-checked',String(selected));
+    button.tabIndex=selected?0:(venue.value? -1 : index===0?0:-1);
+   });
+  }
+  group.addEventListener('keydown',event=>{
+   if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;
+   event.preventDefault();
+   const current=ids.indexOf(venue.value);
+   const step=['ArrowRight','ArrowDown'].includes(event.key)?1:-1;
+   const next=(current+step+ids.length)%ids.length;
+   buttons[next].click();
+   buttons[next].focus();
+  });
+  venue.addEventListener('change',sync);
+  venue.insertAdjacentElement('afterend',group);
+  sync();
+ }
+ const guests=form.elements.guests;
+ if(guests?.tagName==='SELECT'){
+  const wrapper=document.createElement('div');
+  wrapper.className='booking-guest-stepper';
+  wrapper.setAttribute('role','group');
+  wrapper.setAttribute('aria-label',en?'Number of guests':'Количество гостей');
+  const minus=document.createElement('button');
+  minus.type='button';minus.className='booking-stepper-minus';minus.textContent='−';
+  minus.setAttribute('aria-label',en?'Remove a guest':'Уменьшить количество гостей');
+  const display=document.createElement('output');
+  display.className='booking-guest-count';
+  display.setAttribute('aria-live','polite');
+  const plus=document.createElement('button');
+  plus.type='button';plus.className='booking-stepper-plus';plus.textContent='+';
+  plus.setAttribute('aria-label',en?'Add a guest':'Добавить гостя');
+  function sync(){
+   const num=Number(guests.value)||2;
+   display.textContent=String(num)+' '+(en?(num===1?'guest':'guests'):(num%10===1&&num%100!==11?'гость':num%10>=2&&num%10<=4&&(num%100<12||num%100>14)?'гостя':'гостей'));
+   minus.disabled=num<=1;
+   plus.disabled=num>=16;
+  }
+  function move(delta){
+   const next=Math.max(1,Math.min(16,(Number(guests.value)||2)+delta));
+   guests.value=String(next);
+   guests.dispatchEvent(new Event('change',{bubbles:true}));
+   sync();
+  }
+  minus.addEventListener('click',()=>move(-1));
+  plus.addEventListener('click',()=>move(1));
+  guests.addEventListener('change',sync);
+  wrapper.append(minus,display,plus);
+  guests.insertAdjacentElement('afterend',wrapper);
+  sync();
+ }
+ form.classList.add('booking-enhanced');
+}
 // Booking requests are stored in the NOVA D1 database before showing success.
 function bookingFormHTML(requestedVenue){
  const day=minskNow().slice(0,10),fixed=ids.includes(requestedVenue);
@@ -670,14 +753,16 @@ function bookingFormHTML(requestedVenue){
  <form id="book-form">
   <div class="booking-form-scroll">
   <div class="form-fields">
-   <div class="field full"><label for="venue">${t('Заведение','Venue')}</label>
+   <div class="booking-section-title booking-visit-title"><span>01</span><strong>${t('ВАШ ВИЗИТ','YOUR VISIT')}</strong></div>
+   <div class="field full booking-venue"><label for="venue">${t('Заведение','Venue')}</label>
     ${fixed?`<div class="venue-context">${venueLabel(requestedVenue)}</div><input type="hidden" id="venue" name="venue" value="${requestedVenue}">`:
     `<select id="venue" name="venue" required><option value="">${t('Выберите заведение','Choose a venue')}</option>${ids.map(id=>`<option value="${id}">${venueLabel(id)}</option>`).join('')}</select>`}</div>
-   <div class="field"><label for="date">${t('Дата','Date')}</label><input id="date" name="date" type="date" min="${day}" value="${day}" required></div>
-   <div class="field"><label for="time">${t('Время · Минск','Time · Minsk')}</label><select id="time" name="time" required>${Array.from({length:96},(_,i)=>{const hour=String(Math.floor(i/4)).padStart(2,'0'),mins=String(i%4*15).padStart(2,'0');const value=hour+':'+mins;return `<option value="${value}" ${value==='19:00'?'selected':''}>${value}</option>`}).join('')}</select></div>
+   <div class="field booking-date"><label for="date">${t('Дата','Date')}</label><input id="date" name="date" type="date" min="${day}" value="${day}" required></div>
+   <div class="field booking-time"><label for="time">${t('Время · Минск','Time · Minsk')}</label><select id="time" name="time" required>${Array.from({length:96},(_,i)=>{const hour=String(Math.floor(i/4)).padStart(2,'0'),mins=String(i%4*15).padStart(2,'0');const value=hour+':'+mins;return `<option value="${value}" ${value==='19:00'?'selected':''}>${value}</option>`}).join('')}</select></div>
    <div class="field booking-guests"><label for="guests"><span class="booking-desktop-copy">${t('Количество гостей','Guests')}</span><span class="booking-mobile-copy">${t('Гостей','Guests')}</span></label><select id="guests" name="guests">${Array.from({length:16},(_,i)=>`<option value="${i+1}" ${i===1?'selected':''}>${i+1}</option>`).join('')}</select></div>
+   <div class="booking-section-title booking-contact-title"><span>02</span><strong>${t('ВАШИ КОНТАКТЫ','YOUR CONTACTS')}</strong></div>
    <div class="field booking-name"><label for="guest-name">${t('Ваше имя','Your name')}</label><input id="guest-name" name="name" autocomplete="name" maxlength="80" required></div>
-   <div class="field full"><label for="phone">${t('Номер телефона','Phone number')}</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" placeholder="+375 29 123-45-67" required></div>
+   <div class="field full booking-phone"><label for="phone">${t('Номер телефона','Phone number')}</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" placeholder="+375 29 123-45-67" required></div>
    <details class="booking-comment-details">
     <summary>${t('Добавить пожелание','Add a request')}<span aria-hidden="true" class="booking-comment-toggle"></span></summary>
     <div class="field full"><label for="booking-comment">${t('Комментарий (необязательно)','Comment (optional)')}</label><textarea id="booking-comment" name="comment" maxlength="500" rows="2" placeholder="${t('Пожелания к столику','Table preferences')}"></textarea></div>
@@ -743,6 +828,7 @@ function openModal(kind,id=selected){
   body.innerHTML=bookingFormHTML(id);
   const form=body.querySelector('#book-form');
   enhanceBookingSelects(form,language,{forceCustom:id==='zyb'});
+  enhanceMobileBooking(form,language);
   const commentDetails=form.querySelector('.booking-comment-details');
   if(commentDetails){
    const desktop=matchMedia('(min-width:601px)');
