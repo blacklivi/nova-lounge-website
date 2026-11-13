@@ -14,6 +14,9 @@ const request=async(path,method='GET',data)=>{
 };
 let defaults={content:{},content_en:{}},saved={content:{},content_en:{}};
 const drafts={ru:new Map(),en:new Map()},images=new Map();
+// Existing venue menu destinations are also editable beside the home chooser,
+// without duplicating keys in EDITOR_PAGES or creating separate saved values.
+const homeMenuLinks=['menu_zyb','menu_pob','menu_east'];
 let ready=false,busy=false;
 const status=(message,error=false)=>{
  const el=$('#page-editor-status');
@@ -48,7 +51,9 @@ function sendPreview(field,value){
  if(frame?.contentWindow)frame.contentWindow.postMessage({source:'nova-cms-draft',key:field.key,type:field.type,value:String(value)},location.origin);
 }
 function replayPreview(){
- const fields=getPage().sections.flatMap(section=>section.fields);
+ const page=getPage();
+ const fields=page.sections.flatMap(section=>section.fields);
+ if(page.id==='home')fields.push(...homeMenuLinks.map(key=>EDITOR_BY_KEY[key]));
  for(const field of fields){
   if(images.has(field.key))continue; // The original uploaded photo remains visible until the file is published.
   const l=editableLanguage(field)?lang():'ru';
@@ -236,6 +241,10 @@ function renderFields(){
   wrapper.append(create('summary','',section.title+' · '+section.fields.length));
   const inner=create('div','editor-group-fields');
   for(const field of section.fields)inner.append(buildField(field));
+  if(page.id==='home'&&section.id==='menu-dialog'){
+   inner.append(create('p','editor-linked-field-title','Ссылки меню трёх заведений'));
+   for(const key of homeMenuLinks)inner.append(buildField(EDITOR_BY_KEY[key]));
+  }
   wrapper.append(inner);box.append(wrapper);
  }
  searchFields();
@@ -259,9 +268,11 @@ function selectField(key){
  const field=EDITOR_BY_KEY[key];
  if(!field){status('Этот элемент пока относится к системному шаблону; его нельзя редактировать как контент.',true);return}
  const page=EDITOR_PAGES.find(p=>p.sections.some(s=>s.fields.some(f=>f.key===key)));
- if(page&&getPage().id!==page.id){$('#page-editor-select').value=page.id;renderFields();updatePreview()}
+ let target=[...document.querySelectorAll('#page-editor-fields [data-editor-field]')].find(x=>x.dataset.editorField===key);
+ // Prefer a visible quick-link field on the current page, keeping the dialog open.
+ if(!target&&page&&getPage().id!==page.id){$('#page-editor-select').value=page.id;renderFields();updatePreview()}
  $('#page-editor-search').value='';searchFields();
- const target=[...document.querySelectorAll('[data-editor-field]')].find(x=>x.dataset.editorField===key);
+ target=[...document.querySelectorAll('#page-editor-fields [data-editor-field]')].find(x=>x.dataset.editorField===key);
  if(!target){status('Поле найдено в реестре, но отсутствует на выбранной странице',true);return}
  const group=target.closest('details');if(group)group.open=true;
  target.classList.add('editor-selected');
@@ -338,6 +349,8 @@ document.querySelectorAll('[data-tab]').forEach(tab=>{
 window.addEventListener('message',event=>{
  if(event.origin!==location.origin||event.source!==$('#page-editor-frame').contentWindow)return;
  if(event.data?.source==='nova-cms-inspector')selectField(String(event.data.key||''));
+ if(event.data?.source==='nova-cms-modal-opened')replayPreview();
+ if(event.data?.source==='nova-cms-preview-info')status(String(event.data.message||'').slice(0,180));
 });
 const workspace=$('#workspace');
 new MutationObserver(()=>{if(!workspace.hidden&&!ready)activate()}).observe(workspace,{attributes:true,attributeFilter:['hidden']});
