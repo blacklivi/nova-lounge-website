@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {validateReservation} from '../src/reservations.js';
+import {validateReservation,reservationsApi} from '../src/reservations.js';
 
 const worker=readFileSync('src/index.js','utf8');
 const module=readFileSync('src/reservations.js','utf8');
@@ -76,4 +76,44 @@ assert.doesNotMatch(staff,/innerHTML/,'Staff dashboard must not inject guest str
 assert.match(css,/\.reservation\{/,'Staff cards need responsive layout');
 assert.match(config,/"\/reserved"/,'Worker must intercept private page route');
 assert.doesNotMatch(worker,/RESERVATIONS_PASSWORD\s*=|ADMIN_SIGNING_KEY\s*=/,'No staff password or signing key in source');
+
+ 
+// Regression: a well-formed public booking must reach the D1 INSERT rather than
+// throwing a Worker 500 while hashing the visitor's rate-limit key.
+const bookingURL='https://nova.example/api/reservations';
+const bookingDate=new Date(Date.now()+48*3600*1000).toISOString().slice(0,10);
+let bookingInserts=0;
+const bookingDB={
+ prepare(sql){
+  return {
+   bind(...args){
+    return {
+     async first(){
+      if(sql.startsWith('INSERT INTO reservation_rate_limits')){
+       assert.match(args[0],/^[A-Za-z0-9_-]{43}$/,'Rate-limit IP hash must use base64url');
+       return {attempts:1};
+      }
+      if(sql.startsWith('SELECT id FROM reservations'))return null;
+      throw Error('Unexpected reservation read: '+sql);
+     },
+     async run(){
+      assert.match(sql,/^INSERT INTO reservations/,'Booking must persist in D1');
+      assert.equal(args[1],'zyb');
+      bookingInserts++;
+      return {success:true};
+     }
+    };
+   }
+  };
+ }
+};
+const bookingResponse=await reservationsApi(new Request(bookingURL,{
+ method:'POST',
+ headers:{'Content-Type':'application/json'},
+ body:JSON.stringify({...input,date:bookingDate,website:''})
+}),{DB:bookingDB,ADMIN_SIGNING_KEY:'test-signing-key'},new URL(bookingURL));
+assert.equal(bookingResponse.status,201,'Valid public booking must return 201');
+assert.equal((await bookingResponse.json()).ok,true);
+assert.equal(bookingInserts,1,'Valid public booking must be saved once');
+
 console.log('Reservations validation, privacy and protected staff UI checks passed');
