@@ -26,7 +26,7 @@ assert.match(css,/\.modal\[data-kind="booking"\] \.booking-submit-bar\{[\s\S]*fl
 assert.match(css,/safe-area-inset-bottom/,'iOS home indicator area must be padded');
 assert.match(css,/\.modal\[data-kind="booking"\] \.booking-comment-details > summary/,'Expandable notes accessible on touch');
 for(const html of [home,events]){
- assert.match(html,/site\.css\?v=mobile-booking-sheet-20261113/,'Fresh CSS for existing tabs');
- assert.match(html,/app\.js\?v=mobile-booking-sheet-20261113/,'Fresh app script for existing tabs');
+ assert.match(html,/site\.css\?v=mobile-booking-sheet-v2-20261113/,'Fresh CSS for existing tabs');
+ assert.match(html,/app\.js\?v=mobile-booking-sheet-v2-20261113/,'Fresh app script for existing tabs');
 }
 console.log('Mobile booking sheet structure, submission, and responsive guard checks passed');
