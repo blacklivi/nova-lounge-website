@@ -1,4 +1,4 @@
-import {EDITOR_PAGES,EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js';
+import {EDITOR_PAGES,EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js?v=cms-preview-dialogs-20261113';
 import {preparePhoto,uploadPhoto,validatePhoto,formatBytes,IMAGE_ACCEPT} from './image-upload.js';
 import {isPhotoKey,cropKey,DEFAULT_CROP,applyPhotoCrop,cropPresets} from './photo-crop.js';
 import {openPhotoCropEditor} from './photo-crop-editor.js';
