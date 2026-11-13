@@ -26,7 +26,19 @@ assert.match(css,/\.modal\[data-kind="booking"\] \.booking-submit-bar\{[\s\S]*fl
 assert.match(css,/safe-area-inset-bottom/,'iOS home indicator area must be padded');
 assert.match(css,/\.modal\[data-kind="booking"\] \.booking-comment-details > summary/,'Expandable notes accessible on touch');
 for(const html of [home,events]){
- assert.match(html,/site\.css\?v=mobile-booking-sheet-v2-20261113/,'Fresh CSS for existing tabs');
- assert.match(html,/app\.js\?v=mobile-booking-sheet-v2-20261113/,'Fresh app script for existing tabs');
+ assert.match(html,/site\.css\?v=mobile-booking-v3-20261113/,'Fresh CSS for existing tabs');
+ assert.match(html,/app\.js\?v=mobile-booking-v3-20261113/,'Fresh app script for existing tabs');
 }
+
+assert.match(app,/function enhanceMobileBooking\(form,language\)/,'Mobile booking enhancement must exist');
+assert.match(app,/enhanceMobileBooking\(form,language\)/,'Mobile booking UI must activate when the dialog opens');
+assert.match(app,/className='booking-venue-options'/,'Venue selection uses visible cards');
+assert.match(app,/className='booking-guest-stepper'/,'Guest count uses accessible plus/minus stepper');
+assert.match(app,/venue\.required=false/,'Hidden native select must not block controlled validation');
+assert.match(app,/booking-section-title booking-contact-title/,'Visitor and contact sections have visible hierarchy');
+assert.match(css,/NOVA \/ booking v3/,'Distinct v3 style must be present');
+assert.match(css,/height:100dvh/,'Full screen mobile booking must fit dynamic viewport');
+assert.match(css,/\.modal\[data-kind="booking"\] \.booking-venue-options/,'Venue cards are styled for booking only');
+assert.match(css,/\.modal\[data-kind="booking"\] \.booking-guest-stepper/,'Stepper is styled for booking only');
+assert.match(css,/\[data-theme="hof"\]/,'HÓF identity must remain supported');
 console.log('Mobile booking sheet structure, submission, and responsive guard checks passed');
