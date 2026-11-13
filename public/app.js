@@ -707,6 +707,8 @@ function enhanceMobileBooking(form,language){
   });
   venue.addEventListener('change',sync);
   venue.insertAdjacentElement('afterend',group);
+  // Manual submit validation reports an inline error rather than focusing a hidden select.
+  venue.required=false;
   sync();
  }
  const guests=form.elements.guests;
@@ -785,7 +787,7 @@ async function sendBooking(e){
  const output=form.querySelector('#booking-error');
  const showError=message=>{output.textContent=message};
  showError('');
- if(!ids.includes(venue)){showError(t('Выберите заведение.','Choose a venue.'));return}
+ if(!ids.includes(venue)){showError(t('Выберите заведение.','Choose a venue.'));form.querySelector('.booking-venue-options button')?.focus();return}
  if(!validPhone(phone)){showError(t('Введите корректный номер телефона.','Enter a valid phone number.'));form.elements.phone.focus();return}
  if(!form.elements.consent.checked){showError(t('Подтвердите согласие на обработку заявки.','Please consent to the use of your reservation details.'));return}
  const date=String(fd.get('date')||''),time=String(fd.get('time')||'');
@@ -950,7 +952,7 @@ if(isEditorPreview){
   if(!target)return;
   // Inputs and calendar/custom dropdown buttons remain usable for previewing
   // how a form looks, but the capture-phase submit guard blocks any POST.
-  if(target.closest('.modal input,.modal select,.modal textarea,.modal label,.modal .nova-select,.modal .nova-calendar'))return;
+  if(target.closest('.modal input,.modal select,.modal textarea,.modal label,.modal .nova-select,.modal .nova-calendar,.modal .booking-venue-options,.modal .booking-guest-stepper'))return;
   const action=target.closest('[data-modal],[data-close],[data-drawer]');
   const node=target.closest('[data-editor-icon],[data-editor-key],[data-content],[data-image]');
   e.preventDefault();e.stopImmediatePropagation();
