@@ -647,25 +647,25 @@ function contactPanel(id){
  if(id==='zyb'){
   const phone=value('phone_zyb'),route=safeURL(value('map_zyb')),telegram=safeURL(value('telegram_zyb')),instagram=hofInstagramURL();
   const items=[
-   address?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Адрес','Address')}</span><p>${text(address)}</p></div>`:'',
-   hours?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Часы работы','Opening hours')}</span><p class="venue-hours">${text(hours)}</p></div>`:''
+   address?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Адрес','Address')}</span><p data-content="address_zyb">${content('address_zyb')}</p></div>`:'',
+   hours?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Часы работы','Opening hours')}</span><p class="venue-hours" data-content="hours_zyb">${content('hours_zyb')}</p></div>`:''
   ].filter(Boolean).join('');
   const actions=[
-   phone&&validPhone(phone)?`<a class="hof-contact-action" href="tel:${esc(phone.replace(/[^+\d]/g,''))}"><span>${text(phone)}</span>${arrow}</a>`:'',
-   route?`<a class="hof-contact-action" href="${esc(route)}" target="_blank" rel="noopener noreferrer"><span>${t('Построить маршрут','Get directions')}</span>${arrow}</a>`:'',
-   telegram?`<a class="hof-contact-action" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer"><span>Telegram</span>${arrow}</a>`:'',
-   instagram?`<a class="hof-contact-action" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya')}"><span>Instagram</span>${arrow}</a>`:''
+   phone&&validPhone(phone)?`<a class="hof-contact-action" href="tel:${esc(phone.replace(/[^+\d]/g,''))}"><span data-editor-key="phone_zyb">${text(phone)}</span>${arrow}</a>`:'',
+   route?`<a class="hof-contact-action" data-editor-key="map_zyb" href="${esc(route)}" target="_blank" rel="noopener noreferrer"><span>${t('Построить маршрут','Get directions')}</span>${arrow}</a>`:'',
+   telegram?`<a class="hof-contact-action" data-editor-key="telegram_zyb" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer"><span>Telegram</span>${arrow}</a>`:'',
+   instagram?`<a class="hof-contact-action" data-editor-key="instagram_zyb" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya')}"><span>Instagram</span>${arrow}</a>`:''
   ].filter(Boolean).join('');
   if(!items&&!actions)return `<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`;
   return `<div class="hof-contact-details">${items}${actions?`<div class="hof-contact-modal-actions">${actions}</div>`:''}</div>`;
  }
  const links=contactLinks(id);
- return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p>${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;
+ return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p data-content="address_${id}">${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours" data-content="hours_${id}">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;
 }
 // Booking requests are stored in the NOVA D1 database before showing success.
 function bookingFormHTML(requestedVenue){
  const day=minskNow().slice(0,10),fixed=ids.includes(requestedVenue);
- return `<h2 id="modal-title">${bookingLabel()}</h2>
+ return `<h2 id="modal-title" data-editor-key="global_booking_text">${bookingLabel()}</h2>
  <p class="intro">${t('Оставьте заявку. Администратор свяжется с вами для подтверждения бронирования.','Send a request. The venue will contact you to confirm your reservation.')}</p>
  <form id="book-form">
   <div class="form-fields">
