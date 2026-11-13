@@ -666,24 +666,31 @@ function contactPanel(id){
 function bookingFormHTML(requestedVenue){
  const day=minskNow().slice(0,10),fixed=ids.includes(requestedVenue);
  return `<h2 id="modal-title" data-editor-key="global_booking_text">${bookingLabel()}</h2>
- <p class="intro">${t('Оставьте заявку. Администратор свяжется с вами для подтверждения бронирования.','Send a request. The venue will contact you to confirm your reservation.')}</p>
+ <p class="intro"><span class="booking-desktop-copy">${t('Оставьте заявку. Администратор свяжется с вами для подтверждения бронирования.','Send a request. The venue will contact you to confirm your reservation.')}</span><span class="booking-mobile-copy">${t('Выберите дату, время и оставьте контакты. Администратор подтвердит бронь.','Choose a date and time. The venue will contact you to confirm.')}</span></p>
  <form id="book-form">
+  <div class="booking-form-scroll">
   <div class="form-fields">
    <div class="field full"><label for="venue">${t('Заведение','Venue')}</label>
     ${fixed?`<div class="venue-context">${venueLabel(requestedVenue)}</div><input type="hidden" id="venue" name="venue" value="${requestedVenue}">`:
     `<select id="venue" name="venue" required><option value="">${t('Выберите заведение','Choose a venue')}</option>${ids.map(id=>`<option value="${id}">${venueLabel(id)}</option>`).join('')}</select>`}</div>
    <div class="field"><label for="date">${t('Дата','Date')}</label><input id="date" name="date" type="date" min="${day}" value="${day}" required></div>
    <div class="field"><label for="time">${t('Время · Минск','Time · Minsk')}</label><select id="time" name="time" required>${Array.from({length:96},(_,i)=>{const hour=String(Math.floor(i/4)).padStart(2,'0'),mins=String(i%4*15).padStart(2,'0');const value=hour+':'+mins;return `<option value="${value}" ${value==='19:00'?'selected':''}>${value}</option>`}).join('')}</select></div>
-   <div class="field"><label for="guests">${t('Количество гостей','Guests')}</label><select id="guests" name="guests">${Array.from({length:16},(_,i)=>`<option value="${i+1}" ${i===1?'selected':''}>${i+1}</option>`).join('')}</select></div>
-   <div class="field"><label for="guest-name">${t('Ваше имя','Your name')}</label><input id="guest-name" name="name" autocomplete="name" maxlength="80" required></div>
+   <div class="field booking-guests"><label for="guests"><span class="booking-desktop-copy">${t('Количество гостей','Guests')}</span><span class="booking-mobile-copy">${t('Гостей','Guests')}</span></label><select id="guests" name="guests">${Array.from({length:16},(_,i)=>`<option value="${i+1}" ${i===1?'selected':''}>${i+1}</option>`).join('')}</select></div>
+   <div class="field booking-name"><label for="guest-name">${t('Ваше имя','Your name')}</label><input id="guest-name" name="name" autocomplete="name" maxlength="80" required></div>
    <div class="field full"><label for="phone">${t('Номер телефона','Phone number')}</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30" placeholder="+375 29 123-45-67" required></div>
-   <div class="field full"><label for="booking-comment">${t('Комментарий (необязательно)','Comment (optional)')}</label><textarea id="booking-comment" name="comment" maxlength="500" rows="2" placeholder="${t('Пожелания к столику','Table preferences')}"></textarea></div>
+   <details class="booking-comment-details">
+    <summary>${t('Добавить пожелание','Add a request')}<span aria-hidden="true" class="booking-comment-toggle"></span></summary>
+    <div class="field full"><label for="booking-comment">${t('Комментарий (необязательно)','Comment (optional)')}</label><textarea id="booking-comment" name="comment" maxlength="500" rows="2" placeholder="${t('Пожелания к столику','Table preferences')}"></textarea></div>
+   </details>
   </div>
   <div class="booking-honeypot" aria-hidden="true"><label for="booking-website">Website</label><input id="booking-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
   <label class="booking-consent"><input name="consent" type="checkbox" required><span>${t('Согласен(на) на использование имени, телефона и деталей заявки для организации бронирования.','I agree to my name, phone number and reservation details being used to process this request.')}</span></label>
+  </div>
+  <div class="booking-submit-bar">
   <p id="booking-error" class="booking-error" role="alert" aria-live="polite"></p>
   <button class="button form-submit" type="submit">${t('Отправить заявку','Send request')}</button>
-  <p class="booking-assurance">${t('Заявка не означает подтверждённую бронь. При необходимости срочного ответа свяжитесь с заведением по телефону.','A request is not a confirmed reservation. For an urgent reply, call the venue directly.')}</p>
+  <p class="booking-assurance"><span class="booking-desktop-copy">${t('Заявка не означает подтверждённую бронь. При необходимости срочного ответа свяжитесь с заведением по телефону.','A request is not a confirmed reservation. For an urgent reply, call the venue directly.')}</span><span class="booking-mobile-copy">${t('Бронь действительна после подтверждения.','Your table is reserved only after confirmation.')}</span></p>
+  </div>
  </form>`;
 }
 async function sendBooking(e){
@@ -709,6 +716,7 @@ async function sendBooking(e){
   const answer=await response.json();
   if(!response.ok||!answer.ok)throw new Error(response.status===429?t('Слишком много запросов. Свяжитесь с заведением по телефону.','Too many requests. Please call the venue.'):response.status===400?t('Проверьте данные и выберите время не раньше чем через 5 минут.','Check the details and choose a time at least 5 minutes ahead.'):t('Не удалось отправить заявку. Попробуйте ещё раз или позвоните.','Could not send your request. Try again or call.'));
   const body=document.getElementById('modal-body');
+  document.querySelector('dialog')?.classList.add('booking-complete');
   body.innerHTML=`<h2 id="modal-title" tabindex="-1">${t('Заявка получена','Request received')}</h2><p class="intro">${t('Заявка сохранена и передана администратору заведения. Бронь будет действовать после подтверждения.','Your request has been saved for the venue team. Your reservation is valid only once confirmed.')}</p><div class="booking-confirmation"><strong>${venueLabel(venue)}</strong><span>${text(date)} · ${text(time)} · ${text(String(fd.get('guests')))} ${t('гостей','guests')}</span></div><button type="button" class="button form-submit" data-close>${t('Закрыть','Close')}</button>`;
   body.querySelector('#modal-title')?.focus();
  }catch(error){showError(error.message||t('Ошибка соединения. Попробуйте снова.','Network error. Please retry.'));button.disabled=false;button.textContent=t('Отправить заявку','Send request')}
@@ -725,6 +733,7 @@ function openModal(kind,id=selected){
  const dialog=document.querySelector('dialog');if(!dialog.open)lastFocus=document.activeElement;
  modalKind=kind;modalVenue=id||'';
  dialog.dataset.kind=kind;
+ dialog.classList.remove('booking-complete');
  // A single booking component: HOF receives only a visual theme, not new data flow.
  dialog.dataset.theme=(kind==='booking'||kind==='contacts')&&id==='zyb'?'hof':'nova';
  dialog.dataset.bookingVenue=kind==='booking'?(id||'all'):'';
@@ -734,6 +743,13 @@ function openModal(kind,id=selected){
   body.innerHTML=bookingFormHTML(id);
   const form=body.querySelector('#book-form');
   enhanceBookingSelects(form,language,{forceCustom:id==='zyb'});
+  const commentDetails=form.querySelector('.booking-comment-details');
+  if(commentDetails){
+   const desktop=matchMedia('(min-width:601px)');
+   const setCommentMode=()=>{if(desktop.matches)commentDetails.open=true;};
+   setCommentMode();
+   desktop.addEventListener('change',setCommentMode,{once:true});
+  }
   enhanceBookingDate(form,language);
   form.addEventListener('submit',sendBooking);
  }else if(kind==='menu'){
