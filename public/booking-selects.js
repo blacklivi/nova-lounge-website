@@ -1,7 +1,5 @@
 export function enhanceBookingSelects(form, lang, {forceCustom=false}={}){
-  // Native OS pickers are easier to use in the compact mobile booking sheet.
-  // Preserve HÓF's branded custom list on larger devices, and NOVA defaults.
-  if(matchMedia('(max-width:600px)').matches) return;
+  // HÓF uses a bounded brand-styled list on every device; other venues keep native touch pickers.
   if(!forceCustom&&!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   for(const select of form.querySelectorAll('select')){
     const originalRequired=select.required;
