@@ -1,7 +1,7 @@
 import {escapeHTML as esc, typography, cleanPhone, validPhone, minskNow, splitEvents, safeURL, localImage, localizedValue} from './core.js';
 import {enhanceBookingSelects} from './booking-selects.js';
 import {enhanceBookingDate} from './booking-date.js';
-import {EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js';
+import {EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js?v=cms-preview-dialogs-20261113';
 import {cropCSS,applyPhotoCrop,parseCrop,cropPattern,isPhotoKey,DEFAULT_CROP} from './photo-crop.js';
 const app = document.querySelector('#app');
 const isEvents = document.body.dataset.page === 'events';
