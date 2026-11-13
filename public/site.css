@@ -2267,3 +2267,72 @@ img.cms-photo[data-image],
 @media(max-width:380px){
  .hero .hero-descriptor{font-size:clamp(9.6px,2.85vw,11px);letter-spacing:.11em}
 }
+
+/* HÓF venue header: sketch-style orange underline inspired by the supplied
+   reference. Link semantics, other pages, and mobile drawer are unchanged. */
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-nav{
+ position:relative;
+ align-items:center;
+}
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-nav > a{
+ display:inline-flex;
+ align-items:center;
+ min-height:44px;
+ position:relative;
+ z-index:1;
+ text-decoration:none!important;
+ transition:color .2s ease;
+}
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-nav > a:hover,
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-nav > a:focus-visible{
+ color:#F04902;
+ text-decoration:none;
+}
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-nav > a:focus-visible{
+ outline:1px solid #F04902;
+ outline-offset:3px;
+}
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-nav > a::after{
+ content:none!important;
+ display:none!important;
+}
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-nav .hof-sketch-underline{
+ display:block;
+ position:absolute;
+ left:0;
+ bottom:0;
+ width:0;
+ height:12px;
+ opacity:0;
+ overflow:visible;
+ pointer-events:none;
+ color:#F04902;
+ transition:left .24s cubic-bezier(.2,.7,.2,1),
+            width .24s cubic-bezier(.2,.7,.2,1),
+            opacity .16s ease;
+}
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-underline path{
+ fill:none;
+ stroke:currentColor;
+ stroke-width:2.15;
+ stroke-linecap:round;
+ stroke-linejoin:round;
+ stroke-dasharray:100;
+ stroke-dashoffset:100;
+ transition:stroke-dashoffset .34s cubic-bezier(.2,.7,.2,1);
+}
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-underline path:nth-child(2){
+ stroke-width:.85;
+ opacity:.75;
+ transition-delay:65ms;
+}
+body.hof-active:not(.hof-events-active) .site-header .hof-sketch-underline.is-drawn path{
+ stroke-dashoffset:0;
+}
+@media(prefers-reduced-motion:reduce){
+ body.hof-active:not(.hof-events-active) .site-header .hof-sketch-nav > a,
+ body.hof-active:not(.hof-events-active) .site-header .hof-sketch-nav .hof-sketch-underline,
+ body.hof-active:not(.hof-events-active) .site-header .hof-sketch-underline path{
+  transition:none!important;
+ }
+}
