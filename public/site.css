@@ -2339,14 +2339,6 @@ body.hof-active:not(.hof-events-active) .site-header .hof-sketch-underline.is-dr
 
 
 /* Guest booking alignment, including iOS focus/keyboard. No redesign of other dialogs. */
-.modal[data-kind="booking"] .booking-phone-hint{
- display:block;
- margin:6px 0 0;
- font-size:11px;
- line-height:1.45;
- font-weight:400;
- color:var(--booking-muted);
-}
 .modal[data-kind="booking"] #phone{font-variant-numeric:tabular-nums;letter-spacing:.01em}
 .modal[data-kind="booking"] #phone::placeholder{color:#949c90;opacity:1}
 .modal[data-kind="booking"] .field input,
@@ -2384,15 +2376,18 @@ body.hof-active:not(.hof-events-active) .site-header .hof-sketch-underline.is-dr
  }
  .modal[data-kind="booking"] .form-fields{
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-  column-gap:12px;
-  row-gap:17px;
+  grid-template-columns:minmax(0,1fr);
+  column-gap:0;
+  row-gap:14px;
+  width:100%;
+  min-width:0;
+  align-items:stretch;
  }
  .modal[data-kind="booking"] .field{min-width:0;max-width:100%}
  .modal[data-kind="booking"] .field.full{grid-column:1/-1}
  .modal[data-kind="booking"] .field label{
-  min-height:20px;
-  margin:0 0 7px;
+  min-height:0;
+  margin:0 0 6px;
   font-size:13px;
   line-height:1.45;
  }
@@ -2465,8 +2460,47 @@ body.hof-active:not(.hof-events-active) .site-header .hof-sketch-underline.is-dr
 }
 @media(max-width:350px){
  .modal[data-kind="booking"] .modal-shell{padding-inline:15px}
- .modal[data-kind="booking"] .form-fields{column-gap:8px}
+ .modal[data-kind="booking"] .form-fields{row-gap:12px}
  .modal[data-kind="booking"] .field label{font-size:12px}
  .modal[data-kind="booking"] .field input[type="date"]{padding-left:7px;padding-right:3px}
  .modal[data-kind="booking"] .field select{padding-left:7px;padding-right:2px}
+}
+
+/* A single column prevents intrinsic iOS date/select widths and Safari
+   focus zoom from making adjacent mobile booking controls look offset. */
+@media(max-width:600px){
+ .modal[data-kind="booking"] .form-fields > .field,
+ .modal[data-kind="booking"] .form-fields > .field.full{
+  box-sizing:border-box;
+  display:block;
+  grid-column:1/-1;
+  min-width:0;
+  width:100%;
+  max-width:100%;
+ }
+ .modal[data-kind="booking"] .form-fields > .field > input:not([type=hidden]),
+ .modal[data-kind="booking"] .form-fields > .field > select,
+ .modal[data-kind="booking"] .form-fields > .field > .nova-select,
+ .modal[data-kind="booking"] .form-fields > .field > .venue-context,
+ .modal[data-kind="booking"] #booking-comment{
+  box-sizing:border-box;
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  margin-inline:0;
+ }
+ .modal[data-kind="booking"] .form-fields > .field > input:not([type=hidden]),
+ .modal[data-kind="booking"] .form-fields > .field > select,
+ .modal[data-kind="booking"] .nova-select-trigger{
+  min-height:50px;
+  height:50px;
+  font-size:16px!important;
+ }
+ .modal[data-kind="booking"] .form-fields input[type=date]{
+  min-width:0;
+  max-width:100%;
+  overflow:hidden;
+ }
+ .modal[data-kind="booking"] .form-fields input[type=date]::-webkit-date-and-time-value{min-width:0}
 }
