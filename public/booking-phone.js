@@ -28,7 +28,7 @@ export function formatBelarusPhone(value){
 }
 export function normalizeBelarusPhone(value){
  const raw=String(value??'').trim();
- if(!raw||!ALLOWED.test(raw))return null;
+ if(!raw||!ALLOWED.test(raw)|| (raw.includes('+')&&(!raw.startsWith('+')||raw.indexOf('+',1)!==-1)))return null;
  const digits=raw.replace(/\D/g,'');
  let local;
  if(raw.startsWith('+')){
