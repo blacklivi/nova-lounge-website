@@ -6,6 +6,8 @@ const statuses={new:'Новая',confirmed:'Подтверждена',cancelled:
 const roles={owner:'Владелец',manager:'Администратор',viewer:'Наблюдатель'};
 const auth=$('#login-panel'),dashboard=$('#dashboard'),staff=$('#staff-actions'),listing=$('#reservations');
 let page=0,busy=false,initialized=false,identity=null,usersOpen=false,loadSerial=0;
+const detailDialog=$('#reservation-detail-dialog');
+let activeDetail=null;
 function message(el,text='',error=false){if(!el)return;el.textContent=text;el.classList.toggle('error',error)}
 function element(tag,cls,value){
  const el=document.createElement(tag);if(cls)el.className=cls;
@@ -35,6 +37,8 @@ async function api(url,method='GET',body){
  return data;
 }
 function showLogin(){
+ if(detailDialog.open)detailDialog.close();
+ activeDetail=null;
  loadSerial++;busy=false;
  identity=null;initialized=false;usersOpen=false;
  auth.hidden=false;dashboard.hidden=true;staff.hidden=true;
@@ -62,6 +66,53 @@ function labelDate(value){
  const d=new Date(value+'T12:00:00Z');
  return Number.isNaN(d.getTime())?value:new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(d);
 }
+function mobileDate(value){
+ const d=new Date(value+'T12:00:00Z');
+ return Number.isNaN(d.getTime())?value:new Intl.DateTimeFormat('ru-RU',{day:'numeric',month:'long',timeZone:'UTC'}).format(d);
+}
+function guestsLabel(count){
+ const n=Number(count);
+ return n+' '+(n%10===1&&n%100!==11?'гость':n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?'гостя':'гостей');
+}
+function refreshReservationStatus(r,card){
+ card.querySelectorAll('.reservation-status').forEach(el=>{
+  el.textContent=statuses[r.status]||r.status;
+  el.dataset.status=r.status;
+ });
+ const desktopSelect=card.querySelector('.reservation-controls select');
+ if(desktopSelect)desktopSelect.value=r.status;
+ if(activeDetail?.reservation===r){
+  const badge=$('#detail-status');
+  badge.textContent=statuses[r.status]||r.status;
+  badge.dataset.status=r.status;
+  $('#detail-status-select').value=r.status;
+  $('#detail-save').disabled=true;
+ }
+}
+function openReservationDetails(r,card){
+ if(!identity||!initialized||detailDialog.open)return;
+ activeDetail={reservation:r,card};
+ $('#detail-venue').textContent=venues[r.venue]||r.venue;
+ $('#detail-date').textContent=labelDate(r.booking_date);
+ $('#detail-time').textContent=r.booking_time;
+ $('#detail-title').textContent=r.guest_name;
+ $('#detail-guests').textContent=guestsLabel(r.guests);
+ const phone=String(r.phone||'');
+ $('#detail-phone-number').textContent=phone;
+ $('#detail-phone').href='tel:'+phone.replace(/[^+\d]/g,'');
+ const wrap=$('#detail-note-wrap');
+ wrap.hidden=!r.comment;
+ $('#detail-note').textContent=r.comment||'';
+ $('#detail-created').textContent='Заявка получена: '+(r.created_at||'')+' UTC';
+ const writable=identity.role!=='viewer';
+ $('#detail-actions').hidden=!writable;
+ $('#detail-status-select').value=r.status;
+ $('#detail-save').disabled=true;
+ message($('#detail-feedback'),'');
+ refreshReservationStatus(r,card);
+ detailDialog.showModal();
+ $('#detail-close').focus({preventScroll:true});
+}
 function renderCard(r){
  const card=element('article','reservation');
  const when=element('div','reservation-main');
@@ -77,6 +128,25 @@ function renderCard(r){
  const controls=element('div','reservation-controls');
  const tag=element('span','reservation-status',statuses[r.status]||r.status);tag.dataset.status=r.status;
  controls.append(tag);
+ const mobile=element('div','reservation-mobile');
+ const top=element('div','reservation-mobile-top');
+ const dateWrap=element('div','reservation-mobile-date');
+ dateWrap.append(element('span','reservation-mobile-date-day',mobileDate(r.booking_date)),element('strong','reservation-mobile-time',r.booking_time));
+ const mobileTag=element('span','reservation-status reservation-mobile-status',statuses[r.status]||r.status);
+ mobileTag.dataset.status=r.status;
+ top.append(dateWrap,mobileTag);
+ mobile.append(top,element('span','reservation-mobile-venue',venues[r.venue]||r.venue));
+ mobile.append(element('h2','reservation-mobile-name',r.guest_name));
+ const foot=element('div','reservation-mobile-foot');
+ const meta=element('div','reservation-mobile-meta');
+ meta.append(element('span','reservation-mobile-guests',guestsLabel(r.guests)));
+ if(r.comment)meta.append(element('span','reservation-mobile-note-flag','Есть комментарий'));
+ const open=element('button','reservation-mobile-open','Детали заявки');
+ open.type='button';
+ open.setAttribute('aria-label','Открыть заявку '+r.guest_name);
+ open.addEventListener('click',()=>openReservationDetails(r,card));
+ foot.append(meta,open);
+ mobile.append(foot);
  if(identity?.role!=='viewer'){
   const label=element('label','', 'Статус бронирования');
   const select=element('select');
@@ -89,16 +159,16 @@ function renderCard(r){
    const next=select.value,previous=r.status;select.disabled=true;message(info,'Сохраняем...');
    try{
     await api('/api/reserved/reservations/'+encodeURIComponent(r.id),'PATCH',{status:next});
-    r.status=next;tag.textContent=statuses[next];tag.dataset.status=next;message(info,'Сохранено');
+    r.status=next;refreshReservationStatus(r,card);message(info,'Сохранено');
    }catch(error){select.value=previous;message(info,error.message,true)}
    finally{select.disabled=false}
   });
   label.append(select);controls.append(label,info);
  }
- card.append(when,content,controls);return card;
+ card.append(when,content,controls,mobile);return card;
 }
 async function load(){
- if(!initialized||busy)return;
+ if(!initialized||busy||detailDialog.open)return;
  const serial=++loadSerial;
  busy=true;$('#refresh').disabled=true;
  message($('#dashboard-status'),'Загружаем бронирования...');
@@ -173,6 +243,40 @@ async function loadUsers(){
   message($('#users-status'),'');
  }catch(e){message($('#users-status'),e.message,true)}
 }
+$('#detail-close').addEventListener('click',()=>detailDialog.close());
+detailDialog.addEventListener('click',event=>{
+ if(event.target===detailDialog)detailDialog.close();
+});
+detailDialog.addEventListener('close',()=>{
+ activeDetail=null;
+ message($('#detail-feedback'),'');
+});
+$('#detail-status-select').addEventListener('change',()=>{
+ if(!activeDetail||identity?.role==='viewer')return;
+ $('#detail-save').disabled=$('#detail-status-select').value===activeDetail.reservation.status;
+ message($('#detail-feedback'),'');
+});
+$('#detail-save').addEventListener('click',async()=>{
+ if(!activeDetail||!identity||identity.role==='viewer')return;
+ const {reservation:r,card}=activeDetail;
+ const next=$('#detail-status-select').value;
+ if(!Object.hasOwn(statuses,next)||next===r.status)return;
+ const save=$('#detail-save'),select=$('#detail-status-select');
+ save.disabled=true;select.disabled=true;
+ message($('#detail-feedback'),'Сохраняем статус...');
+ try{
+  await api('/api/reserved/reservations/'+encodeURIComponent(r.id),'PATCH',{status:next});
+  if(activeDetail?.reservation!==r)return;
+  r.status=next;
+  refreshReservationStatus(r,card);
+  message($('#detail-feedback'),'Статус сохранён');
+ }catch(error){
+  if(activeDetail?.reservation===r)message($('#detail-feedback'),error.message,true);
+ }finally{
+  select.disabled=false;
+  if(activeDetail?.reservation===r)save.disabled=select.value===r.status;
+ }
+});
 $('#login-form').addEventListener('submit',async e=>{
  e.preventDefault();const button=e.currentTarget.querySelector('button');
  button.disabled=true;message($('#login-status'),'Проверяем доступ...');

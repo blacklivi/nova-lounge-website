@@ -6,8 +6,8 @@
  <meta name="robots" content="noindex,nofollow,noarchive">
  <meta name="theme-color" content="#FFFFFF">
  <title>RESERVED — NOVA</title>
- <link rel="stylesheet" href="/reserved.css">
- <script type="module" src="/reserved.js"></script>
+ <link rel="stylesheet" href="/reserved.css?v=staff-mobile-cards-20261113">
+ <script type="module" src="/reserved.js?v=staff-mobile-cards-20261113"></script>
 </head>
 <body>
  <main class="reserved-shell">
@@ -73,6 +73,35 @@
    <div id="reservations" class="reservation-list" aria-live="polite"></div>
    <div class="pagination"><button id="previous" class="ghost-button" type="button" disabled>Назад</button><span id="page-number">1</span><button id="next" class="ghost-button" type="button" disabled>Далее</button></div>
   </section>
+  <dialog id="reservation-detail-dialog" class="reservation-detail-dialog" aria-labelledby="detail-title" aria-modal="true">
+   <div class="reservation-detail-shell">
+    <header class="reservation-detail-head">
+     <div><p class="detail-overline">NOVA / БРОНИРОВАНИЯ</p><span id="detail-venue" class="detail-venue"></span></div>
+     <button id="detail-close" type="button" class="detail-close" aria-label="Закрыть детали бронирования">×</button>
+    </header>
+    <div class="reservation-detail-scroll">
+     <div class="detail-time-row"><div><span class="detail-label">ДАТА И ВРЕМЯ</span><p id="detail-date" class="detail-date"></p></div><strong id="detail-time" class="detail-time"></strong></div>
+     <span id="detail-status" class="reservation-status detail-current-status"></span>
+     <p class="detail-label detail-guest-label">ГОСТЬ</p>
+     <h2 id="detail-title"></h2>
+     <div class="detail-guests"><span>Количество гостей</span><strong id="detail-guests"></strong></div>
+     <a id="detail-phone" class="detail-phone" href="tel:"><span><small>ТЕЛЕФОН ГОСТЯ</small><strong id="detail-phone-number"></strong></span><span aria-hidden="true">↗</span></a>
+     <section id="detail-note-wrap" class="detail-note-wrap" hidden><h3>Комментарий к брони</h3><p id="detail-note"></p></section>
+     <p id="detail-created" class="detail-created"></p>
+    </div>
+    <footer id="detail-actions" class="reservation-detail-actions">
+     <label id="detail-status-label" for="detail-status-select">Изменить статус брони</label>
+     <div class="detail-status-form">
+      <select id="detail-status-select" aria-label="Новый статус бронирования">
+       <option value="new">Новая</option><option value="confirmed">Подтверждена</option><option value="cancelled">Отменена</option>
+       <option value="completed">Завершена</option><option value="no_show">Не пришли</option>
+      </select>
+      <button id="detail-save" class="primary-button" type="button">Сохранить</button>
+     </div>
+     <p id="detail-feedback" class="status" role="status" aria-live="polite"></p>
+    </footer>
+   </div>
+  </dialog>
  </main>
 </body>
 </html>
