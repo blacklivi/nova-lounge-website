@@ -737,7 +737,7 @@ function openModal(kind,id=selected){
   enhanceBookingDate(form,language);
   form.addEventListener('submit',sendBooking);
  }else if(kind==='menu'){
- body.innerHTML=`<h2 id="modal-title" data-editor-key="home_menu_modal_title">${E('home_menu_modal_title')}</h2><p class="intro" data-editor-key="home_menu_modal_intro">${E('home_menu_modal_intro')}</p><div class="modal-list">${ids.map(i=>`<button class="button secondary" type="button" data-editor-key="menu_${i}" data-modal="menu-location" data-venue="${i}">${E('home_menu_modal_'+i+'_label')}</button>`).join('')}</div>`;
+ body.innerHTML=`<h2 id="modal-title" data-editor-key="home_menu_modal_title">${E('home_menu_modal_title')}</h2><p class="intro" data-editor-key="home_menu_modal_intro">${E('home_menu_modal_intro')}</p><div class="modal-list">${ids.map(i=>`<button class="button secondary" type="button" data-editor-key="menu_${i}" data-modal="menu-location" data-venue="${i}"><span data-editor-key="home_menu_modal_${i}_label">${E('home_menu_modal_'+i+'_label')}</span></button>`).join('')}</div>`;
  }else if(kind==='menu-location'){
  body.innerHTML=`<h2 id="modal-title">${t('Меню','Menu')} / ${name(id)}</h2><p class="intro">${t('Ссылка на меню этого заведения пока не подключена.','The menu for this space is coming soon.')}</p><button class="button secondary" data-close>${t('Закрыть','Close')}</button>`;
  }else if(kind==='contacts')body.innerHTML=`<h2 id="modal-title">${t('Контакты','Contacts')} / ${name(id)}</h2>${contactPanel(id)}`;
