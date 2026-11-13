@@ -238,7 +238,7 @@ function renderFields(){
   const wrapper=create('details','editor-group');
   wrapper.open=true;
   wrapper.dataset.section=section.id;
-  wrapper.append(create('summary','',section.title+' · '+section.fields.length));
+  wrapper.append(create('summary','',section.title+' · '+(section.fields.length+(page.id==='home'&&section.id==='menu-dialog'?homeMenuLinks.length:0))));
   const inner=create('div','editor-group-fields');
   for(const field of section.fields)inner.append(buildField(field));
   if(page.id==='home'&&section.id==='menu-dialog'){
