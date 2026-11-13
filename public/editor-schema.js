@@ -46,6 +46,13 @@ const home=[
   f('home_story_menu_text','Кнопка меню','text','Посмотреть меню','View the menu'),
   f('home_story_menu_icon','Иконка кнопки меню','icon','arrow-right')
  ]),
+ g('menu-dialog','Всплывающее окно «Посмотреть меню»',[
+  f('home_menu_modal_title','Заголовок окна','text','Меню NOVA','NOVA menus'),
+  f('home_menu_modal_intro','Описание под заголовком','textarea','У каждого пространства своё меню.','Each space has its own menu.'),
+  f('home_menu_modal_zyb_label','Текст выбора HÓF','text','Зыбицкая','Zybitskaya'),
+  f('home_menu_modal_pob_label','Текст выбора Победителей','text','Победителей','Pobediteley'),
+  f('home_menu_modal_east_label','Текст выбора Восток','text','Восток','Vostok'),
+ ]),
  g('events','Афиша главной',[
   f('home_events_visible','Показывать раздел событий','toggle','yes'),
   f('home_events_title','Заголовок','text','События','Events'),f('home_events_url','Переход к афише','link','/events'),

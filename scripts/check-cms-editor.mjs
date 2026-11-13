@@ -108,4 +108,34 @@ assert.match(app,/instagram=hofInstagramURL\(\)/,'HÓF contact modal must resolv
 assert.match(app,/instagram\?\x60<a class="hof-contact-action"/,'HÓF contact modal must link to Instagram');
 assert.doesNotMatch(siteCss,/\.hof-page \.hof-instagram-link\{/,'Removed orange footer Instagram styles must not linger');
 
+
+// In the CMS iframe, modal openers must behave like the public UI while all
+// external navigation and guest form submissions remain blocked.
+for(const key of ['home_menu_modal_title','home_menu_modal_intro',
+ 'home_menu_modal_zyb_label','home_menu_modal_pob_label','home_menu_modal_east_label']){
+ assert.ok(EDITOR_BY_KEY[key], 'Menu chooser content must be editable: '+key);
+}
+assert.match(app,/if\(isEditorPreview\)\{[\s\S]*?document\.addEventListener\('submit',e=>\{/,
+ 'Preview must capture all form submissions before guest booking handlers');
+assert.match(app,/e\.preventDefault\(\);e\.stopImmediatePropagation\(\);/,
+ 'Read-only preview must block default navigation');
+assert.match(app,/if\(kind==='menu-location'\)\{inspect\(ids\.includes\(id\)\?'menu_'\+id:''\);return\}/,
+ 'Selecting a venue from menu preview must inspect its CMS destination rather than navigate');
+assert.match(app,/if\(\['menu','booking','contacts'\]\.includes\(kind\)\)\{openModal\(kind,id\);return\}/,
+ 'Modals must be openable from CMS iframe');
+assert.match(app,/data-editor-key="menu_\$\{i\}" data-modal="menu-location"/,
+ 'Modal venue choices must expose their existing menu link fields');
+assert.match(app,/source:'nova-cms-modal-opened',kind/,
+ 'Opening a modal must ask the editor to replay pending draft values');
+assert.match(admin,/const homeMenuLinks=\['menu_zyb','menu_pob','menu_east'\]/,
+ 'Quick-link fields must reuse the original menu destinations');
+assert.match(admin,/if\(page\.id==='home'&&section\.id==='menu-dialog'\)/,
+ 'Menu links must be directly editable next to the home menu chooser');
+assert.match(admin,/if\(!target&&page&&getPage\(\)\.id!==page\.id\)/,
+ 'Inspecting a menu quick-link must not reload the preview and close the dialog');
+assert.match(admin,/event\.data\?\.source==='nova-cms-modal-opened'\)replayPreview\(\)/,
+ 'Draft changes must appear when an initially closed modal is opened');
+assert.match(app,/data-editor-key="map_zyb"/,
+ 'HOF contact modal links must be inspectable');
+
 console.log('NOVA page CMS registry, link security and editor smoke guards passed');

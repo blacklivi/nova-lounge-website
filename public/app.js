@@ -113,7 +113,7 @@ const hofInstagramURL=()=>safeURL(value('instagram_zyb'));
 const locationMark=()=>I('global_map_icon','map-pin').replace('class="arrow"','class="footer-icon"');
 function contactLinks(id){
  const phone=value('phone_'+id), instagram=safeURL(value('instagram_'+id)), telegram=safeURL(value('telegram_'+id)), route=safeURL(value('map_'+id));
- return `${phone&&validPhone(phone)?`<a class="footer-phone" href="tel:${esc(phone.replace(/[^+\d]/g,''))}">${text(phone)}</a>`:''}${instagram||telegram||route?`<div class="footer-socials">${instagram?`<a class="footer-social-icon" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="${id==='zyb'?t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya'):'Instagram NOVA '+name(id)}" title="Instagram">${instagramMark()}<span class="sr-only">Instagram</span></a>`:''}${telegram?`<a class="footer-social-text" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer">Telegram</a>`:''}${route?`<a class="footer-route footer-social-icon" href="${esc(route)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Показать NOVA на карте','View NOVA on map')} ${name(id)}" title="${t('На карте','View on map')}">${locationMark()}</a>`:''}</div>`:''}`;
+ return `${phone&&validPhone(phone)?`<a class="footer-phone" data-editor-key="phone_${id}" href="tel:${esc(phone.replace(/[^+\d]/g,''))}">${text(phone)}</a>`:''}${instagram||telegram||route?`<div class="footer-socials">${instagram?`<a class="footer-social-icon" data-editor-key="instagram_${id}" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="${id==='zyb'?t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya'):'Instagram NOVA '+name(id)}" title="Instagram">${instagramMark()}<span class="sr-only">Instagram</span></a>`:''}${telegram?`<a class="footer-social-text" data-editor-key="telegram_${id}" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer">Telegram</a>`:''}${route?`<a class="footer-route footer-social-icon" data-editor-key="map_${id}" href="${esc(route)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Показать NOVA на карте','View NOVA on map')} ${name(id)}" title="${t('На карте','View on map')}">${locationMark()}</a>`:''}</div>`:''}`;
 }
 function footer(){return `<footer class="site-footer" id="contacts"><div class="footer-top"><div><a class="brand" href="${H('global_logo_url','/')}" data-editor-key="global_logo_url">${E('footer_logo_text')}</a><p data-content="footer_tagline">${content('footer_tagline')}</p></div></div><div class="footer-locations">${ids.map(id=>`<div class="footer-location"><h3><a href="${venueURL(id)}" data-place="${id}">${brandName(id)}</a></h3>${value('address_'+id)?`<p class="venue-address">${content('address_'+id)}</p>`:''}${value('hours_'+id)?`<p class="venue-hours">${content('hours_'+id)}</p>`:''}${contactLinks(id)}${!['address_','phone_','instagram_','telegram_','hours_','map_'].some(k=>value(k+id))?`<p class="muted">${t('Контакты уточняются','Contact details coming soon')}</p>`:''}</div>`).join('')}</div><div class="footer-bottom"><span data-editor-key="footer_left">${E('footer_left')}</span><span data-editor-key="footer_right">${E('footer_right')}</span></div></footer>`;}
 function layers(){return `<aside id="drawer" class="drawer" inert aria-hidden="true" aria-label="${t('Мобильная навигация','Mobile navigation')}"><nav>${nav()}</nav><button type="button" class="button" data-modal="booking">${bookingLabel()}</button><p>MINSK · LOUNGE CAFÉ</p></aside><div class="mobile-cta"><button class="button" data-modal="booking">${bookingLabel()}</button></div><button class="to-top" data-top hidden aria-label="${t('Наверх','Back to top')}">${arrow}</button><dialog class="modal" aria-labelledby="modal-title"><div class="modal-shell"><div class="modal-top"><span class="eyebrow">NOVA / <span id="modal-caption">MINSK</span></span><button class="close" data-close aria-label="${t('Закрыть окно','Close dialog')}">×</button></div><div id="modal-body"></div></div></dialog>`;}
@@ -647,25 +647,25 @@ function contactPanel(id){
  if(id==='zyb'){
   const phone=value('phone_zyb'),route=safeURL(value('map_zyb')),telegram=safeURL(value('telegram_zyb')),instagram=hofInstagramURL();
   const items=[
-   address?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Адрес','Address')}</span><p>${text(address)}</p></div>`:'',
-   hours?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Часы работы','Opening hours')}</span><p class="venue-hours">${text(hours)}</p></div>`:''
+   address?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Адрес','Address')}</span><p data-content="address_zyb">${content('address_zyb')}</p></div>`:'',
+   hours?`<div class="hof-contact-info"><span class="hof-contact-label">${t('Часы работы','Opening hours')}</span><p class="venue-hours" data-content="hours_zyb">${content('hours_zyb')}</p></div>`:''
   ].filter(Boolean).join('');
   const actions=[
-   phone&&validPhone(phone)?`<a class="hof-contact-action" href="tel:${esc(phone.replace(/[^+\d]/g,''))}"><span>${text(phone)}</span>${arrow}</a>`:'',
-   route?`<a class="hof-contact-action" href="${esc(route)}" target="_blank" rel="noopener noreferrer"><span>${t('Построить маршрут','Get directions')}</span>${arrow}</a>`:'',
-   telegram?`<a class="hof-contact-action" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer"><span>Telegram</span>${arrow}</a>`:'',
-   instagram?`<a class="hof-contact-action" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya')}"><span>Instagram</span>${arrow}</a>`:''
+   phone&&validPhone(phone)?`<a class="hof-contact-action" href="tel:${esc(phone.replace(/[^+\d]/g,''))}"><span data-editor-key="phone_zyb">${text(phone)}</span>${arrow}</a>`:'',
+   route?`<a class="hof-contact-action" data-editor-key="map_zyb" href="${esc(route)}" target="_blank" rel="noopener noreferrer"><span>${t('Построить маршрут','Get directions')}</span>${arrow}</a>`:'',
+   telegram?`<a class="hof-contact-action" data-editor-key="telegram_zyb" href="${esc(telegram)}" target="_blank" rel="noopener noreferrer"><span>Telegram</span>${arrow}</a>`:'',
+   instagram?`<a class="hof-contact-action" data-editor-key="instagram_zyb" href="${esc(instagram)}" target="_blank" rel="noopener noreferrer" aria-label="${t('Instagram HÓF by NOVA — Зыбицкая','Instagram HÓF by NOVA — Zybitskaya')}"><span>Instagram</span>${arrow}</a>`:''
   ].filter(Boolean).join('');
   if(!items&&!actions)return `<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`;
   return `<div class="hof-contact-details">${items}${actions?`<div class="hof-contact-modal-actions">${actions}</div>`:''}</div>`;
  }
  const links=contactLinks(id);
- return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p>${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;
+ return `${address||hours||links?`<div class="contact-list">${address?`<div><h3>${t('Адрес','Address')}</h3><p data-content="address_${id}">${text(address)}</p></div>`:''}${hours?`<div><h3>${t('Часы работы','Opening hours')}</h3><p class="venue-hours" data-content="hours_${id}">${text(hours)}</p></div>`:''}${links}</div>`:`<p class="intro">${t('Контакты этого заведения ещё уточняются.','Contact details for this space are coming soon.')}</p>`}`;
 }
 // Booking requests are stored in the NOVA D1 database before showing success.
 function bookingFormHTML(requestedVenue){
  const day=minskNow().slice(0,10),fixed=ids.includes(requestedVenue);
- return `<h2 id="modal-title">${bookingLabel()}</h2>
+ return `<h2 id="modal-title" data-editor-key="global_booking_text">${bookingLabel()}</h2>
  <p class="intro">${t('Оставьте заявку. Администратор свяжется с вами для подтверждения бронирования.','Send a request. The venue will contact you to confirm your reservation.')}</p>
  <form id="book-form">
   <div class="form-fields">
@@ -737,7 +737,7 @@ function openModal(kind,id=selected){
   enhanceBookingDate(form,language);
   form.addEventListener('submit',sendBooking);
  }else if(kind==='menu'){
- body.innerHTML=`<h2 id="modal-title">${t('Меню NOVA','NOVA menus')}</h2><p class="intro">${t('У каждого пространства своё меню.','Each space has its own menu.')}</p><div class="modal-list">${ids.map(i=>`<button class="button secondary" data-modal="menu-location" data-venue="${i}">${name(i)}</button>`).join('')}</div>`;
+ body.innerHTML=`<h2 id="modal-title" data-editor-key="home_menu_modal_title">${E('home_menu_modal_title')}</h2><p class="intro" data-editor-key="home_menu_modal_intro">${E('home_menu_modal_intro')}</p><div class="modal-list">${ids.map(i=>`<button class="button secondary" type="button" data-editor-key="menu_${i}" data-modal="menu-location" data-venue="${i}"><span data-editor-key="home_menu_modal_${i}_label">${E('home_menu_modal_'+i+'_label')}</span></button>`).join('')}</div>`;
  }else if(kind==='menu-location'){
  body.innerHTML=`<h2 id="modal-title">${t('Меню','Menu')} / ${name(id)}</h2><p class="intro">${t('Ссылка на меню этого заведения пока не подключена.','The menu for this space is coming soon.')}</p><button class="button secondary" data-close>${t('Закрыть','Close')}</button>`;
  }else if(kind==='contacts')body.innerHTML=`<h2 id="modal-title">${t('Контакты','Contacts')} / ${name(id)}</h2>${contactPanel(id)}`;
@@ -750,6 +750,7 @@ function openModal(kind,id=selected){
  requestAnimationFrame(()=>{if(dialog.open)dialog.classList.add('is-visible');});
  // Move initial focus to the labelled dialog heading; avoid an autofocus ring on Close in iOS Safari.
  const heading=body.querySelector('#modal-title');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
+ if(isEditorPreview)window.parent.postMessage({source:'nova-cms-modal-opened',kind},location.origin);
 }
 let hofDockObserver=null;
 function setupHofDockObserver(){
@@ -834,15 +835,36 @@ function navigate(id){
   scrollToSection(id);
  }
 }
-// Page preview is read-only. Click targets select fields in the authorized parent editor.
+// The CMS iframe is interactive for local UI only: open dialogs and controls,
+// inspect their fields, but never navigate, place bookings or send external requests.
 if(isEditorPreview){
- document.addEventListener('click',e=>{
-  const node=e.target.closest('[data-editor-icon],[data-editor-key],[data-content],[data-image]');
+ const inspect=key=>window.parent.postMessage({source:'nova-cms-inspector',key},location.origin);
+ document.addEventListener('submit',e=>{
   e.preventDefault();e.stopImmediatePropagation();
-  const key=node?.dataset.editorIcon||node?.dataset.editorKey||node?.dataset.content||node?.dataset.image||'';
-  window.parent.postMessage({source:'nova-cms-inspector',key},location.origin);
+  window.parent.postMessage({source:'nova-cms-preview-info',message:'Это предпросмотр: отправка заявок отключена.'},location.origin);
  },true);
-  // Same-origin draft messages update the preview DOM only; never write to D1 or R2.
+ document.addEventListener('click',e=>{
+  const target=e.target instanceof Element?e.target:null;
+  if(!target)return;
+  // Inputs and calendar/custom dropdown buttons remain usable for previewing
+  // how a form looks, but the capture-phase submit guard blocks any POST.
+  if(target.closest('.modal input,.modal select,.modal textarea,.modal label,.modal .nova-select,.modal .nova-calendar'))return;
+  const action=target.closest('[data-modal],[data-close],[data-drawer]');
+  const node=target.closest('[data-editor-icon],[data-editor-key],[data-content],[data-image]');
+  e.preventDefault();e.stopImmediatePropagation();
+  if(action?.hasAttribute('data-close')){closeModal();return}
+  if(action?.hasAttribute('data-drawer')){setDrawer(!drawerOpen);return}
+  if(action?.hasAttribute('data-modal')){
+   const kind=action.dataset.modal;
+   const id=action.dataset.venue||selected||(isEvents?scopedEventVenue:null);
+   // Never let a preview menu choice call window.location.assign().
+   if(kind==='menu-location'){inspect(ids.includes(id)?'menu_'+id:'');return}
+   if(['menu','booking','contacts'].includes(kind)){openModal(kind,id);return}
+  }
+  const key=node?.dataset.editorIcon||node?.dataset.editorKey||node?.dataset.content||node?.dataset.image||'';
+  if(key)inspect(key);
+ },true);
+ // Same-origin draft messages update the preview DOM only; never write to D1 or R2.
  window.addEventListener('message',event=>{
   if(event.source!==window.parent||event.origin!==location.origin||event.data?.source!=='nova-cms-draft')return;
   const {key,value,type}=event.data;

@@ -206,3 +206,6 @@ a .ui-arrow,button .ui-arrow{width:1em;height:1em;margin-left:.25em}
  .nova-crop-actions button{flex:1 1 auto}
  .nova-crop-actions .nova-crop-apply{flex:1 0 100%}
 }
+
+/* Inline shortcut fields reuse the same venue menu URLs as their venue pages. */
+.editor-linked-field-title{font-size:12px;line-height:1.5;font-weight:600;color:#3c4937;margin:8px 0 0;padding-top:12px;border-top:1px solid #dedfd6}
