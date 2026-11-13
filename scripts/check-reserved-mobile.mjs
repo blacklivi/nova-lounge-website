@@ -16,8 +16,8 @@ assert.doesNotMatch(guest,/enhanceMobileBooking|booking-form-scroll|booking-sect
 assert.doesNotMatch(guestCSS,/NOVA \/ booking v3|Mobile reservation redesign/,'No guest full-screen or bottom-sheet overrides remain');
 assert.doesNotMatch(selects,/if\(matchMedia\('\(max-width:600px\)'\)\.matches\) return/,'Restore original HÓF custom mobile chooser behavior');
 for(const page of [home,events]){
- assert.match(page,/site\.css\?v=(?:guest-booking-restored-20261113|by-phone-mask-20261114)/,'Old CSS cache must be replaced');
- assert.match(page,/app\.js\?v=(?:guest-booking-restored-20261113|by-phone-mask-20261114)/,'Old JS cache must be replaced');
+ assert.match(page,/site\.css\?v=(?:guest-booking-restored-20261113|mobile-one-column-20261114)/,'Old CSS cache must be replaced');
+ assert.match(page,/app\.js\?v=(?:guest-booking-restored-20261113|mobile-one-column-20261114)/,'Old JS cache must be replaced');
 }
 for(const id of ['reservation-detail-dialog','detail-close','detail-venue','detail-date','detail-time','detail-title','detail-guests','detail-phone','detail-note-wrap','detail-status','detail-status-select','detail-save','detail-feedback']){
  assert.ok(html.includes('id="'+id+'"'),'Staff dialog element missing: '+id);
