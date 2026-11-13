@@ -45,7 +45,11 @@ assert.match(css,/Guest booking alignment, including iOS/,'Scoped mobile layout 
 assert.match(css,/@media\(max-width:600px\)\{[\s\S]*\.modal\[data-kind="booking"\]/,'Only mobile booking modal is adjusted');
 assert.match(css,/font-size:16px!important/,'iPhone inputs must not trigger autofocus zoom');
 for(const page of [home,events]){
- assert.match(page,/site\.css\?v=by-phone-mask-20261114/,'CSS cache must be refreshed');
- assert.match(page,/app\.js\?v=by-phone-mask-20261114/,'JS cache must be refreshed');
+ assert.match(page,/site\.css\?v=mobile-one-column-20261114/,'CSS cache must be refreshed');
+ assert.match(page,/app\.js\?v=mobile-one-column-20261114/,'JS cache must be refreshed');
 }
+assert.doesNotMatch(app,/booking-phone-hint|Беларусь: \+375, код|Belarus: \+375, code/,'No visible phone operator hint on either language');
+assert.doesNotMatch(css,/\.booking-phone-hint/,'Remove unused visible phone hint styles');
+assert.match(css,/grid-template-columns:minmax\(0,1fr\);\s*column-gap:0;\s*row-gap:14px/,'Mobile booking fields must use a stable one-column layout');
+assert.match(css,/\.modal\[data-kind="booking"\] \.form-fields > \.field,\s*\.modal\[data-kind="booking"\] \.form-fields > \.field\.full/,'Each mobile field must occupy the full column');
 console.log('BY phone mask, server operators and mobile booking alignment checks passed');
