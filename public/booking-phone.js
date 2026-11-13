@@ -54,6 +54,15 @@ export function enhanceBelarusPhone(form,language='ru'){
   ?'Use a Belarusian number with operator 25, 29, 33 or 44.'
   :'Укажите номер РБ с кодом 25, 29, 33 или 44.';
  input.setAttribute('aria-description',error);
+ input.addEventListener('paste',event=>{
+  const pasted=event.clipboardData?.getData('text')||'';
+  if(!pasted)return;
+  event.preventDefault();
+  const formatted=formatBelarusPhone(pasted);
+  input.value=formatted;
+  input.dataset.lastDigits=partialDigits(formatted);
+  input.setSelectionRange(formatted.length,formatted.length);
+ });
  input.addEventListener('focus',()=>{
   if(!input.value){
    input.value='+375 ';
