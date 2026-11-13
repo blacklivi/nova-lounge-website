@@ -737,7 +737,7 @@ function openModal(kind,id=selected){
   enhanceBookingDate(form,language);
   form.addEventListener('submit',sendBooking);
  }else if(kind==='menu'){
- body.innerHTML=`<h2 id="modal-title">${t('Меню NOVA','NOVA menus')}</h2><p class="intro">${t('У каждого пространства своё меню.','Each space has its own menu.')}</p><div class="modal-list">${ids.map(i=>`<button class="button secondary" data-modal="menu-location" data-venue="${i}">${name(i)}</button>`).join('')}</div>`;
+ body.innerHTML=`<h2 id="modal-title" data-editor-key="home_menu_modal_title">${E('home_menu_modal_title')}</h2><p class="intro" data-editor-key="home_menu_modal_intro">${E('home_menu_modal_intro')}</p><div class="modal-list">${ids.map(i=>`<button class="button secondary" type="button" data-editor-key="menu_${i}" data-modal="menu-location" data-venue="${i}">${E('home_menu_modal_'+i+'_label')}</button>`).join('')}</div>`;
  }else if(kind==='menu-location'){
  body.innerHTML=`<h2 id="modal-title">${t('Меню','Menu')} / ${name(id)}</h2><p class="intro">${t('Ссылка на меню этого заведения пока не подключена.','The menu for this space is coming soon.')}</p><button class="button secondary" data-close>${t('Закрыть','Close')}</button>`;
  }else if(kind==='contacts')body.innerHTML=`<h2 id="modal-title">${t('Контакты','Contacts')} / ${name(id)}</h2>${contactPanel(id)}`;
@@ -750,6 +750,7 @@ function openModal(kind,id=selected){
  requestAnimationFrame(()=>{if(dialog.open)dialog.classList.add('is-visible');});
  // Move initial focus to the labelled dialog heading; avoid an autofocus ring on Close in iOS Safari.
  const heading=body.querySelector('#modal-title');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
+ if(isEditorPreview)window.parent.postMessage({source:'nova-cms-modal-opened',kind},location.origin);
 }
 let hofDockObserver=null;
 function setupHofDockObserver(){
@@ -834,15 +835,36 @@ function navigate(id){
   scrollToSection(id);
  }
 }
-// Page preview is read-only. Click targets select fields in the authorized parent editor.
+// The CMS iframe is interactive for local UI only: open dialogs and controls,
+// inspect their fields, but never navigate, place bookings or send external requests.
 if(isEditorPreview){
- document.addEventListener('click',e=>{
-  const node=e.target.closest('[data-editor-icon],[data-editor-key],[data-content],[data-image]');
+ const inspect=key=>window.parent.postMessage({source:'nova-cms-inspector',key},location.origin);
+ document.addEventListener('submit',e=>{
   e.preventDefault();e.stopImmediatePropagation();
-  const key=node?.dataset.editorIcon||node?.dataset.editorKey||node?.dataset.content||node?.dataset.image||'';
-  window.parent.postMessage({source:'nova-cms-inspector',key},location.origin);
+  window.parent.postMessage({source:'nova-cms-preview-info',message:'Это предпросмотр: отправка заявок отключена.'},location.origin);
  },true);
-  // Same-origin draft messages update the preview DOM only; never write to D1 or R2.
+ document.addEventListener('click',e=>{
+  const target=e.target instanceof Element?e.target:null;
+  if(!target)return;
+  // Inputs and calendar/custom dropdown buttons remain usable for previewing
+  // how a form looks, but the capture-phase submit guard blocks any POST.
+  if(target.closest('.modal input,.modal select,.modal textarea,.modal label,.modal .nova-select,.modal .nova-calendar'))return;
+  const action=target.closest('[data-modal],[data-close],[data-drawer]');
+  const node=target.closest('[data-editor-icon],[data-editor-key],[data-content],[data-image]');
+  e.preventDefault();e.stopImmediatePropagation();
+  if(action?.hasAttribute('data-close')){closeModal();return}
+  if(action?.hasAttribute('data-drawer')){setDrawer(!drawerOpen);return}
+  if(action?.hasAttribute('data-modal')){
+   const kind=action.dataset.modal;
+   const id=action.dataset.venue||selected||(isEvents?scopedEventVenue:null);
+   // Never let a preview menu choice call window.location.assign().
+   if(kind==='menu-location'){inspect(ids.includes(id)?'menu_'+id:'');return}
+   if(['menu','booking','contacts'].includes(kind)){openModal(kind,id);return}
+  }
+  const key=node?.dataset.editorIcon||node?.dataset.editorKey||node?.dataset.content||node?.dataset.image||'';
+  if(key)inspect(key);
+ },true);
+ // Same-origin draft messages update the preview DOM only; never write to D1 or R2.
  window.addEventListener('message',event=>{
   if(event.source!==window.parent||event.origin!==location.origin||event.data?.source!=='nova-cms-draft')return;
   const {key,value,type}=event.data;
