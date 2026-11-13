@@ -21,6 +21,7 @@ const json=async req=>{
  return body;
 };
 const digest=async text=>new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(text)));
+const b64=bytes=>btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
 function parseDate(value){
  if(typeof value!=='string'||!/^20\d{2}-(0[1-9]|1[0-2])-([0-2]\d|3[01])$/.test(value))return false;
  const d=new Date(value+'T00:00:00.000Z');
