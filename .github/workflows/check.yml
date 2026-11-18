@@ -26,3 +26,12 @@ jobs:
         with:
           name: nova-browser
           path: artifacts/browser
+      - name: One-time public read-only release audit
+        if: always() && github.head_ref == 'codex/post-deploy-audit-81'
+        continue-on-error: true
+        run: node scripts/smoke-public.mjs
+      - uses: actions/upload-artifact@v4
+        if: always() && github.head_ref == 'codex/post-deploy-audit-81'
+        with:
+          name: nova-public-audit
+          path: artifacts/public-smoke
