@@ -34,3 +34,14 @@ jobs:
         with:
           name: nova-production-83
           path: artifacts/public-smoke
+      - name: Check staging admission without credentials
+        if: github.head_ref == 'codex/staging-acceptance-83'
+        run: |
+          set -eu
+          for origin in https://511781d7-nova-lounge-demo.blacklivi-olx.workers.dev https://codex-nova-private-stage-83-nova-lounge-demo.blacklivi-olx.workers.dev; do
+            for path in / /app.js /site.css /admin /reserved /api/content /api/reserved/session /api/reservations; do
+              status=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' "$origin$path")
+              printf '%s %s %s\n' "$(date -u +%FT%TZ)" "$origin$path" "$status"
+              test "$status" = 401
+            done
+          done
