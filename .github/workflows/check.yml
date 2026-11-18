@@ -26,3 +26,11 @@ jobs:
         with:
           name: nova-browser
           path: artifacts/browser
+      - name: One-time release verification for Issue 83
+        if: github.head_ref == 'codex/staging-acceptance-83'
+        run: node scripts/smoke-public.mjs
+      - uses: actions/upload-artifact@v4
+        if: always() && github.head_ref == 'codex/staging-acceptance-83'
+        with:
+          name: nova-production-83
+          path: artifacts/public-smoke
