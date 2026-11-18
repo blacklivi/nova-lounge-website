@@ -112,6 +112,16 @@ test('staff roles, scoped totals, audit history, revocation and session expiry',
  const history = (await local.db.prepare('SELECT from_status,to_status FROM reservation_audit WHERE reservation_id=? ORDER BY rowid').bind(id).all()).results;
  assert.ok(history.every((item, index) => !index || item.from_status === history[index - 1].to_status));
  assert.equal((await local.db.prepare('SELECT status FROM reservations WHERE id=?').bind(id).first()).status, history.at(-1).to_status);
+ // Force a zero-row guarded update to exercise the conflict path without timing assumptions.
+ await local.db.prepare("CREATE TRIGGER skip_fixture_update BEFORE UPDATE OF status ON reservations BEGIN SELECT RAISE(IGNORE); END").run();
+ try {
+  const next = history.at(-1).to_status === 'completed' ? 'cancelled' : 'completed';
+  const conflict = await expectStatus(update(manager, id, next), 409);
+  assert.deepEqual(await conflict.json(), {ok: false, error: 'status_changed'});
+  assert.equal(await local.db.prepare('SELECT COUNT(*) AS total FROM reservation_audit WHERE reservation_id=?').bind(id).first('total'), history.length);
+ } finally {
+  await local.db.prepare('DROP TRIGGER skip_fixture_update').run();
+ }
  const users = await (await call(root + '/users', {cookie: owner})).json();
  const record = users.users.find(u => u.username === 'manager');
  assert.equal('password_hash' in record, false);
@@ -191,4 +201,18 @@ test('public routes serve crawlable metadata, valid assets and expected HTTP err
  const sitemap = await seoRoute(new Request(domain + '/sitemap.xml')).text();
  assert.equal(sitemap.match(/<loc>/g).length, 8);
  assert.ok(sitemap.includes(domain + '/spaces/zybitskaya'));
+});
+
+test('D1 write failure cannot return a successful booking or leave a booking row', async () => {
+ const isolated = await startLocalWorker();
+ try {
+  await isolated.db.prepare("CREATE TRIGGER reject_fixture BEFORE INSERT ON reservations BEGIN SELECT RAISE(ABORT, 'fixture unavailable'); END").run();
+  const response = await expectStatus(fetch(isolated.base + '/api/reservations', {
+   method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(booking)
+  }), 500);
+  assert.deepEqual(await response.json(), {ok: false, error: 'request_failed'});
+  assert.equal((await isolated.db.prepare('SELECT COUNT(*) AS total FROM reservations').first()).total, 0);
+ } finally {
+  await isolated.worker.close();
+ }
 });

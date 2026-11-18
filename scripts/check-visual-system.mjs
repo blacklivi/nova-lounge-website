@@ -32,7 +32,7 @@ assert.match(app,/window\.addEventListener\('resize',updateTop,\{passive:true\}\
 assert.match(app,/data-modal="booking" data-venue="zyb"/,'HOF fixed venue booking ID must be retained');
 assert.match(app,/function bookingFormHTML\(requestedVenue\)/,'Guests need a reservation form');
 assert.match(app,/fetch\('\/api\/reservations'/,'Guest form must submit to Worker API');
-assert.match(app,/if\(!response\.ok\|\|!answer\.ok\)throw new Error/,'Client cannot mark unsaved requests successful');
+assert.match(app,/if\(!response\.ok\|\|!answer\?\.ok\)\{showError/,'Client cannot mark unsaved requests successful');
 
 assert.match(css,/\/\* HÓF — restore the original asymmetrical contact actions and full-width/,'Contact actions restore the black primary and underlined secondary styling');
 assert.match(css,/\.hof-page \.hof-compact-contact \.hof-bottom-actions > \.hof-text-button\{\s*color:#000!important;\s*background:transparent!important;\s*border:0!important;\s*border-bottom:1px solid #000!important/,'Contacts must be a text link with an underline, not a boxed button');

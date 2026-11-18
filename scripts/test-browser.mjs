@@ -36,7 +36,19 @@ test('public booking works at phone, tablet and desktop sizes', {timeout: 180000
    const errors = [];
    page.on('pageerror', error => errors.push(error.message));
    assert.equal((await page.goto(local.base + path, {waitUntil: 'domcontentloaded'})).status(), 200);
+   await page.getByRole('button', {name: /^RU .*Русский язык$/}).waitFor();
+   await page.getByRole('button', {name: /^EN .*English language$/}).waitFor();
    const trigger = page.locator('button[data-modal="booking"]:visible').first();
+   if (label === 'desktop') {
+    await trigger.focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await page.locator('dialog').evaluate(dialog => dialog.contains(document.activeElement)), true);
+    await page.keyboard.press('Tab');
+    assert.equal(await page.locator('dialog').evaluate(dialog => dialog.contains(document.activeElement)), true);
+    await page.keyboard.press('Escape');
+    await page.locator('dialog:not([open])').waitFor({state: 'attached'});
+    assert.equal(await trigger.evaluate(button => button === document.activeElement), true);
+   }
    await trigger.click();
    const form = page.locator('#book-form');
    await form.waitFor();
@@ -51,7 +63,19 @@ test('public booking works at phone, tablet and desktop sizes', {timeout: 180000
    assert.equal(await form.locator('#time option').count(), 96);
    const date = new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 10);
    await form.locator('#date').fill(date);
-   await form.locator('#time').selectOption('18:45', {force: true});
+   if (venue === 'zyb') {
+    const time = form.locator('#time + .nova-select .nova-select-trigger');
+    assert.match(await time.getAttribute('aria-label'), /19:00$/);
+    await time.click();
+    await form.getByRole('listbox').getByRole('option', {name: '18:45', exact: true}).click();
+    assert.match(await time.getAttribute('aria-label'), /18:45$/);
+   } else {
+    await form.locator('#time').selectOption('18:45', {force: true});
+   }
+   const calendar = form.locator('#date + .nova-select .nova-select-trigger');
+   if (await calendar.count()) {
+    assert.ok((await calendar.getAttribute('aria-label')).includes(await calendar.textContent()));
+   }
    await form.locator('#guest-name').fill('Local browser fixture');
    const phone = form.locator('#phone');
    await phone.fill('');
@@ -75,8 +99,15 @@ test('public booking works at phone, tablet and desktop sizes', {timeout: 180000
    if (index === 0) {
     await page.route('**/api/reservations', route => route.abort(), {times: 1});
     await submit.click();
-    await form.locator('#booking-error').filter({hasText: /\S/}).waitFor();
+    await form.locator('#booking-error').filter({hasText: 'Ошибка соединения. Попробуйте снова.'}).waitFor({timeout: 3000});
     assert.equal(await submit.isEnabled(), true);
+    await page.route('**/api/reservations', route => route.fulfill({
+     status: 502, contentType: 'text/html', body: '<h1>Bad gateway</h1>'
+    }), {times: 1});
+    await submit.click();
+    await form.locator('#booking-error').filter({hasText: 'Не удалось отправить заявку.'}).waitFor();
+    assert.equal(await submit.isEnabled(), true);
+    assert.equal(await local.db.prepare('SELECT COUNT(*) AS total FROM reservations').first('total'), 0);
    }
    const [response] = await Promise.all([
     page.waitForResponse(r => r.url().endsWith('/api/reservations') && r.request().method() === 'POST'), submit.click()
@@ -155,4 +186,20 @@ test('staff mobile details and CMS editor save through the real Worker', {timeou
  assert.equal(cropRow.value, '50,50,130');
  await guest.locator('[data-language="en"]:visible').click();
  await guest.locator('.hero-tagline').filter({hasText: 'Local NOVA test'}).waitFor({state: 'attached'});
+ const png = await guest.screenshot({clip: {x: 0, y: 0, width: 160, height: 160}});
+ await editor.locator('[data-editor-field="hero_image"] input[type="file"]').setInputFiles({
+  name: 'synthetic-local.png', mimeType: 'image/png', buffer: png
+ });
+ await crop.locator('.nova-crop-apply').click();
+ await editor.locator('#page-editor-status').filter({hasText: 'WebP готов'}).waitFor();
+ const [upload] = await Promise.all([
+  editor.waitForResponse(r => r.url().endsWith('/api/admin/upload') && r.request().method() === 'POST'),
+  editor.locator('#page-editor-save').click()
+ ]);
+ assert.equal(upload.status(), 201);
+ const pngResult = await upload.json();
+ assert.match(pngResult.url, /\.webp$/);
+ const converted = await guest.request.get(local.base + pngResult.url);
+ assert.equal(converted.status(), 200);
+ assert.equal(converted.headers()['content-type'], 'image/webp');
 });
