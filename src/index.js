@@ -55,7 +55,9 @@ async function translateEvent(env,b){
 }
 function validateEvent(b){const title=short(b.title,110),description=short(b.description,1300),date=short(b.starts_at,16),venue=short(b.venue,8),image_url=short(b.image_url,220);
  const image_crop=b.image_crop===undefined?DEFAULT_CROP:b.image_crop;
- if(!title||!/^20\d\d-(0[1-9]|1[0-2])-([0-2]\d|3[01])T([01]\d|2[0-3]):[0-5]\d$/.test(date)||!venueIDs.has(venue)||!validImage(image_url)||typeof image_crop!=='string'||!cropPattern.test(image_crop))throw Error('invalid_event');return {title,description,starts_at:date,venue,image_url,image_crop,published:b.published===false||b.published===0?0:1}}
+ const at=new Date(date+'Z');
+ if(!Number.isFinite(at.getTime())||at.toISOString().slice(0,16)!==date)return null;
+ if(!title||!/^20\d\d-(0[1-9]|1[0-2])-([0-2]\d|3[01])T([01]\d|2[0-3]):[0-5]\d$/.test(date)||!venueIDs.has(venue)||!validImage(image_url)||typeof image_crop!=='string'||!cropPattern.test(image_crop))return null;return {title,description,starts_at:date,venue,image_url,image_crop,published:b.published===false||b.published===0?0:1}}
 async function eventList(db,admin=false){const q=admin?'SELECT * FROM events ORDER BY starts_at DESC,created_at DESC':'SELECT id,title,description,title_en,description_en,starts_at,venue,image_url,image_crop FROM events WHERE published = 1 ORDER BY starts_at ASC';return (await db.prepare(q).all()).results||[]}
 async function api(request,env,url){const path=url.pathname;
  if(path==='/api/content'&&request.method==='GET'){const [ru,en]=await Promise.all([env.DB.prepare('SELECT key,value FROM site_content').all(),env.DB.prepare('SELECT key,value FROM site_content_en').all()]);return respond({content:Object.fromEntries((ru.results||[]).map(r=>[r.key,r.value])),content_en:Object.fromEntries((en.results||[]).map(r=>[r.key,r.value]))})}
@@ -103,13 +105,13 @@ async function api(request,env,url){const path=url.pathname;
  }
  if(path==='/api/admin/events'){
   if(request.method==='GET')return respond({events:await eventList(env.DB,true)});
-  if(request.method==='POST'){const b=validateEvent(await payload(request)),id=crypto.randomUUID();const en=await translateEvent(env,b);await env.DB.prepare('INSERT INTO events(id,title,description,title_en,description_en,starts_at,venue,image_url,image_crop,published) VALUES(?,?,?,?,?,?,?,?,?,?)').bind(id,b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.image_crop,b.published).run();return respond({ok:true,id,translation_pending:en.translation_pending},201)}
+  if(request.method==='POST'){const b=validateEvent(await payload(request));if(!b)return error('invalid_event');const id=crypto.randomUUID();const en=await translateEvent(env,b);await env.DB.prepare('INSERT INTO events(id,title,description,title_en,description_en,starts_at,venue,image_url,image_crop,published) VALUES(?,?,?,?,?,?,?,?,?,?)').bind(id,b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.image_crop,b.published).run();return respond({ok:true,id,translation_pending:en.translation_pending},201)}
  }
  if(path.startsWith('/api/admin/events/')){
   const id=path.slice('/api/admin/events/'.length);
   if(!/^[0-9a-f-]{36}$/.test(id))return error('invalid_id');
   if(request.method==='DELETE'){await env.DB.prepare('DELETE FROM events WHERE id=?').bind(id).run();return respond({ok:true})}
-  if(request.method==='PUT'){const b=validateEvent(await payload(request));const en=await translateEvent(env,b);const r=await env.DB.prepare('UPDATE events SET title=?,description=?,title_en=?,description_en=?,starts_at=?,venue=?,image_url=?,image_crop=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.image_crop,b.published,id).run();return respond({ok:true,changed:r.meta?.changes||0,translation_pending:en.translation_pending})}
+  if(request.method==='PUT'){const b=validateEvent(await payload(request));if(!b)return error('invalid_event');const en=await translateEvent(env,b);const r=await env.DB.prepare('UPDATE events SET title=?,description=?,title_en=?,description_en=?,starts_at=?,venue=?,image_url=?,image_crop=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').bind(b.title,b.description,en.title_en,en.description_en,b.starts_at,b.venue,b.image_url,b.image_crop,b.published,id).run();return respond({ok:true,changed:r.meta?.changes||0,translation_pending:en.translation_pending})}
  }
  if(path==='/api/admin/upload'&&request.method==='POST'){
   const type=request.headers.get('content-type')||'';if(!['image/jpeg','image/png','image/webp'].includes(type))return error('unsupported_image_type');

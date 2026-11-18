@@ -1,4 +1,3 @@
-import {minskNow} from '../public/core.js';
 import {normalizeBelarusPhone} from '../public/booking-phone.js';
 import {currentReservedUser,publicIdentity,reservedLogin,reservedLogout,reservedUsers,reservedUserUpdate} from './reserved-auth.js';
 
@@ -64,21 +63,22 @@ async function submit(req,env){
  if(!env.DB||!env.ADMIN_SIGNING_KEY)return fail('booking_unavailable',503);
  const length=Number(req.headers.get('content-length')||0);
  if(length>4096)return fail('invalid_payload',413);
- const body=await json(req);
+ let body;
+ try{body=await json(req)}catch{return fail('invalid_json')}
  // The honeypot traps basic bots without persisting their unsolicited data.
  if(body.website)return ok({ok:true,accepted:true},202);
  const data=validateReservation(body);
  if(!data)return fail('invalid_reservation',400);
  if(!await limitPublic(req,env))return fail('rate_limited',429);
- const duplicate=await env.DB.prepare(`SELECT id FROM reservations WHERE venue=? AND phone=? AND booking_date=?
- AND booking_time=? AND created_at>=datetime('now','-10 minutes') LIMIT 1`)
- .bind(data.venue,data.phone,data.date,data.time).first();
- if(duplicate)return ok({ok:true,accepted:true},202);
- await env.DB.prepare(`INSERT INTO reservations
+ const saved=await env.DB.prepare(`INSERT INTO reservations
  (id,venue,guest_name,phone,booking_date,booking_time,guests,comment,status,source,consent_at)
- VALUES(?,?,?,?,?,?,?,?,'new','website',CURRENT_TIMESTAMP)`)
- .bind(crypto.randomUUID(),data.venue,data.name,data.phone,data.date,data.time,data.guests,data.comment).run();
- return ok({ok:true,accepted:true},201);
+ SELECT ?,?,?,?,?,?,?,?,'new','website',CURRENT_TIMESTAMP
+ WHERE NOT EXISTS (
+  SELECT 1 FROM reservations WHERE venue=? AND phone=? AND booking_date=?
+  AND booking_time=? AND created_at>=datetime('now','-10 minutes')
+ )`).bind(crypto.randomUUID(),data.venue,data.name,data.phone,data.date,data.time,data.guests,data.comment,
+  data.venue,data.phone,data.date,data.time).run();
+ return ok({ok:true,accepted:true},saved.meta.changes===1?201:202);
 }
 async function list(req,env,url,actor){
  const venue=url.searchParams.get('venue')||'all',status=url.searchParams.get('status')||'all';
@@ -109,7 +109,8 @@ async function list(req,env,url,actor){
 async function changeStatus(req,env,id,actor){
  if(actor.role==='viewer')return fail('forbidden',403);
  if(!/^[0-9a-f-]{36}$/.test(id))return fail('invalid_id');
- const b=await json(req);
+ let b;
+ try{b=await json(req)}catch{return fail('invalid_json')}
  const status=cleanString(b.status,16);
  if(!STATUSES.has(status))return fail('invalid_status');
  const old=await env.DB.prepare('SELECT status,venue FROM reservations WHERE id=?').bind(id).first();
@@ -117,10 +118,12 @@ async function changeStatus(req,env,id,actor){
  // for confirmation, cancellation, or even existence probing.
  if(!old||(actor.role!=='owner'&&old.venue!==actor.venue))return fail('not_found',404);
  if(old.status!==status){
-  await env.DB.batch([
+  const [updated]=await env.DB.batch([
    env.DB.prepare('UPDATE reservations SET status=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND venue=? AND status=?').bind(status,id,old.venue,old.status),
-   env.DB.prepare('INSERT INTO reservation_audit(id,reservation_id,from_status,to_status,actor) VALUES(?,?,?,?,?)').bind(crypto.randomUUID(),id,old.status,status,actor.username)
+   // D1 executes both statements in one transaction. changes() refers to the UPDATE.
+   env.DB.prepare('INSERT INTO reservation_audit(id,reservation_id,from_status,to_status,actor) SELECT ?,?,?,?,? WHERE changes()=1').bind(crypto.randomUUID(),id,old.status,status,actor.username)
   ]);
+  if(updated.meta.changes!==1)return fail('status_changed',409);
  }
  return ok({ok:true,status});
 }

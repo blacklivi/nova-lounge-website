@@ -93,14 +93,13 @@ const bookingDB={
        assert.match(args[0],/^[A-Za-z0-9_-]{43}$/,'Rate-limit IP hash must use base64url');
        return {attempts:1};
       }
-      if(sql.startsWith('SELECT id FROM reservations'))return null;
       throw Error('Unexpected reservation read: '+sql);
      },
      async run(){
       assert.match(sql,/^INSERT INTO reservations/,'Booking must persist in D1');
       assert.equal(args[1],'zyb');
       bookingInserts++;
-      return {success:true};
+      return {success:true,meta:{changes:1}};
      }
     };
    }
