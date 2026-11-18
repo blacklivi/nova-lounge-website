@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
 import {test} from 'node:test';
 import {chromium, firefox, webkit, devices} from 'playwright';
 import {adminPassword, startLocalWorker} from './local-worker.mjs';
@@ -127,6 +128,16 @@ test('staff mobile details and CMS editor save through the real Worker', {timeou
  await editor.locator('#editor-field-hero_tagline').fill('Локальный тест NOVA');
  await editor.locator('#page-editor-language').selectOption('en');
  await editor.locator('#editor-field-hero_tagline').fill('Local NOVA test');
+ await editor.locator('#page-editor-language').selectOption('ru');
+ const photo = fileURLToPath(new URL('../public/media/clean-e333e88f87b3e9.jpg', import.meta.url));
+ await editor.locator('[data-editor-field="hero_image"] input[type="file"]').setInputFiles(photo);
+ const crop = editor.locator('.nova-crop-dialog[open]');
+ await crop.locator('.nova-crop-zoom').fill('130');
+ await crop.locator('.nova-crop-apply').click();
+ await editor.locator('#page-editor-status').filter({hasText: 'WebP готов'}).waitFor();
+ const beforePublish = await (await fetch(local.base + '/api/content')).json();
+ assert.notEqual(beforePublish.content.hero_tagline, 'Локальный тест NOVA');
+ assert.notEqual(beforePublish.content.hero_image_crop, '50,50,130');
  const [published] = await Promise.all([
   editor.waitForResponse(r => r.url().endsWith('/api/admin/content') && r.request().method() === 'PUT'),
   editor.locator('#page-editor-save').click()
@@ -135,6 +146,13 @@ test('staff mobile details and CMS editor save through the real Worker', {timeou
  const guest = await browser.newPage();
  await guest.goto(local.base + '/');
  await guest.locator('.hero-tagline').filter({hasText: 'Локальный тест NOVA'}).waitFor({state: 'attached'});
+ const image = guest.locator('.hero-photo img');
+ const imageURL = await image.getAttribute('src');
+ assert.match(new URL(imageURL, local.base).pathname, /^\/media\/upload-.*\.webp$/);
+ assert.equal((await guest.request.get(local.base + imageURL)).headers()['content-type'], 'image/webp');
+ assert.equal(await image.evaluate(el => el.style.getPropertyValue('--photo-zoom')), '1.30');
+ const cropRow = await local.db.prepare("SELECT value FROM site_content WHERE key='hero_image_crop'").first();
+ assert.equal(cropRow.value, '50,50,130');
  await guest.locator('[data-language="en"]:visible').click();
  await guest.locator('.hero-tagline').filter({hasText: 'Local NOVA test'}).waitFor({state: 'attached'});
 });
