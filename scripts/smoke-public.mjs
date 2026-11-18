@@ -1,16 +1,21 @@
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {EDITOR_BY_KEY} from '../public/editor-schema.js';
+import {localizedValue} from '../public/core.js';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {chromium, webkit, devices} from 'playwright';
 
 const base = 'https://nova-lounge-demo.blacklivi-olx.workers.dev';
 const report = [];
 const errors = [];
+let liveContent;
+let liveDefaults;
 const output = process.env.NOVA_TEST_ARTIFACTS || 'artifacts/public-smoke';
 const routes = [
  ['/', 200], ['/spaces/zybitskaya', 200], ['/spaces/pobediteley', 200], ['/spaces/vostok', 200],
  ['/events', 200], ['/events/hof', 200], ['/events/pobediteley', 200], ['/events/vostok', 200],
  ['/favicon.svg', 200], ['/app.js', 200], ['/site.css', 200], ['/api/content', 200],
- ['/api/events', 200], ['/robots.txt', 200], ['/sitemap.xml', 404], ['/reserved', 200], ['/admin', 200],
+ ['/content-defaults.json', 200], ['/api/events', 200], ['/robots.txt', 200], ['/sitemap.xml', 404], ['/reserved', 200], ['/admin', 200],
  ['/api/reserved/session', 401], ['/api/reserved/reservations', 401], ['/api/reserved/users', 401],
  ['/api/admin/session', 401], ['/api/admin/content', 401], ['/api/admin/events', 401],
  ['/nova-smoke-nonexistent', 404]
@@ -37,11 +42,13 @@ for (const [path, expected] of routes) {
   if (path === '/api/content') {
    const data = await response.json();
    assert.ok(data.content && data.content_en);
+   liveContent = data;
    const byLanguage = Object.fromEntries(['content', 'content_en'].map(key => [
     key, Object.fromEntries(Object.entries(data[key]).filter(([name]) => /^(menu|instagram|address|hours|phone)_(zyb|pob|east)$/.test(name)))
    ]));
    report.push({publicEditableFields: byLanguage});
   }
+  if (path === '/content-defaults.json') liveDefaults = await response.json();
   if (path === '/api/events') {
    const data = await response.json();
    assert.ok(Array.isArray(data.events));
@@ -51,6 +58,42 @@ for (const [path, expected] of routes) {
   errors.push(`${method} ${path}: ${error.message}`);
  }
 }
+
+if (liveContent && liveDefaults) {
+ const links = new Set();
+ for (const language of ['ru', 'en']) {
+  for (const venue of ['zyb', 'pob', 'east']) {
+   const fields = Object.fromEntries(['menu', 'instagram', 'map', 'address', 'phone', 'hours'].map(field => {
+    const key = field + '_' + venue;
+    return [field, localizedValue(key, language, liveDefaults, liveContent) || EDITOR_BY_KEY[key]?.[language] || ''];
+   }));
+   report.push({utc: new Date().toISOString(), language, venue, fields});
+   for (const key of ['menu', 'instagram', 'map']) {
+    if (fields[key].startsWith('https://')) links.add(fields[key]);
+   }
+  }
+ }
+ await Promise.all([...links].map(async url => {
+  try {
+   const res = await fetch(url, {redirect: 'follow', signal: AbortSignal.timeout(10000)});
+   report.push({utc: new Date().toISOString(), url, finalURL: res.url, status: res.status, external: true});
+   await res.body?.cancel();
+  } catch (error) {
+   report.push({utc: new Date().toISOString(), url, error: error.cause?.code || error.name, external: true});
+  }
+ }));
+}
+
+await Promise.all(['/app.js', '/reserved.js', '/booking-phone.js', '/site.css'].map(async path => {
+ try {
+  const res = await fetch(base + path, {redirect: 'manual', signal: AbortSignal.timeout(8000)});
+  assert.equal(res.status, 200);
+  const sha256 = createHash('sha256').update(Buffer.from(await res.arrayBuffer())).digest('hex');
+  report.push({utc: new Date().toISOString(), url: base + path, status: res.status, sha256});
+ } catch (error) {
+  errors.push(path + ': ' + error.message);
+ }
+}));
 
 if (report.some(row => row.url === base + '/' && row.status === 200)) {
  const profiles = [

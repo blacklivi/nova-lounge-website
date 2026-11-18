@@ -104,7 +104,7 @@ const media = key => localImage(value(key)) || localImage(defaults.content[key])
 const arrow = '<svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17m-7-7 7 7-7 7"/></svg>';
 const bookingLabel = () => E('global_booking_text');
 const image = (key,alt,priority=false,fallbackKey='') => `<img class="cms-photo" data-image="${key}" src="${esc(media(key)||(fallbackKey?media(fallbackKey):''))}?v=visual-2" alt="${text(alt)}" style="${cropCSS(editorValue(key+'_crop')||(fallbackKey?editorValue(fallbackKey+'_crop'):'')||DEFAULT_CROP)}" ${priority?'fetchpriority="high"':'loading="lazy"'} decoding="async" width="900" height="900">`;
-const languages = () => `<div class="language" role="group" aria-label="${t('Язык сайта','Site language')}">${['ru','en'].map(l=>`<button type="button" data-language="${l}" aria-pressed="${l===language}" aria-label="${l==='ru'?'Русский язык':'English language'}">${l.toUpperCase()}</button>`).join('')}</div>`;
+const languages = () => `<div class="language" role="group" aria-label="${t('Язык сайта','Site language')}">${['ru','en'].map(l=>`<button type="button" data-language="${l}" aria-pressed="${l===language}" aria-label="${l==='ru'?'RU — Русский язык':'EN — English language'}">${l.toUpperCase()}</button>`).join('')}</div>`;
 const nav = () => `<a href="${H('nav_spaces_url','/#venues')}" ${hrefFor('nav_spaces_url','/#venues')==='/#venues'?'data-home="venues"':''} data-editor-key="nav_spaces_url">${E('nav_spaces_text')}</a><a href="${H('nav_events_url','/events')}" ${isEvents?'aria-current="page"':''} data-editor-key="nav_events_url">${E('nav_events_text')}</a><a href="${H('nav_about_url','/#about')}" ${hrefFor('nav_about_url','/#about')==='/#about'?'data-home="about"':''} data-editor-key="nav_about_url">${E('nav_about_text')}</a><a href="${H('nav_contacts_url','#contacts')}" data-editor-key="nav_contacts_url">${E('nav_contacts_text')}</a>`;
 const hofSketchUnderline = '<svg class="hof-sketch-underline" viewBox="0 0 100 12" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="100" d="M3 6.4 C17 4.8 25 7.8 40 6.4 S76 7.2 97 5.5"/><path pathLength="100" d="M9 9 C29 7.4 43 9.7 63 8.1 S84 8 93 7.3"/></svg>';
 const novaHeaderMark="<svg class=\"brand-mark-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"99 49 287 290\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M 282.87 58.11 C 283.29 59.82 281.06 59.04 279.93 58.87 C 276.83 58.4 273.13 58.28 270 58.41 C 259.96 58.85 249.89 59.46 240 61.3 C 212.98 66.31 187.15 79.78 168.12 99.83 C 163.88 104.29 160.46 109.5 156.34 113.95 C 155.38 114.98 152.3 118.41 152.59 119.92 C 152.79 120.96 154.62 119.63 154.93 119.42 C 156.69 118.27 158.44 117.03 160.11 115.76 C 164.29 112.61 169.28 109.66 174 107.4 C 190.41 99.53 207.02 92.24 225.01 88.76 C 251.74 83.6 279.59 83.44 306 90.42 C 316.3 93.14 325.53 97.92 335.03 102.45 C 347.17 108.24 359.13 118.81 366.76 129.9 C 375.3 142.33 380.75 155.86 382.16 171 C 382.65 176.32 382.07 181.67 382.25 187 C 383.04 210.68 378.28 232.64 368.87 254.12 C 366.11 260.43 362.83 267.54 358.58 273 C 354.34 278.43 350.2 283.84 345.76 289.12 C 337.46 299 326.34 309.08 314.88 315.13 C 306.64 319.48 298.67 324.05 289.95 327.36 C 271.1 334.53 251.06 336.25 231 335.46 C 223.62 335.17 215.05 333.92 208 331.66 C 206.94 331.32 201.48 330.64 201.74 329.02 C 201.82 328.5 203.71 328.52 204 328.51 C 206 328.39 208 328.47 210 328.48 C 219.06 328.51 228.08 327.02 237 325.73 C 244.26 324.68 251.73 322.54 258.6 320.02 C 279.13 312.49 297.71 303.75 314.18 288.89 C 319.31 284.27 324.02 278.85 327.88 273.13 C 328.62 272.03 331.89 268.42 331.57 267.06 C 331.23 265.59 327.47 268.68 327 269.03 C 321.76 272.89 315.95 276.97 310.02 279.65 C 293.75 287.01 278.2 293.76 260.7 298.01 C 212.97 309.62 153.91 300.48 120.43 262.01 C 109.89 249.89 103.32 233.89 101.58 218 C 100.78 210.75 101.51 203.28 101.34 196 C 100.03 140.07 134.49 83.82 187.03 62.55 C 204.88 55.32 223.6 51.39 243 51.39 C 256.66 51.39 270.13 53.68 282.87 58.11 Z M 322.13 109.11 C 313.48 104.87 305.26 101.27 295.97 98.69 C 283.1 95.12 269.14 95.43 256 96.52 C 216.96 99.77 183.37 119.58 156.1 146.75 C 149.54 153.28 144.72 161.51 139.95 169.32 C 125.44 193.06 122.23 221.84 132.98 247.65 C 138.68 261.32 150.99 271.04 162.87 278.89 C 167.92 282.22 173.97 283.9 179.56 286 C 194.9 291.76 212.84 292.67 229 290.54 C 259.61 286.51 290.11 274.81 313.44 253.97 C 322.6 245.78 330.48 236.9 337.9 227.17 C 356.44 202.87 365.09 164.21 348.98 136.55 C 342.26 125.03 333.23 116.32 322.13 109.11 Z\" fill=\"currentColor\" fill-rule=\"evenodd\" transform=\"translate(0.5 0.5)\"/></svg>";
@@ -689,7 +689,9 @@ function bookingFormHTML(requestedVenue){
 }
 async function sendBooking(e){
  e.preventDefault();
- const form=e.currentTarget, fd=new FormData(form);
+ const form=e.currentTarget,button=form.querySelector('[type="submit"]');
+ if(button.disabled)return;
+ const fd=new FormData(form);
  const venue=String(fd.get('venue')||''),phone=normalizeBelarusPhone(fd.get('phone')||'');
  const output=form.querySelector('#booking-error');
  const showError=message=>{output.textContent=message};
@@ -701,18 +703,19 @@ async function sendBooking(e){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^([01]\d|2[0-3]):(00|15|30|45)$/.test(time)||date+'T'+time<=minskNow()){
   showError(t('Выберите дату и время в будущем по Минску.','Choose a future date and time in Minsk.'));return;
  }
- const button=form.querySelector('[type="submit"]');
  button.disabled=true;button.textContent=t('Отправляем…','Sending…');
  try{
   const response=await fetch('/api/reservations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
    venue,name:String(fd.get('name')||'').trim(),phone,date,time,guests:Number(fd.get('guests')),comment:String(fd.get('comment')||'').trim(),consent:true,website:fd.get('website')||''
-  }),credentials:'same-origin',cache:'no-store'});
-  const answer=await response.json();
-  if(!response.ok||!answer.ok)throw new Error(response.status===429?t('Слишком много запросов. Свяжитесь с заведением по телефону.','Too many requests. Please call the venue.'):response.status===400?t('Проверьте данные и выберите время не раньше чем через 5 минут.','Check the details and choose a time at least 5 minutes ahead.'):t('Не удалось отправить заявку. Попробуйте ещё раз или позвоните.','Could not send your request. Try again or call.'));
-  const body=document.getElementById('modal-body');
+  }),credentials:'same-origin',cache:'no-store'}).catch(()=>null);
+  if(!response){showError(t('Ошибка соединения. Попробуйте снова.','Network error. Please retry.'));return}
+  const answer=await response.json().catch(()=>null);
+  if(!response.ok||!answer?.ok){showError(response.status===429?t('Слишком много запросов. Свяжитесь с заведением по телефону.','Too many requests. Please call the venue.'):response.status===400?t('Проверьте данные и выберите время не раньше чем через 5 минут.','Check the details and choose a time at least 5 minutes ahead.'):t('Не удалось отправить заявку. Попробуйте ещё раз или позвоните.','Could not send your request. Try again or call.'));return}
+  if(!form.isConnected||!form.closest('dialog')?.open)return;
+  const body=form.closest('#modal-body');
   body.innerHTML=`<h2 id="modal-title" tabindex="-1">${t('Заявка получена','Request received')}</h2><p class="intro">${t('Заявка сохранена и передана администратору заведения. Бронь будет действовать после подтверждения.','Your request has been saved for the venue team. Your reservation is valid only once confirmed.')}</p><div class="booking-confirmation"><strong>${venueLabel(venue)}</strong><span>${text(date)} · ${text(time)} · ${text(String(fd.get('guests')))} ${t('гостей','guests')}</span></div><button type="button" class="button form-submit" data-close>${t('Закрыть','Close')}</button>`;
   body.querySelector('#modal-title')?.focus();
- }catch(error){showError(error.message||t('Ошибка соединения. Попробуйте снова.','Network error. Please retry.'));button.disabled=false;button.textContent=t('Отправить заявку','Send request')}
+ }finally{button.disabled=false;button.textContent=t('Отправить заявку','Send request')}
 }
 function openModal(kind,id=selected){
  if(drawerOpen)setDrawer(false);

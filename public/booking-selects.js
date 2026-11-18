@@ -5,15 +5,21 @@ export function enhanceBookingSelects(form, lang, {forceCustom=false}={}){
     const originalRequired=select.required;
     select.required=false;select.tabIndex=-1;select.classList.add('nova-native-hidden');
     const box=document.createElement('div');box.className='nova-select';
-    const trigger=document.createElement('button');trigger.type='button';trigger.className='nova-select-trigger';trigger.textContent=select.selectedOptions[0]?.textContent||'';
+    const trigger=document.createElement('button');trigger.type='button';trigger.className='nova-select-trigger';
     trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
-    trigger.setAttribute('aria-label',form.querySelector('label[for="'+select.id+'"]')?.textContent||'');
+    const label=form.querySelector('label[for="'+select.id+'"]')?.textContent;
+    const updateTrigger=()=>{
+      trigger.textContent=select.selectedOptions[0]?.textContent||'';
+      if(label)trigger.setAttribute('aria-label',label+': '+trigger.textContent);
+    };
+    updateTrigger();
+    select.addEventListener('change',updateTrigger);
     const list=document.createElement('div');list.className='nova-select-list';list.role='listbox';list.hidden=true;
     const items=[...select.options].map(option=>{
       const item=document.createElement('button');item.type='button';item.role='option';item.className='nova-select-option';item.textContent=option.textContent;
       item.setAttribute('aria-selected',String(select.value===option.value));
       item.addEventListener('click',()=>{
-        select.value=option.value;trigger.textContent=option.textContent;list.hidden=true;trigger.setAttribute('aria-expanded','false');
+        select.value=option.value;list.hidden=true;trigger.setAttribute('aria-expanded','false');
         items.forEach(el=>el.setAttribute('aria-selected',String(el===item)));
         select.dispatchEvent(new Event('change',{bubbles:true}));trigger.focus();
       });

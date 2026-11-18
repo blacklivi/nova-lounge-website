@@ -17,7 +17,7 @@ assert.match(app,/key!=='archive'\|\|list\.length/,'Empty venue archives must no
 assert.match(app,/function bookingFormHTML\(requestedVenue\)/,'Public form must exist');
 assert.match(app,/async function sendBooking\(e\)/,'Public form needs submit handler');
 assert.match(app,/fetch\('\/api\/reservations'/,'Submissions must go to the real reservation API');
-assert.match(app,/if\(!response\.ok\|\|!answer\.ok\)throw new Error/,'No false success when persistence fails');
+assert.match(app,/if\(!response\.ok\|\|!answer\?\.ok\)\{showError/,'No false success when persistence fails');
 assert.match(app,/data-close/,'Confirmation must be dismissible');
 assert.doesNotMatch(app,/Это только предварительный просмотр|Demo mode/,'No demo booking messages');
 
