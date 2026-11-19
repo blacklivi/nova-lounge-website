@@ -1,6 +1,7 @@
 import {escapeHTML as esc, typography, validPhone, minskNow, splitEvents, safeURL, localImage, localizedValue} from './core.js';
 import {enhanceBookingSelects} from './booking-selects.js';
 import {enhanceBookingDate} from './booking-date.js';
+import {availableBookingTimes,bookingWindow,enhanceBookingTiming,isValidBookingTime} from './booking-time.js';
 import {enhanceBelarusPhone,normalizeBelarusPhone} from './booking-phone.js';
 import {EDITOR_BY_KEY,ICON_CHOICES} from './editor-schema.js?v=cms-preview-dialogs-20261113';
 import {cropCSS,applyPhotoCrop,parseCrop,cropPattern,isPhotoKey,DEFAULT_CROP} from './photo-crop.js';
@@ -665,7 +666,7 @@ function contactPanel(id){
 }
 // Booking requests are stored in the NOVA D1 database before showing success.
 function bookingFormHTML(requestedVenue){
- const day=minskNow().slice(0,10),fixed=ids.includes(requestedVenue);
+ const now=Date.now(),window=bookingWindow(now),day=window.firstDate,fixed=ids.includes(requestedVenue);
  return `<h2 id="modal-title" data-editor-key="global_booking_text">${bookingLabel()}</h2>
  <p class="intro">${t('Оставьте заявку. Администратор свяжется с вами для подтверждения бронирования.','Send a request. The venue will contact you to confirm your reservation.')}</p>
  <form id="book-form">
@@ -673,8 +674,8 @@ function bookingFormHTML(requestedVenue){
    <div class="field full"><label for="venue">${t('Заведение','Venue')}</label>
     ${fixed?`<div class="venue-context">${venueLabel(requestedVenue)}</div><input type="hidden" id="venue" name="venue" value="${requestedVenue}">`:
     `<select id="venue" name="venue" required><option value="">${t('Выберите заведение','Choose a venue')}</option>${ids.map(id=>`<option value="${id}">${venueLabel(id)}</option>`).join('')}</select>`}</div>
-   <div class="field"><label for="date">${t('Дата','Date')}</label><input id="date" name="date" type="date" min="${day}" value="${day}" required></div>
-   <div class="field"><label for="time">${t('Время · Минск','Time · Minsk')}</label><select id="time" name="time" required>${Array.from({length:96},(_,i)=>{const hour=String(Math.floor(i/4)).padStart(2,'0'),mins=String(i%4*15).padStart(2,'0');const value=hour+':'+mins;return `<option value="${value}" ${value==='19:00'?'selected':''}>${value}</option>`}).join('')}</select></div>
+   <div class="field"><label for="date">${t('Дата','Date')}</label><input id="date" name="date" type="date" min="${day}" max="${window.lastDate}" value="${day}" required></div>
+   <div class="field"><label for="time">${t('Время · Минск','Time · Minsk')}</label><select id="time" name="time" required>${availableBookingTimes(day,now).map(value=>`<option value="${value}" ${value===window.firstTime?'selected':''}>${value}</option>`).join('')}</select></div>
    <div class="field"><label for="guests">${t('Количество гостей','Guests')}</label><select id="guests" name="guests">${Array.from({length:16},(_,i)=>`<option value="${i+1}" ${i===1?'selected':''}>${i+1}</option>`).join('')}</select></div>
    <div class="field"><label for="guest-name">${t('Ваше имя','Your name')}</label><input id="guest-name" name="name" autocomplete="name" maxlength="80" required></div>
    <div class="field full"><label for="phone">${t('Номер телефона','Phone number')}</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="numeric" maxlength="19" placeholder="+375 (29) 123-45-67" required></div>
@@ -691,6 +692,9 @@ async function sendBooking(e){
  e.preventDefault();
  const form=e.currentTarget,button=form.querySelector('[type="submit"]');
  if(button.disabled)return;
+ // Never silently submit a different slot if the guest left the dialog open past its validity.
+ const moved=form.refreshBookingTiming?.();
+ if(moved){form.querySelector('#booking-error').textContent=t('Ближайшее доступное время обновилось. Проверьте дату и время перед отправкой.','The next available time has changed. Check the date and time before sending.');return}
  const fd=new FormData(form);
  const venue=String(fd.get('venue')||''),phone=normalizeBelarusPhone(fd.get('phone')||'');
  const output=form.querySelector('#booking-error');
@@ -700,7 +704,7 @@ async function sendBooking(e){
  if(!phone){showError(t('Введите белорусский номер +375 с кодом 25, 29, 33 или 44.','Enter a Belarusian +375 number with code 25, 29, 33 or 44.'));form.elements.phone.focus();return}
  if(!form.elements.consent.checked){showError(t('Подтвердите согласие на обработку заявки.','Please consent to the use of your reservation details.'));return}
  const date=String(fd.get('date')||''),time=String(fd.get('time')||'');
- if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^([01]\d|2[0-3]):(00|15|30|45)$/.test(time)||date+'T'+time<=minskNow()){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!isValidBookingTime(date,time)){
   showError(t('Выберите дату и время в будущем по Минску.','Choose a future date and time in Minsk.'));return;
  }
  button.disabled=true;button.textContent=t('Отправляем…','Sending…');
@@ -739,6 +743,7 @@ function openModal(kind,id=selected){
   const form=body.querySelector('#book-form');
   enhanceBookingSelects(form,language,{forceCustom:id==='zyb'});
   enhanceBookingDate(form,language);
+  form.refreshBookingTiming=enhanceBookingTiming(form);
   enhanceBelarusPhone(form,language);
   form.addEventListener('submit',sendBooking);
  }else if(kind==='menu'){
