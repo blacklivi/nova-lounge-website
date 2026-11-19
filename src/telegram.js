@@ -1,7 +1,6 @@
 // Telegram venue notifications and secure venue-group pairing for NOVA.
 // Tokens, webhook verification token and pairing code are Cloudflare secrets.
 const LABELS={zyb:'Зыбицкая',pob:'Победителей',east:'Восток'};
-const VALID_STATUSES={new:'Новая',confirmed:'Подтверждена',cancelled:'Отменена',completed:'Завершена',no_show:'Не пришли'};
 const WEBHOOK_URL='https://nova-lounge-demo.blacklivi-olx.workers.dev/api/telegram/webhook';
 const textReply=(value,status=200)=>Response.json({ok:value},{status,headers:{'Cache-Control':'no-store'}});
 async function telegram(env,method,data){
@@ -16,17 +15,30 @@ async function telegram(env,method,data){
  if(!response.ok||!result?.ok)throw Error('telegram_api_error_'+method+'_'+(result?.error_code||response.status));
  return result.result;
 }
-function messageText(b){
- return 'NOVA | Бронирование\n'+
-  'Заведение: '+(LABELS[b.venue]||b.venue)+'\n'+
-  'Дата: '+b.booking_date+'\n'+
-  'Время: '+b.booking_time+' (Минск)\n'+
-  'Гостей: '+b.guests+'\n'+
-  'Имя: '+b.guest_name+'\n'+
-  'Телефон: '+b.phone+'\n'+
-  (b.comment?'Комментарий: '+b.comment+'\n':'')+
-  'Статус: '+(VALID_STATUSES[b.status]||b.status)+'\n'+
-  'Обработка: https://nova-lounge-demo.blacklivi-olx.workers.dev/reserved';
+// Compact, plain-text message matching the restaurant's booking notification style.
+// Plain text is intentional: guest input must never be interpreted as Telegram markup.
+export function messageText(b){
+ const number=Number.isSafeInteger(b.booking_number)&&b.booking_number>0?' №'+b.booking_number:'';
+ const heading={
+  new:'🟡 Новая бронь'+number,
+  confirmed:'🟢 Бронь'+number+' подтверждена',
+  cancelled:'🔴 Бронь'+number+' отменена',
+  completed:'✅ Бронь'+number+' завершена',
+  no_show:'⚪ Бронь'+number+': гости не пришли'
+ }[b.status]||'Бронь'+number;
+ const date=/^\d{4}-\d{2}-\d{2}$/.test(b.booking_date||'')?
+  b.booking_date.slice(8,10)+'.'+b.booking_date.slice(5,7)+'.'+b.booking_date.slice(0,4):b.booking_date;
+ const clean=value=>String(value??'').replace(/\s+/g,' ').trim();
+ const lines=[
+  heading,
+  '📅 '+date,
+  '⏰ '+b.booking_time,
+  '👥 '+b.guests,
+  '👤 '+clean(b.guest_name),
+  '📞 '+clean(b.phone)
+ ];
+ if(clean(b.comment))lines.push('💬 '+clean(b.comment));
+ return lines.join('\n');
 }
 function markup(b){
  return b.status==='new'?{inline_keyboard:[[
@@ -35,7 +47,7 @@ function markup(b){
  ]]}:undefined;
 }
 async function booking(env,id){
- return env.DB.prepare('SELECT id,venue,guest_name,phone,booking_date,booking_time,guests,comment,status,telegram_sent_at,telegram_chat_id,telegram_message_id,created_at FROM reservations WHERE id=?').bind(id).first();
+ return env.DB.prepare('SELECT id,venue,guest_name,phone,booking_date,booking_time,guests,comment,status,telegram_sent_at,telegram_chat_id,telegram_message_id,created_at,(SELECT number FROM reservation_numbers WHERE reservation_id=reservations.id) AS booking_number FROM reservations WHERE id=?').bind(id).first();
 }
 export async function sendReservation(env,id){
  if(!env.TELEGRAM_BOT_TOKEN||!env.DB)return false;

@@ -48,6 +48,8 @@ test('guest bookings persist for all venues and equivalent retries create one ro
  assert.deepEqual(responses.map(r => r.status).sort(), [201, 202, 202]);
  const saved = await rows();
  assert.equal(saved.length, 5);
+ const numberRows=(await local.db.prepare('SELECT number FROM reservation_numbers ORDER BY number').all()).results;
+ assert.deepEqual(numberRows.map(r=>r.number),[1,2,3,4,5], 'Every saved reservation must get a unique, increasing number');
  assert.ok(saved.every(r => r.booking_date === date && r.consent_at && r.status === 'new'));
  assert.deepEqual(saved.filter(r => r.booking_time === '19:15').map(r => [r.venue, r.phone, r.guests]), [
   ['east', '+375330000001', 2], ['east', '+375440000001', 3], ['pob', '+375290000001', 16], ['zyb', '+375250000001', 1]
