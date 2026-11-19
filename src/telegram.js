@@ -18,14 +18,13 @@ async function telegram(env,method,data){
 // Compact, plain-text message matching the restaurant's booking notification style.
 // Plain text is intentional: guest input must never be interpreted as Telegram markup.
 export function messageText(b){
- const number=Number.isSafeInteger(b.booking_number)&&b.booking_number>0?' №'+b.booking_number:'';
  const heading={
-  new:'🟡 Новая бронь'+number,
-  confirmed:'🟢 Бронь'+number+' подтверждена',
-  cancelled:'🔴 Бронь'+number+' отменена',
-  completed:'✅ Бронь'+number+' завершена',
-  no_show:'⚪ Бронь'+number+': гости не пришли'
- }[b.status]||'Бронь'+number;
+  new:'🟡 Новая бронь',
+  confirmed:'🟢 Бронь подтверждена',
+  cancelled:'🔴 Бронь отменена',
+  completed:'✅ Бронь завершена',
+  no_show:'⚪ Бронь: гости не пришли'
+ }[b.status]||'Бронь';
  const date=/^\d{4}-\d{2}-\d{2}$/.test(b.booking_date||'')?
   b.booking_date.slice(8,10)+'.'+b.booking_date.slice(5,7)+'.'+b.booking_date.slice(0,4):b.booking_date;
  const clean=value=>String(value??'').replace(/\s+/g,' ').trim();
@@ -47,7 +46,7 @@ function markup(b){
  ]]}:undefined;
 }
 async function booking(env,id){
- return env.DB.prepare('SELECT id,venue,guest_name,phone,booking_date,booking_time,guests,comment,status,telegram_sent_at,telegram_chat_id,telegram_message_id,created_at,(SELECT number FROM reservation_numbers WHERE reservation_id=reservations.id) AS booking_number FROM reservations WHERE id=?').bind(id).first();
+ return env.DB.prepare('SELECT id,venue,guest_name,phone,booking_date,booking_time,guests,comment,status,telegram_sent_at,telegram_chat_id,telegram_message_id,created_at FROM reservations WHERE id=?').bind(id).first();
 }
 export async function sendReservation(env,id){
  if(!env.TELEGRAM_BOT_TOKEN||!env.DB)return false;
