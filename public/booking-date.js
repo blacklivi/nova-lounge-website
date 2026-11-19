@@ -33,7 +33,11 @@ export function enhanceBookingDate(form,language){
     panel.append(grid);
   };
   updateTrigger();field.classList.add('nova-native-hidden');field.required=false;field.tabIndex=-1;
-  trigger.addEventListener('click',()=>{if(!panel.hidden){close();return}draw();panel.hidden=false;trigger.setAttribute('aria-expanded','true')});
+  trigger.addEventListener('click',()=>{if(!panel.hidden){close();return}
+    // A dialog can remain open over midnight: read the current date/minimum before rendering.
+    const current=field.value||field.min;
+    if(current){year=Number(current.slice(0,4));month=Number(current.slice(5,7))-1}
+    draw();panel.hidden=false;trigger.setAttribute('aria-expanded','true')});
   wrap.append(trigger,panel);field.insertAdjacentElement('afterend',wrap);
   wrap.addEventListener('keydown',e=>{if(e.key==='Escape'){close();trigger.focus()}});
   wrap.addEventListener('focusout',e=>{if(!wrap.contains(e.relatedTarget))close()});
