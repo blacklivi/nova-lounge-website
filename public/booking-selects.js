@@ -15,7 +15,10 @@ export function enhanceBookingSelects(form, lang, {forceCustom=false}={}){
     updateTrigger();
     select.addEventListener('change',updateTrigger);
     const list=document.createElement('div');list.className='nova-select-list';list.role='listbox';list.hidden=true;
-    const items=[...select.options].map(option=>{
+    let items=[];
+    const rebuildItems=()=>{
+     list.replaceChildren();
+     items=[...select.options].map(option=>{
       const item=document.createElement('button');item.type='button';item.role='option';item.className='nova-select-option';item.textContent=option.textContent;
       item.setAttribute('aria-selected',String(select.value===option.value));
       item.addEventListener('click',()=>{
@@ -24,12 +27,16 @@ export function enhanceBookingSelects(form, lang, {forceCustom=false}={}){
         select.dispatchEvent(new Event('change',{bubbles:true}));trigger.focus();
       });
       list.append(item);return item;
-    });
+     });
+    };
     const close=()=>{
       list.hidden=true;
       list.classList.remove('nova-select-above');
       trigger.setAttribute('aria-expanded','false');
     };
+    // Date changes rebuild the underlying time options. Refresh this custom list as well.
+    select.addEventListener('booking-options-changed',()=>{close();rebuildItems();updateTrigger()});
+    rebuildItems();
     const show=()=>{
       // This list stays in the dialog, rather than becoming the OS-native 96-row menu.
       list.hidden=false;
