@@ -53,19 +53,30 @@ test('public booking works at phone, tablet and desktop sizes', {timeout: 180000
    const form = page.locator('#book-form');
    await form.waitFor();
    assert.equal(await page.locator('html').getAttribute('lang'), lang);
-   assert.equal(await form.locator('#date').getAttribute('min'),
-    new Intl.DateTimeFormat('sv-SE', {timeZone: 'Europe/Minsk'}).format(new Date()));
+   // The selected day and time must be a future 15-minute slot in Minsk.
+   const firstSelected=await form.locator('#date').inputValue();
+   const minDate=await form.locator('#date').getAttribute('min');
+   assert.equal(firstSelected,minDate);
+   const initialTimes=await form.locator('#time option').allTextContents();
+   assert.ok(initialTimes.length>0&&initialTimes.length<=96);
+   assert.equal(await form.locator('#time').inputValue(),initialTimes[0]);
+   await form.locator('#date').evaluate(el=>{
+    el.value='2020-01-01';
+    el.dispatchEvent(new Event('change',{bubbles:true}));
+   });
+   assert.equal(await form.locator('#date').inputValue(),minDate,'Past dates must reset to the first valid date');
    if (path === '/') {
     await form.locator('#venue').selectOption(venue);
    } else {
     assert.equal(await form.locator('#venue').inputValue(), venue);
    }
-   assert.equal(await form.locator('#time option').count(), 96);
    const date = new Date(Date.now() + 86400000 * 3).toISOString().slice(0, 10);
    await form.locator('#date').fill(date);
+   assert.equal(await form.locator('#time option').count(),96,'Future dates must show all quarter-hour slots');
+   assert.equal(await form.locator('#time').inputValue(),'00:00','After changing the date, preselect its earliest available time');
    if (venue === 'zyb') {
     const time = form.locator('#time + .nova-select .nova-select-trigger');
-    assert.match(await time.getAttribute('aria-label'), /19:00$/);
+    assert.match(await time.getAttribute('aria-label'), /00:00$/);
     await time.click();
     await form.getByRole('listbox').getByRole('option', {name: '18:45', exact: true}).click();
     assert.match(await time.getAttribute('aria-label'), /18:45$/);
