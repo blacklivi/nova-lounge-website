@@ -1,4 +1,5 @@
 import {normalizeBelarusPhone} from '../public/booking-phone.js';
+import {sendReservation,updateTelegramReservation} from './telegram.js';
 import {currentReservedUser,publicIdentity,reservedLogin,reservedLogout,reservedUsers,reservedUserUpdate} from './reserved-auth.js';
 
 const NO_STORE={'Cache-Control':'no-store, max-age=0','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'};
@@ -58,7 +59,7 @@ async function limitPublic(req,env){
  RETURNING attempts`).bind(hash,now,cutoff,cutoff,now).first();
  return (row?.attempts||0)<=8;
 }
-async function submit(req,env){
+async function submit(req,env,ctx){
  if(!originOK(req))return fail('forbidden',403);
  if(!env.DB||!env.ADMIN_SIGNING_KEY)return fail('booking_unavailable',503);
  const length=Number(req.headers.get('content-length')||0);
@@ -70,14 +71,19 @@ async function submit(req,env){
  const data=validateReservation(body);
  if(!data)return fail('invalid_reservation',400);
  if(!await limitPublic(req,env))return fail('rate_limited',429);
+ const id=crypto.randomUUID();
  const saved=await env.DB.prepare(`INSERT INTO reservations
  (id,venue,guest_name,phone,booking_date,booking_time,guests,comment,status,source,consent_at)
  SELECT ?,?,?,?,?,?,?,?,'new','website',CURRENT_TIMESTAMP
  WHERE NOT EXISTS (
   SELECT 1 FROM reservations WHERE venue=? AND phone=? AND booking_date=?
   AND booking_time=? AND created_at>=datetime('now','-10 minutes')
- )`).bind(crypto.randomUUID(),data.venue,data.name,data.phone,data.date,data.time,data.guests,data.comment,
+ )`).bind(id,data.venue,data.name,data.phone,data.date,data.time,data.guests,data.comment,
   data.venue,data.phone,data.date,data.time).run();
+ if(saved.meta.changes===1&&env.TELEGRAM_BOT_TOKEN){
+  const task=sendReservation(env,id);
+  if(ctx?.waitUntil)ctx.waitUntil(task);else await task;
+ }
  return ok({ok:true,accepted:true},saved.meta.changes===1?201:202);
 }
 async function list(req,env,url,actor){
@@ -106,7 +112,7 @@ async function list(req,env,url,actor){
  .bind(...params,page*100).all();
  return ok({ok:true,reservations:rows.results||[],total:count?.total||0,page});
 }
-async function changeStatus(req,env,id,actor){
+async function changeStatus(req,env,id,actor,ctx){
  if(actor.role==='viewer')return fail('forbidden',403);
  if(!/^[0-9a-f-]{36}$/.test(id))return fail('invalid_id');
  let b;
@@ -124,12 +130,16 @@ async function changeStatus(req,env,id,actor){
    env.DB.prepare('INSERT INTO reservation_audit(id,reservation_id,from_status,to_status,actor) SELECT ?,?,?,?,? WHERE changes()=1').bind(crypto.randomUUID(),id,old.status,status,actor.username)
   ]);
   if(updated.meta.changes!==1)return fail('status_changed',409);
+  if(env.TELEGRAM_BOT_TOKEN){
+   const task=updateTelegramReservation(env,id);
+   if(ctx?.waitUntil)ctx.waitUntil(task);else await task;
+  }
  }
  return ok({ok:true,status});
 }
-export async function reservationsApi(req,env,url){
+export async function reservationsApi(req,env,url,ctx){
  const path=url.pathname;
- if(path==='/api/reservations')return req.method==='POST'?submit(req,env):fail('method_not_allowed',405);
+ if(path==='/api/reservations')return req.method==='POST'?submit(req,env,ctx):fail('method_not_allowed',405);
  if(path==='/api/reserved/login')return req.method==='POST'?reservedLogin(req,env):fail('method_not_allowed',405);
  if(!path.startsWith('/api/reserved/'))return fail('not_found',404);
  // Both the owner and every venue-scoped staff member have independently
@@ -152,7 +162,7 @@ export async function reservationsApi(req,env,url){
  if(path==='/api/reserved/reservations'&&req.method==='GET')return list(req,env,url,actor);
  if(path.startsWith('/api/reserved/reservations/')&&req.method==='PATCH'){
   if(!actionOK(req))return fail('forbidden',403);
-  return changeStatus(req,env,path.slice('/api/reserved/reservations/'.length),actor);
+  return changeStatus(req,env,path.slice('/api/reserved/reservations/'.length),actor,ctx);
  }
  return fail('not_found',404);
 }
