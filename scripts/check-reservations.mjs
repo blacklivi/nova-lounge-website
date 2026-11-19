@@ -31,7 +31,7 @@ assert.match(migration,/reservation_audit/,'Staff status changes need audit trai
 assert.match(staffMigration,/CREATE TABLE IF NOT EXISTS reservation_users/,'Staff credentials must be stored in D1');
 assert.match(staffMigration,/CREATE TABLE IF NOT EXISTS reservation_sessions/,'Sessions must be revocable');
 assert.match(staffMigration,/CREATE TABLE IF NOT EXISTS reservation_staff_audit/,'Changes to staff access must be auditable');
-assert.match(worker,/reservationsApi\(request,env,url\)/,'Worker must route reservation APIs');
+assert.match(worker,/reservationsApi\(request,env,url,ctx\)/,'Worker must route reservation APIs and carry the Worker context');
 assert.match(worker,/p==='\/reserved'/,'Worker must serve protected route');
 assert.match(worker,/X-Frame-Options/,'Private staff app must not be embedded');
 assert.match(auth,/env\.RESERVATIONS_PASSWORD\|\|env\.ADMIN_PASSWORD/,'Owner login uses only configured Worker secret');
