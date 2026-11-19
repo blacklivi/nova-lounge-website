@@ -80,11 +80,11 @@ async function submit(req,env,ctx){
   AND booking_time=? AND created_at>=datetime('now','-10 minutes')
  )`).bind(id,data.venue,data.name,data.phone,data.date,data.time,data.guests,data.comment,
   data.venue,data.phone,data.date,data.time).run();
- if(saved.meta.changes===1&&env.TELEGRAM_BOT_TOKEN){
+ if(saved.meta.changes>0&&env.TELEGRAM_BOT_TOKEN){
   const task=sendReservation(env,id);
   if(ctx?.waitUntil)ctx.waitUntil(task);else await task;
  }
- return ok({ok:true,accepted:true},saved.meta.changes===1?201:202);
+ return ok({ok:true,accepted:true},saved.meta.changes>0?201:202);
 }
 async function list(req,env,url,actor){
  const venue=url.searchParams.get('venue')||'all',status=url.searchParams.get('status')||'all';
