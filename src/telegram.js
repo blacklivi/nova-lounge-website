@@ -1,7 +1,6 @@
 // Telegram venue notifications and secure venue-group pairing for NOVA.
 // Tokens, webhook verification token and pairing code are Cloudflare secrets.
 const LABELS={zyb:'Зыбицкая',pob:'Победителей',east:'Восток'};
-const VALID_STATUSES={new:'Новая',confirmed:'Подтверждена',cancelled:'Отменена',completed:'Завершена',no_show:'Не пришли'};
 const WEBHOOK_URL='https://nova-lounge-demo.blacklivi-olx.workers.dev/api/telegram/webhook';
 const textReply=(value,status=200)=>Response.json({ok:value},{status,headers:{'Cache-Control':'no-store'}});
 async function telegram(env,method,data){
@@ -27,9 +26,9 @@ export function messageText(b){
   completed:'✅ Бронь'+number+' завершена',
   no_show:'⚪ Бронь'+number+': гости не пришли'
  }[b.status]||'Бронь'+number;
- const date=/^\\d{4}-\\d{2}-\\d{2}$/.test(b.booking_date||'')?
+ const date=/^\d{4}-\d{2}-\d{2}$/.test(b.booking_date||'')?
   b.booking_date.slice(8,10)+'.'+b.booking_date.slice(5,7)+'.'+b.booking_date.slice(0,4):b.booking_date;
- const clean=value=>String(value??'').replace(/\\s+/g,' ').trim();
+ const clean=value=>String(value??'').replace(/\s+/g,' ').trim();
  const lines=[
   heading,
   '📅 '+date,
