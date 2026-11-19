@@ -16,6 +16,8 @@ export function enhanceBookingSelects(form, lang, {forceCustom=false}={}){
     select.addEventListener('change',updateTrigger);
     const list=document.createElement('div');list.className='nova-select-list';list.role='listbox';list.hidden=true;
     let items=[];
+    // A date change may select a different time without rebuilding the list.
+    select.addEventListener('change',()=>items.forEach((item,i)=>item.setAttribute('aria-selected',String(select.selectedIndex===i))));
     const rebuildItems=()=>{
      list.replaceChildren();
      items=[...select.options].map(option=>{
