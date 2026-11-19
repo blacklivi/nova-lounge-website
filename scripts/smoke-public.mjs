@@ -117,9 +117,19 @@ if (report.some(row => row.url === base + '/' && row.status === 200)) {
     }
    });
    await page.goto(base + path, {waitUntil: 'domcontentloaded', timeout: 12000});
+   const language = label === 'iphone-390' || label === 'android' ? 'en' : 'ru';
+   await page.getByRole('button', {name: /^RU .*Русский язык$/}).waitFor();
+   await page.getByRole('button', {name: /^EN .*English language$/}).waitFor();
+   if (language === 'en') await page.getByRole('button', {name: /^EN .*English language$/}).click();
    await page.locator('button[data-modal="booking"]:visible').first().click();
    const form = page.locator('#book-form');
    assert.equal(await form.locator('#time option').count(), 96);
+   assert.equal(await page.locator('html').getAttribute('lang'), language);
+   const date = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+   await form.locator('#date').fill(date);
+   await form.locator('#guests').selectOption('4', {force: true});
+   assert.equal(await form.locator('#date').inputValue(), date);
+   assert.equal(await form.locator('#guests').inputValue(), '4');
    const phone = form.locator('#phone');
    await phone.pressSequentially('290000001');
    assert.equal(await phone.inputValue(), '+375 (29) 000-00-01');
@@ -130,7 +140,7 @@ if (report.some(row => row.url === base + '/' && row.status === 200)) {
      rootFits: document.documentElement.scrollWidth <= innerWidth + 1};
    });
    await page.screenshot({path: output + '/' + label + '.png'});
-   report.push({utc: new Date().toISOString(), url: base + path, label, ...stats, browserErrors});
+   report.push({utc: new Date().toISOString(), url: base + path, label, language, dateAndGuestControls: true, ...stats, browserErrors});
    assert.ok(stats.rootFits);
    assert.deepEqual(browserErrors, []);
   } catch (error) {
