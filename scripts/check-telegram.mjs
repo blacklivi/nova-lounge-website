@@ -15,7 +15,6 @@ assert.match(migration,/CREATE TABLE IF NOT EXISTS telegram_venue_chats/);
 assert.match(migration,/telegram_message_id/);
 assert.match(numberMigration,/AUTOINCREMENT/,'Booking numbers must never be reused');
 assert.match(numberMigration,/CREATE TRIGGER IF NOT EXISTS reservation_number_after_insert/,'New bookings must be numbered automatically');
-assert.match(readFileSync('src/telegram.js','utf8'),/AS booking_number FROM reservations WHERE id=\?/,'Booking number must be fetched from the persistent mapping');
 assert.match(config,/"\*\/5 \* \* \* \*"/);
 assert.doesNotMatch(worker,/8965559775|AAGN4/,'Telegram tokens must never be committed');
 assert.doesNotMatch(readFileSync('src/telegram.js','utf8'),/8965559775|AAGN4/,'Telegram tokens must never be committed');
@@ -40,12 +39,15 @@ globalThis.fetch=async (url,options)=>{
 };
 const sample={id,venue:'zyb',guest_name:'Оля',phone:'+375296390777',booking_date:'2026-11-21',booking_time:'18:00',guests:4,comment:'Без повода, не в центре зала',status:'new',booking_number:36,telegram_sent_at:null,telegram_chat_id:null,telegram_message_id:null};
 assert.equal(messageText(sample),[
- '🟡 Новая бронь №36','📅 21.11.2026','⏰ 18:00','👥 4','👤 Оля',
+ '🟡 Новая бронь','📅 21.11.2026','⏰ 18:00','👥 4','👤 Оля',
  '📞 +375296390777','💬 Без повода, не в центре зала'
 ].join('\n'),'The Telegram notification must match the screenshot');
 assert.equal(messageText({...sample,comment:'  '}),messageText(sample).replace('\n💬 Без повода, не в центре зала',''));
-assert.match(messageText({...sample,status:'cancelled'}),/^🔴 Бронь №36 отменена\n/);
-assert.match(messageText({...sample,booking_number:undefined}),/^🟡 Новая бронь\n/);
+assert.match(messageText({...sample,status:'cancelled'}),/^🔴 Бронь отменена\n/);
+for(const status of ['new','confirmed','cancelled','completed','no_show']){
+ assert.doesNotMatch(messageText({...sample,status}),/№\s*\d+/, 'The public booking sequence must stay hidden in '+status);
+}
+assert.match(messageText({...sample,status:'confirmed'}),/^🟢 Бронь подтверждена\n/);
 const updates=[];
 const env={
  TELEGRAM_BOT_TOKEN:'fake-token',TELEGRAM_WEBHOOK_SECRET:'secret',TELEGRAM_SETUP_CODE:'pair-key',
