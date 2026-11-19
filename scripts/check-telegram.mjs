@@ -75,7 +75,7 @@ try{
  sample.telegram_chat_id='-100123';sample.telegram_message_id=900;sample.status='confirmed';
  await updateTelegramReservation(env,id);
  assert.equal(calls.at(-1).method,'editMessageText');
- assert.match(calls.at(-1).body.text,/Подтверждена/);
+ assert.match(calls.at(-1).body.text,/подтверждена/);
  assert.equal(calls.at(-1).body.reply_markup,undefined);
 }finally{
  globalThis.fetch=originalFetch;
