@@ -1,5 +1,6 @@
 import {publicPage,seoRoute,isPublicPage} from './seo.js';
 import {reservationsApi} from './reservations.js';
+import {telegramWebhook,telegramScheduled} from './telegram.js';
 import {EDITOR_FIELDS,PHOTO_CROP_FIELDS,ICON_CHOICES} from '../public/editor-schema.js';
 import {cropPattern,DEFAULT_CROP} from '../public/photo-crop.js';
 // NOVA website — API for editorial content, events, media and protected admin.
@@ -125,7 +126,7 @@ async function api(request,env,url){const path=url.pathname;
  }
  return error('not_found',404)
 }
-export default {async fetch(request,env){const url=new URL(request.url),p=url.pathname;
+export default {async fetch(request,env,ctx){const url=new URL(request.url),p=url.pathname;
  try{
   // Generate crawlable landing pages and switch indexing on only for a future official domain.
   if(p==='/robots.txt'||p==='/sitemap.xml')return seoRoute(request);
@@ -147,7 +148,8 @@ export default {async fetch(request,env){const url=new URL(request.url),p=url.pa
   }
   if(p.startsWith('/api/')){
     if(!env.DB)return error('database_not_connected',503);
-    if(p==='/api/reservations'||p.startsWith('/api/reserved/'))return await reservationsApi(request,env,url);
+    if(p==='/api/telegram/webhook')return await telegramWebhook(request,env);
+    if(p==='/api/reservations'||p.startsWith('/api/reserved/'))return await reservationsApi(request,env,url,ctx);
     return await api(request,env,url);
   }
   if(p.startsWith('/media/upload-')&&MEDIA_RE.test(p)){
@@ -156,4 +158,6 @@ export default {async fetch(request,env){const url=new URL(request.url),p=url.pa
   }
   return env.ASSETS.fetch(request);
  }catch(e){console.error('NOVA request error',p,String(e));return error('request_failed',500)}
-}}
+},
+ async scheduled(controller,env,ctx){ctx.waitUntil(telegramScheduled(env))}
+};
