@@ -150,7 +150,7 @@ test('event editor grows text and fits phones and desktop without horizontal scr
   await page.setViewportSize({width,height:900});
   await description.fill('Короткое описание');
   const short=await description.evaluate(el=>el.getBoundingClientRect().height);
-  await description.fill(Array.from({length:14},(_,i)=>'Новая строка '+i+': музыка, праздничная атмосфера и гости HOF').join('\\n'));
+  await description.fill(Array.from({length:14},(_,i)=>'Новая строка '+i+': музыка, праздничная атмосфера и гости HOF').join('\n'));
   const tall=await description.evaluate(el=>el.getBoundingClientRect().height);
   assert.ok(tall>short+100,'Textarea must expand for long text at '+width+'px: '+short+' -> '+tall);
   const geometry=await page.evaluate(()=>{
