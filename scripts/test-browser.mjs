@@ -135,6 +135,41 @@ test('public booking works at phone, tablet and desktop sizes', {timeout: 180000
  }
 });
 
+test('event editor grows text and fits phones and desktop without horizontal scrolling', {timeout: 60000}, async t => {
+ const local=await startLocalWorker();
+ t.after(()=>local.worker.close());
+ const browser=await chromium.launch({executablePath:process.env.NOVA_CHROMIUM_PATH});
+ t.after(()=>browser.close());
+ const page=await browser.newPage({viewport:{width:390,height:844}});
+ await page.goto(local.base+'/admin');
+ await page.locator('#password').fill(adminPassword);
+ await page.locator('#login-form button[type="submit"]').click();
+ await page.locator('[data-tab="events"]').click();
+ const description=page.locator('#event-form textarea[name="description"]');
+ for(const width of [320,390,768,1440]){
+  await page.setViewportSize({width,height:900});
+  await description.fill('Короткое описание');
+  const short=await description.evaluate(el=>el.getBoundingClientRect().height);
+  await description.fill(Array.from({length:14},(_,i)=>'Новая строка '+i+': музыка, праздничная атмосфера и гости HOF').join('\\n'));
+  const tall=await description.evaluate(el=>el.getBoundingClientRect().height);
+  assert.ok(tall>short+100,'Textarea must expand for long text at '+width+'px: '+short+' -> '+tall);
+  const geometry=await page.evaluate(()=>{
+   const form=document.querySelector('#event-form').getBoundingClientRect();
+   const description=document.querySelector('#event-form textarea[name="description"]').getBoundingClientRect();
+   const upload=document.querySelector('#event-upload-dropzone').getBoundingClientRect();
+   return {viewport:innerWidth,bodyWidth:document.documentElement.scrollWidth,formLeft:form.left,formRight:form.right,
+    textRight:description.right,uploadRight:upload.right};
+  });
+  assert.ok(geometry.bodyWidth<=width+2,'Horizontal overflow at '+width+': '+JSON.stringify(geometry));
+  assert.ok(geometry.formLeft>=-1&&geometry.formRight<=width+1&&geometry.textRight<=width+1&&geometry.uploadRight<=width+1,
+   'Event editor must fit viewport at '+width+': '+JSON.stringify(geometry));
+ }
+ await page.locator('#event-reset').click();
+ assert.equal(await description.inputValue(),'');
+ assert.equal(await page.locator('#event-upload-dropzone').isVisible(),true);
+ assert.equal(await page.locator('#event-image-tools').isVisible(),false);
+});
+
 test('staff mobile details and CMS editor save through the real Worker', {timeout: 45000}, async t => {
  const local = await startLocalWorker();
  t.after(() => local.worker.close());
