@@ -71,4 +71,17 @@ assert.match(app,/if\(isEvents\)\{[\s\S]*?template\.innerHTML=eventsPage\(\)/,'V
 assert.match(app,/eventsFailed&&!eventsLoaded\?t\('Не удалось загрузить афишу/,'Load failures must not masquerade as an empty venue calendar');
 assert.match(backend,/const noStore=\{ 'Cache-Control':'no-store'/,'Public API response must not be cached');
 
+// Event admin must remain usable at phone, tablet and desktop widths.
+const adminCss=readFileSync('public/admin.css','utf8');
+assert.match(html,/class="event-description"/,'Event description must be an expanding multiline field');
+assert.match(admin,/elements\.description\.addEventListener\('input',resizeEventDescription\)/,'Description must resize on input');
+assert.match(admin,/if\(b\.dataset\.tab==='events'\)requestAnimationFrame\(resizeEventDescription\)/,'Description must resize after tab becomes visible');
+assert.match(html,/id="event-upload-dropzone"/,'Native file control must have a separate upload surface');
+assert.match(html,/id="event-image-tools"/,'Selected event poster must have its own preview and controls');
+assert.match(admin,/syncEventImageControls\(\)/,'Poster control state must follow uploaded images');
+assert.match(adminCss,/\.events-panel \.event-layout\{display:flex;flex-direction:column/,'Event form and list must stack instead of clipping in columns');
+assert.match(adminCss,/\.events-panel \.event-edit \.event-description\{[^}]*overflow-y:hidden/,'Description should grow without an internal scrollbar');
+assert.match(adminCss,/@media\(max-width:430px\)/,'Narrow phone layout must be supported');
+assert.match(adminCss,/\.event-image-tools\[hidden\]/,'Image controls must hide when no poster exists');
+
 console.log('Scoped HOF/NOVA events, CMS linkage, SEO, and shared data checks passed');
