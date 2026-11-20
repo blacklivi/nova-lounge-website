@@ -27,14 +27,17 @@ function renderEventList(){
  const scope=$('#events-venue-filter')?.value||'all';
  const items=currentEvents.filter(ev=>scope==='all'||ev.venue===scope);
  for(const ev of items){
-  const row=document.createElement('div');row.className='item';
-  const div=document.createElement('div');
-  const label=document.createElement('span');
+  const row=document.createElement('div');row.className='item event-item';
   const isPast=ev.starts_at<minskNow();
   const publication=ev.published?(isPast?'ОПУБЛИКОВАНО · АРХИВ':'ОПУБЛИКОВАНО · БЛИЖАЙШИЕ'):'ЧЕРНОВИК · НЕ ВИДНО НА САЙТЕ';
-  label.textContent=ev.starts_at.replace('T',' ')+' · '+(adminVenueNames[ev.venue]||ev.venue)+' · '+publication;
-  const title=document.createElement('strong');title.textContent=ev.title;
-  div.append(label,title);
+  const top=document.createElement('div');top.className='event-item-top';
+  const badges=document.createElement('div');badges.className='event-badges';
+  const visibility=document.createElement('span');
+  visibility.className='event-badge '+(ev.published?'event-badge--published':'event-badge--draft');
+  visibility.textContent=ev.published?'ОПУБЛИКОВАНО':'ЧЕРНОВИК';
+  const timing=document.createElement('span');timing.className='event-badge';
+  timing.textContent=isPast?'АРХИВ':ev.published?'БЛИЖАЙШИЕ':'НЕ ОПУБЛИКОВАНО';
+  badges.append(visibility,timing);
   const actions=document.createElement('div');actions.className='event-row-actions';
   if(ev.published){
    const preview=document.createElement('a');
@@ -42,9 +45,18 @@ function renderEventList(){
    preview.textContent='На сайте ↗';preview.target='_blank';preview.rel='noopener noreferrer';
    actions.append(preview);
   }
-  const button=document.createElement('button');button.type='button';button.textContent='Изменить';
+  top.append(badges,actions);
+  const title=document.createElement('strong');title.textContent=ev.title;
+  const meta=document.createElement('span');meta.className='event-item-meta';
+  const raw=String(ev.starts_at||'');
+  const parts=raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  const months=['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+  const formatted=parts?`${Number(parts[3])} ${months[Number(parts[2])-1]} ${parts[1]}, ${parts[4]}:${parts[5]}`:raw.replace('T',' ');
+  meta.textContent=formatted+' · '+(adminVenueNames[ev.venue]||ev.venue);
+  row.setAttribute('aria-label',publication+' · '+ev.title);
+  const button=document.createElement('button');button.type='button';button.className='event-item-edit';button.textContent='Изменить';
   button.addEventListener('click',()=>editEvent(ev.id));
-  actions.append(button);row.append(div,actions);box.append(row);
+  row.append(top,title,meta,button);box.append(row);
  }
  if(!items.length){
   const p=document.createElement('p');p.className='muted';
@@ -56,13 +68,25 @@ async function loadEvents(){
  const r=await request('/api/admin/events');currentEvents=r.events||[];
  renderEventList();
 }
+function resizeEventDescription(){
+ const field=$('#event-form')?.elements.description;
+ if(!field)return;
+ field.style.height='auto';
+ field.style.height=Math.max(112,field.scrollHeight)+'px';
+}
+function syncEventImageControls(){
+ const hasImage=!$('#event-image-preview').hidden;
+ $('#event-upload-dropzone').hidden=hasImage;
+ $('#event-image-tools').hidden=!hasImage;
+ $('#event-image-state').textContent=$('#event-image').files?.length?'Новое изображение готово':'Афиша загружена';
+}
 function editEvent(id){let e=currentEvents.find(x=>x.id===id);if(!e)return;const f=$('#event-form');for(const k of ['title','description','starts_at','venue','image_url'])f.elements[k].value=e[k]||'';f.elements.published.checked=!!e.published;f.elements.id.value=e.id;updateVenueEventPreview();$('#event-form-title').textContent='Редактировать событие';$('#event-delete').hidden=false;const img=$('#event-image-preview');img.src=e.image_url||'';img.hidden=!e.image_url;
  $('#event-image-frame').hidden=!e.image_url;$('#event-crop-open').disabled=!e.image_url;
  f.elements.image_crop.value=e.image_crop||DEFAULT_CROP;
  applyPhotoCrop(img,f.elements.image_crop.value);
- $('#event-image').value='';$('#event-status').textContent='';window.scrollTo({top:f.getBoundingClientRect().top+window.scrollY-35,behavior:'smooth'})}
+ $('#event-image').value='';syncEventImageControls();resizeEventDescription();$('#event-status').textContent='';window.scrollTo({top:f.getBoundingClientRect().top+window.scrollY-35,behavior:'smooth'})}
 function resetEvent(){const f=$('#event-form');f.reset();f.elements.id.value='';f.elements.image_url.value='';updateVenueEventPreview();$('#event-form-title').textContent='Новое событие';$('#event-delete').hidden=true;$('#event-image-preview').hidden=true;$('#event-image-frame').hidden=true;$('#event-crop-open').disabled=true;
- f.elements.image_crop.value=DEFAULT_CROP;$('#event-status').textContent=''}
+ f.elements.image_crop.value=DEFAULT_CROP;syncEventImageControls();resizeEventDescription();$('#event-status').textContent=''}
 async function authorized(){try{await request('/api/admin/session');return true}catch(e){return false}}
 async function showWorkspace(){
  $('#login').hidden=true;$('#workspace').hidden=false;$('#logout').hidden=false;
@@ -78,6 +102,7 @@ $$('[data-tab]').forEach(b=>b.addEventListener('click',()=>{
  $$('[data-tab]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-selected',String(x===b))});
  $('#pages-section').hidden=b.dataset.tab!=='pages';
  $('#events-section').hidden=b.dataset.tab!=='events';
+  if(b.dataset.tab==='events')requestAnimationFrame(resizeEventDescription);
 }));
 $('#event-image').addEventListener('change',async e=>{
  const file=e.target.files[0];if(!file)return;
@@ -89,7 +114,7 @@ $('#event-image').addEventListener('change',async e=>{
   if(im.dataset.objectUrl)URL.revokeObjectURL(im.dataset.objectUrl);
   im.dataset.objectUrl=URL.createObjectURL(result.file);
   im.src=im.dataset.objectUrl;im.hidden=false;
-  $('#event-image-frame').hidden=false;$('#event-crop-open').disabled=false;
+  $('#event-image-frame').hidden=false;$('#event-crop-open').disabled=false;syncEventImageControls();
   $('#event-form').elements.image_crop.value=DEFAULT_CROP;
   applyPhotoCrop(im,DEFAULT_CROP);
   const crop=await openPhotoCropEditor({src:im.dataset.objectUrl,key:'event',initial:DEFAULT_CROP,title:'Кадрирование афиши'});
@@ -159,6 +184,9 @@ $('#event-form').addEventListener('submit',async e=>{
 });
 $('#event-form').elements.venue.addEventListener('change',updateVenueEventPreview);
 $('#events-venue-filter').addEventListener('change',renderEventList);
+$('#event-form').elements.description.addEventListener('input',resizeEventDescription);
+window.addEventListener('resize',resizeEventDescription);
+resizeEventDescription();syncEventImageControls();
 updateVenueEventPreview();
 $('#event-reset').addEventListener('click',resetEvent);$('#reload-events').addEventListener('click',loadEvents);
 $('#event-delete').addEventListener('click',async()=>{const id=$('#event-id').value;if(!id||!confirm('Удалить событие без возможности восстановления?'))return;try{await request('/api/admin/events/'+id,'DELETE');notifyEventChanged();resetEvent();await loadEvents();status($('#event-status'),'Событие удалено.')}catch(e){status($('#event-status'),e.message,true)}});
